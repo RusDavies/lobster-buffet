@@ -176,6 +176,8 @@ Draft package manifest fields:
 }
 ```
 
+The current machine-readable manifest lives at `manifests/provider-operations.v0.1.0.json`.
+
 ## `command.describe(name)`
 
 ### Purpose

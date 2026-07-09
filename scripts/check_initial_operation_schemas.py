@@ -16,6 +16,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 CHECKS = [
     (
+        ROOT / "schemas/provider-operation-manifest.v0.1.0.json",
+        ROOT / "manifests/provider-operations.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/operations/command.describe.input.v0.1.0.json",
         ROOT / "fixtures/operations/command.describe.input.valid.json",
     ),
@@ -32,6 +36,8 @@ CHECKS = [
         ROOT / "fixtures/operations/project.inspect.output.valid.json",
     ),
 ]
+
+MANIFEST = ROOT / "manifests/provider-operations.v0.1.0.json"
 
 
 class ValidationError(Exception):
@@ -109,11 +115,25 @@ def main() -> int:
             all_errors.append(f"{fixture_path.relative_to(ROOT)} failed {schema_path.relative_to(ROOT)}")
             all_errors.extend(f"  {error}" for error in errors)
 
+    manifest = load_json(MANIFEST)
+    for operation in manifest["operations"]:
+        for key in ("input_schema_ref", "output_schema_ref"):
+            ref = ROOT / operation[key]
+            if not ref.exists():
+                all_errors.append(f"{operation['name']}: missing {key} {operation[key]}")
+
+        definition_path = operation["definition_ref"].split("#", 1)[0]
+        if not (ROOT / definition_path).exists():
+            all_errors.append(f"{operation['name']}: missing definition {operation['definition_ref']}")
+
+        if not operation["read_only"]:
+            all_errors.append(f"{operation['name']}: initial operations must be read-only")
+
     if all_errors:
         print("\n".join(all_errors))
         return 1
 
-    print(f"Validated {len(CHECKS)} initial operation fixture(s).")
+    print(f"Validated {len(CHECKS)} schema fixture(s) and {len(manifest['operations'])} manifest operation(s).")
     return 0
 
 

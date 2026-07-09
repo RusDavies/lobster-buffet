@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/provider-operation-manifest.v0.1.0.json",
+  "title": "Lobster Buffet provider operation manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "package", "portage", "operations"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["lobster-buffet.provider-operation-manifest.v0.1.0"]
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "provider_api", "version", "stability", "public_release_ready"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider_api": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stability": {
+          "type": "string",
+          "enum": ["draft", "experimental", "stable", "deprecated"]
+        },
+        "public_release_ready": {
+          "type": "boolean"
+        }
+      }
+    },
+    "portage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["managed_paths", "local_only_paths", "doctor_checks"],
+      "properties": {
+        "managed_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "local_only_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "doctor_checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "version",
+          "stability",
+          "definition_ref",
+          "read_only",
+          "input_schema_ref",
+          "output_schema_ref",
+          "side_effects",
+          "approval",
+          "adapter_capabilities",
+          "errors",
+          "portage",
+          "redshield"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "stability": {
+            "type": "string",
+            "enum": ["draft", "experimental", "stable", "deprecated"]
+          },
+          "definition_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "read_only": {
+            "type": "boolean"
+          },
+          "input_schema_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "output_schema_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "side_effects": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "none",
+                "filesystem.read",
+                "filesystem.write",
+                "git.read",
+                "git.write",
+                "network.read",
+                "network.write",
+                "message.visible_send",
+                "external.action",
+                "secret.read"
+              ]
+            }
+          },
+          "approval": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["required", "classes"],
+            "properties": {
+              "required": {
+                "type": "boolean"
+              },
+              "classes": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "external_action",
+                    "public_release",
+                    "destructive_change",
+                    "secret_access",
+                    "private_data_export",
+                    "repo_mutation",
+                    "visible_message_send"
+                  ]
+                }
+              }
+            }
+          },
+          "adapter_capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "portage": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["package_manifest_required", "doctor_checks"],
+            "properties": {
+              "package_manifest_required": {
+                "type": "boolean"
+              },
+              "doctor_checks": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "redshield": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["operation_plan_required", "audit_event_required"],
+            "properties": {
+              "operation_plan_required": {
+                "type": "boolean"
+              },
+              "audit_event_required": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

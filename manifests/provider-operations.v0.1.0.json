@@ -1,0 +1,110 @@
+{
+  "schema": "lobster-buffet.provider-operation-manifest.v0.1.0",
+  "package": {
+    "name": "lobster-buffet",
+    "provider_api": "lobster-buffet.provider.v0",
+    "version": "0.1.0",
+    "stability": "draft",
+    "public_release_ready": false
+  },
+  "portage": {
+    "managed_paths": [
+      "docs/operations/INITIAL_SCHEMA_SLICE.md",
+      "schemas/operations/",
+      "schemas/provider-operation-manifest.v0.1.0.json",
+      "manifests/provider-operations.v0.1.0.json",
+      "fixtures/operations/",
+      "scripts/check_initial_operation_schemas.py"
+    ],
+    "local_only_paths": [],
+    "doctor_checks": [
+      "provider_manifest_schema_valid",
+      "operation_schema_files_exist",
+      "operation_fixture_validation_passes",
+      "operation_definition_refs_resolve",
+      "operation_side_effects_declared",
+      "adapter_capabilities_declared"
+    ]
+  },
+  "operations": [
+    {
+      "name": "command.describe",
+      "version": "0.1.0",
+      "stability": "draft",
+      "definition_ref": "docs/operations/INITIAL_SCHEMA_SLICE.md#commanddescribename",
+      "read_only": true,
+      "input_schema_ref": "schemas/operations/command.describe.input.v0.1.0.json",
+      "output_schema_ref": "schemas/operations/command.describe.output.v0.1.0.json",
+      "side_effects": [
+        "none"
+      ],
+      "approval": {
+        "required": false,
+        "classes": []
+      },
+      "adapter_capabilities": [],
+      "errors": [
+        "input.invalid",
+        "catalog.command_not_found",
+        "operation.version_unsupported"
+      ],
+      "portage": {
+        "package_manifest_required": true,
+        "doctor_checks": [
+          "input_schema_exists",
+          "output_schema_exists",
+          "fixture_validates",
+          "operation_is_read_only"
+        ]
+      },
+      "redshield": {
+        "operation_plan_required": true,
+        "audit_event_required": false
+      }
+    },
+    {
+      "name": "project.inspect",
+      "version": "0.1.0",
+      "stability": "draft",
+      "definition_ref": "docs/operations/INITIAL_SCHEMA_SLICE.md#projectinspectcontext",
+      "read_only": true,
+      "input_schema_ref": "schemas/operations/project.inspect.input.v0.1.0.json",
+      "output_schema_ref": "schemas/operations/project.inspect.output.v0.1.0.json",
+      "side_effects": [
+        "filesystem.read",
+        "git.read"
+      ],
+      "approval": {
+        "required": false,
+        "classes": []
+      },
+      "adapter_capabilities": [
+        "project.resolve",
+        "filesystem.read_project_metadata",
+        "git.inspect_status"
+      ],
+      "errors": [
+        "input.invalid",
+        "adapter.capability_missing",
+        "adapter.ambiguous_context",
+        "adapter.private_data_blocked",
+        "project.not_found",
+        "project.not_git_repo"
+      ],
+      "portage": {
+        "package_manifest_required": true,
+        "doctor_checks": [
+          "input_schema_exists",
+          "output_schema_exists",
+          "fixture_validates",
+          "operation_is_read_only",
+          "adapter_capabilities_declared"
+        ]
+      },
+      "redshield": {
+        "operation_plan_required": true,
+        "audit_event_required": false
+      }
+    }
+  ]
+}
