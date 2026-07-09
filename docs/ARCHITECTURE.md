@@ -20,12 +20,17 @@ Lobster Buffet is a shared provider for OpenClaw process operations. It should e
 6. LLM orchestration
    - Interpret user intent, choose operation, resolve ambiguity, and communicate results.
 
-## Candidate Transports
+## Provider Transport
 
-- OpenClaw dynamic tool provider.
-- MCP-style provider.
-- Local CLI invoked by OpenClaw agents.
-- Hybrid: CLI core with provider wrappers.
+Accepted v0.x shape: CLI core with provider wrappers.
+
+The CLI core is the canonical local execution layer for deterministic operation
+logic, schema validation, fixture tests, and local adapter loading. The first
+wrapper should expose selected operations as OpenClaw dynamic tools. MCP-style
+support can follow later as another wrapper once the operation and adapter
+contracts are stable.
+
+See `docs/operations/PROVIDER_TRANSPORT_DECISION.md`.
 
 ## Initial Operations
 
