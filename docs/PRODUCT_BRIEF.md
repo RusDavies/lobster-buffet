@@ -74,6 +74,8 @@ The intended split is:
 - Lobster Buffet should not depend on either project for its core portable provider behavior.
 - Redshield integrations should be optional, explicit, and driven by declared operation metadata rather than private workspace assumptions.
 
+The commercial open-core strategy for this split is described in `docs/COMMERCIAL_STRATEGY.md`.
+
 ## Success Criteria
 
 - A target OpenClaw instance can install or configure the provider without exposing private local data.
