@@ -50,6 +50,10 @@ The draft catalog is maintained in `docs/operations/OPERATION_CATALOG.md` and `m
 
 ## Local Adapter Boundary
 
+The local adapter contract is defined in
+`docs/operations/LOCAL_ADAPTER_CONTRACT.md`, with machine-readable capability
+metadata in `manifests/local-adapter-capabilities.v0.1.0.json`.
+
 Adapters own local/private facts:
 
 - Discord guild/channel ids.

@@ -1,0 +1,118 @@
+{
+  "schema": "lobster-buffet.local-adapter-capabilities.v0.1.0",
+  "adapter_api": "lobster-buffet.local-adapter.v0",
+  "capabilities": [
+    {
+      "name": "project.resolve",
+      "category": "project",
+      "side_effects": ["filesystem.read"],
+      "private_data_policy": "opaque_ref",
+      "summary": "Resolve caller context into a scoped project reference without exposing private channel maps or local paths by default."
+    },
+    {
+      "name": "filesystem.read_project_metadata",
+      "category": "filesystem",
+      "side_effects": ["filesystem.read"],
+      "private_data_policy": "redacted_summary",
+      "summary": "Read approved project metadata files and return structured summaries."
+    },
+    {
+      "name": "filesystem.write_project_files",
+      "category": "filesystem",
+      "side_effects": ["filesystem.write"],
+      "private_data_policy": "local_only",
+      "summary": "Write approved project files after preview, policy gates, and local repo checks."
+    },
+    {
+      "name": "git.inspect_status",
+      "category": "git",
+      "side_effects": ["git.read"],
+      "private_data_policy": "redacted_summary",
+      "summary": "Inspect repository boundary, branch, dirty state, and ahead/behind state."
+    },
+    {
+      "name": "git.write_branch",
+      "category": "git",
+      "side_effects": ["git.write"],
+      "private_data_policy": "local_only",
+      "summary": "Create branches, stage files, commit, or merge only after explicit operation gates."
+    },
+    {
+      "name": "incident.read_state",
+      "category": "incident",
+      "side_effects": ["filesystem.read"],
+      "private_data_policy": "redacted_summary",
+      "summary": "Read local incident state and return active/stale/closed summaries."
+    },
+    {
+      "name": "incident.write_state",
+      "category": "incident",
+      "side_effects": ["filesystem.write"],
+      "private_data_policy": "local_only",
+      "summary": "Append incident updates, closures, blockers, and follow-up state."
+    },
+    {
+      "name": "review.read_state",
+      "category": "review",
+      "side_effects": ["filesystem.read"],
+      "private_data_policy": "redacted_summary",
+      "summary": "Read local review-session state, comments, decisions, and apply gates."
+    },
+    {
+      "name": "review.write_state",
+      "category": "review",
+      "side_effects": ["filesystem.write"],
+      "private_data_policy": "local_only",
+      "summary": "Record review comments, decisions, approvals, or blockers."
+    },
+    {
+      "name": "heartbeat.read_state",
+      "category": "heartbeat",
+      "side_effects": ["filesystem.read"],
+      "private_data_policy": "redacted_summary",
+      "summary": "Read status and heartbeat state needed to decide whether visible progress is due."
+    },
+    {
+      "name": "channel.resolve",
+      "category": "channel",
+      "side_effects": ["none"],
+      "private_data_policy": "opaque_ref",
+      "summary": "Resolve a caller surface or channel label into a local opaque channel reference."
+    },
+    {
+      "name": "remote.resolve",
+      "category": "remote",
+      "side_effects": ["none"],
+      "private_data_policy": "opaque_ref",
+      "summary": "Resolve local repository remote metadata without exposing credentials or private account details."
+    },
+    {
+      "name": "visible_message.preview",
+      "category": "visible_message",
+      "side_effects": ["none"],
+      "private_data_policy": "redacted_summary",
+      "summary": "Prepare a visible-message summary without sending it."
+    },
+    {
+      "name": "visible_message.send",
+      "category": "visible_message",
+      "side_effects": ["message.visible_send"],
+      "private_data_policy": "explicit_disclosure_required",
+      "summary": "Send a visible message only when the operation and local policy allow it."
+    },
+    {
+      "name": "approval.request",
+      "category": "approval",
+      "side_effects": ["message.visible_send"],
+      "private_data_policy": "explicit_disclosure_required",
+      "summary": "Ask for local human approval when operation gates require it."
+    },
+    {
+      "name": "secret.read",
+      "category": "secret",
+      "side_effects": ["secret.read"],
+      "private_data_policy": "explicit_disclosure_required",
+      "summary": "Read a named local secret only for operations with explicit local authorization."
+    }
+  ]
+}

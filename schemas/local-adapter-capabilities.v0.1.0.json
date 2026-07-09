@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/local-adapter-capabilities.v0.1.0.json",
+  "title": "Lobster Buffet local adapter capabilities",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "adapter_api", "capabilities"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["lobster-buffet.local-adapter-capabilities.v0.1.0"]
+    },
+    "adapter_api": {
+      "type": "string",
+      "enum": ["lobster-buffet.local-adapter.v0"]
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "category", "side_effects", "private_data_policy", "summary"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "type": "string",
+            "enum": ["project", "filesystem", "git", "incident", "review", "heartbeat", "channel", "remote", "visible_message", "approval", "secret"]
+          },
+          "side_effects": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "none",
+                "filesystem.read",
+                "filesystem.write",
+                "git.read",
+                "git.write",
+                "network.read",
+                "network.write",
+                "message.visible_send",
+                "external.action",
+                "secret.read"
+              ]
+            }
+          },
+          "private_data_policy": {
+            "type": "string",
+            "enum": ["category_only", "opaque_ref", "redacted_summary", "local_only", "explicit_disclosure_required"]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

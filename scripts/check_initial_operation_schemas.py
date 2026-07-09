@@ -24,6 +24,10 @@ CHECKS = [
         ROOT / "manifests/operation-catalog.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/local-adapter-capabilities.v0.1.0.json",
+        ROOT / "manifests/local-adapter-capabilities.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/operations/command.describe.input.v0.1.0.json",
         ROOT / "fixtures/operations/command.describe.input.valid.json",
     ),
@@ -43,6 +47,7 @@ CHECKS = [
 
 MANIFEST = ROOT / "manifests/provider-operations.v0.1.0.json"
 CATALOG = ROOT / "manifests/operation-catalog.v0.1.0.json"
+ADAPTER_CAPABILITIES = ROOT / "manifests/local-adapter-capabilities.v0.1.0.json"
 
 
 class ValidationError(Exception):
@@ -122,6 +127,7 @@ def main() -> int:
 
     manifest = load_json(MANIFEST)
     catalog = load_json(CATALOG)
+    adapter_capabilities = load_json(ADAPTER_CAPABILITIES)
     for operation in manifest["operations"]:
         for key in ("input_schema_ref", "output_schema_ref"):
             ref = ROOT / operation[key]
@@ -148,6 +154,22 @@ def main() -> int:
         if operation["implementation_state"] == "schema_defined" and operation["name"] not in schema_defined:
             all_errors.append(f"{operation['name']}: marked schema_defined but missing from provider manifest")
 
+    capability_names = [capability["name"] for capability in adapter_capabilities["capabilities"]]
+    if len(capability_names) != len(set(capability_names)):
+        all_errors.append("adapter capability catalog contains duplicate capability names")
+
+    known_capabilities = set(capability_names)
+    for source, operations in (
+        ("provider manifest", manifest["operations"]),
+        ("operation catalog", catalog["operations"]),
+    ):
+        for operation in operations:
+            for capability in operation["adapter_capabilities"]:
+                if capability not in known_capabilities:
+                    all_errors.append(
+                        f"{operation['name']}: {source} references undefined adapter capability {capability!r}"
+                    )
+
     if all_errors:
         print("\n".join(all_errors))
         return 1
@@ -155,7 +177,8 @@ def main() -> int:
     print(
         f"Validated {len(CHECKS)} schema fixture(s), "
         f"{len(manifest['operations'])} manifest operation(s), "
-        f"and {len(catalog['operations'])} catalog operation(s)."
+        f"{len(catalog['operations'])} catalog operation(s), "
+        f"and {len(adapter_capabilities['capabilities'])} adapter capability(ies)."
     )
     return 0
 
