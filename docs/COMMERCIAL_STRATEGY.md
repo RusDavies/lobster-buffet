@@ -98,3 +98,6 @@ This direction implies Armor needs:
 ## Boundary
 
 Redshield products should be optional and adjacent. Lobster Buffet should expose the metadata and hooks they need, but the initial portable provider should not depend on paid products to function.
+
+The shared operation gate contract for those hooks lives in
+`docs/operations/REDSHIELD_OPERATION_GATE_CONTRACT.md`.

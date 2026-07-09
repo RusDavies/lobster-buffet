@@ -80,3 +80,7 @@ Lobster Buffet should make operation plans inspectable before execution. Plans s
 - expected verification steps
 
 The default execution path should remain local-first and self-contained. Redshield integrations should wrap or gate provider operations when available, not become mandatory dependencies for the initial portable provider.
+
+The stable operation-plan, Warden decision, Armor decision, and Buffet audit
+event contract is defined in
+`docs/operations/REDSHIELD_OPERATION_GATE_CONTRACT.md`.
