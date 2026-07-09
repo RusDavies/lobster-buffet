@@ -14,7 +14,10 @@ Lobster Buffet is a shared provider for OpenClaw process operations. It should e
    - Channel mapping, project roots, Git/GitHub conventions, visible-message surfaces, secrets, and local policy.
 4. Distribution
    - Lobster Portage or related package release path.
-5. LLM orchestration
+5. Optional policy and hardening gates
+   - Redshield Warden for policy, approval, and side-effect review.
+   - Redshield Armor for hardening, security validation, and release checks.
+6. LLM orchestration
    - Interpret user intent, choose operation, resolve ambiguity, and communicate results.
 
 ## Candidate Transports
@@ -61,3 +64,17 @@ Lobster Portage should remain the distribution and managed-file layer. Lobster B
 - manifest validation style.
 - conservative doctor/diff/apply behavior.
 - release and rollback discipline.
+
+## Redshield Touchpoint
+
+Lobster Buffet should make operation plans inspectable before execution. Plans should include enough metadata for adjacent Redshield tools to reason about policy and security without reading private workspace state directly:
+
+- operation name and schema version
+- normalized inputs after adapter resolution
+- side effects and mutation scope
+- approval requirements
+- local adapter capabilities used
+- files, remotes, channels, or external surfaces affected by category rather than by private identifier unless explicitly authorized
+- expected verification steps
+
+The default execution path should remain local-first and self-contained. Redshield integrations should wrap or gate provider operations when available, not become mandatory dependencies for the initial portable provider.

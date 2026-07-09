@@ -19,6 +19,7 @@ Today many of those processes live as Markdown instructions inside one instance.
 - Keep instance-specific data in local adapters and overlays.
 - Support public open-source release once privacy, safety, and compatibility gates are met.
 - Integrate cleanly with Lobster Portage as the package/distribution layer.
+- Leave a clear integration point for Redshield policy and hardening projects without making them part of the provider core.
 
 ## Non-Goals
 
@@ -62,6 +63,17 @@ Lobster Buffet should reuse those concepts. The likely split is:
 - Lobster Buffet defines and implements runtime-callable provider operations.
 - Each target OpenClaw instance supplies local adapters for channels, projects, remotes, secrets, and user-facing surfaces.
 
+## Relationship To Redshield
+
+Lobster Buffet should expose operation schemas, operation plans, side-effect metadata, approval requirements, and structured results in a way that future Redshield projects can consume.
+
+The intended split is:
+
+- Redshield Warden can act as an adjacent policy and approval gate for operations before they execute.
+- Redshield Armor can act as an adjacent hardening and security validation layer for provider code, schemas, adapters, and release artifacts.
+- Lobster Buffet should not depend on either project for its core portable provider behavior.
+- Redshield integrations should be optional, explicit, and driven by declared operation metadata rather than private workspace assumptions.
+
 ## Success Criteria
 
 - A target OpenClaw instance can install or configure the provider without exposing private local data.
@@ -70,6 +82,7 @@ Lobster Buffet should reuse those concepts. The likely split is:
 - Project lifecycle operations can inspect and repair existing state before changing it.
 - Incident operations resurface stale work instead of burying it.
 - Lobster Portage can distribute or reference the provider package cleanly.
+- Redshield policy and hardening layers can inspect Buffet operation plans without requiring private adapter data.
 
 ## Risks
 
