@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operation-catalog.v0.1.0.json",
+  "title": "Lobster Buffet operation catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "package", "operations"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["lobster-buffet.operation-catalog.v0.1.0"]
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "provider_api", "catalog_version", "stability"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider_api": {
+          "type": "string",
+          "minLength": 1
+        },
+        "catalog_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stability": {
+          "type": "string",
+          "enum": ["draft", "experimental", "stable", "deprecated"]
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "family",
+          "name",
+          "version",
+          "stability",
+          "implementation_state",
+          "read_only",
+          "side_effects",
+          "approval_classes",
+          "adapter_capabilities",
+          "errors",
+          "summary"
+        ],
+        "properties": {
+          "family": {
+            "type": "string",
+            "enum": [
+              "command",
+              "project_lifecycle",
+              "incident",
+              "alignment",
+              "review",
+              "heartbeat",
+              "git_workflow"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "stability": {
+            "type": "string",
+            "enum": ["draft", "experimental", "stable", "deprecated"]
+          },
+          "implementation_state": {
+            "type": "string",
+            "enum": ["planned", "schema_defined", "implemented", "deprecated"]
+          },
+          "read_only": {
+            "type": "boolean"
+          },
+          "side_effects": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "none",
+                "filesystem.read",
+                "filesystem.write",
+                "git.read",
+                "git.write",
+                "network.read",
+                "network.write",
+                "message.visible_send",
+                "external.action",
+                "secret.read"
+              ]
+            }
+          },
+          "approval_classes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "external_action",
+                "public_release",
+                "destructive_change",
+                "secret_access",
+                "private_data_export",
+                "repo_mutation",
+                "visible_message_send"
+              ]
+            }
+          },
+          "adapter_capabilities": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

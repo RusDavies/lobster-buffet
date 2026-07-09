@@ -29,6 +29,8 @@ Lobster Buffet is a shared provider for OpenClaw process operations. It should e
 
 ## Initial Operations
 
+The draft catalog is maintained in `docs/operations/OPERATION_CATALOG.md` and `manifests/operation-catalog.v0.1.0.json`.
+
 - `command.list`
 - `command.describe`
 - `project.inspect`

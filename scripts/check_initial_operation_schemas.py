@@ -20,6 +20,10 @@ CHECKS = [
         ROOT / "manifests/provider-operations.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/operation-catalog.v0.1.0.json",
+        ROOT / "manifests/operation-catalog.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/operations/command.describe.input.v0.1.0.json",
         ROOT / "fixtures/operations/command.describe.input.valid.json",
     ),
@@ -38,6 +42,7 @@ CHECKS = [
 ]
 
 MANIFEST = ROOT / "manifests/provider-operations.v0.1.0.json"
+CATALOG = ROOT / "manifests/operation-catalog.v0.1.0.json"
 
 
 class ValidationError(Exception):
@@ -116,6 +121,7 @@ def main() -> int:
             all_errors.extend(f"  {error}" for error in errors)
 
     manifest = load_json(MANIFEST)
+    catalog = load_json(CATALOG)
     for operation in manifest["operations"]:
         for key in ("input_schema_ref", "output_schema_ref"):
             ref = ROOT / operation[key]
@@ -129,11 +135,28 @@ def main() -> int:
         if not operation["read_only"]:
             all_errors.append(f"{operation['name']}: initial operations must be read-only")
 
+    operation_names = [operation["name"] for operation in catalog["operations"]]
+    if len(operation_names) != len(set(operation_names)):
+        all_errors.append("operation catalog contains duplicate operation names")
+
+    schema_defined = {operation["name"] for operation in manifest["operations"]}
+    for name in schema_defined:
+        if name not in operation_names:
+            all_errors.append(f"{name}: schema-backed operation missing from operation catalog")
+
+    for operation in catalog["operations"]:
+        if operation["implementation_state"] == "schema_defined" and operation["name"] not in schema_defined:
+            all_errors.append(f"{operation['name']}: marked schema_defined but missing from provider manifest")
+
     if all_errors:
         print("\n".join(all_errors))
         return 1
 
-    print(f"Validated {len(CHECKS)} schema fixture(s) and {len(manifest['operations'])} manifest operation(s).")
+    print(
+        f"Validated {len(CHECKS)} schema fixture(s), "
+        f"{len(manifest['operations'])} manifest operation(s), "
+        f"and {len(catalog['operations'])} catalog operation(s)."
+    )
     return 0
 
 
