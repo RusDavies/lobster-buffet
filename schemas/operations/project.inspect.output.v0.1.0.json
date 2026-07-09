@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/project.inspect.output.v0.1.0.json",
+  "title": "project.inspect output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["project", "repo", "backlog", "capabilities", "warnings"],
+  "properties": {
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "kind", "lifecycle_state", "privacy"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lifecycle_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "privacy": {
+          "type": "string",
+          "enum": ["public", "public-candidate", "private", "internal", "unknown"]
+        }
+      }
+    },
+    "repo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["is_git_repo", "branch", "dirty", "ahead", "behind"],
+      "properties": {
+        "is_git_repo": {
+          "type": "boolean"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "dirty": {
+          "type": "boolean"
+        },
+        "ahead": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "behind": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "backlog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["open_next", "open_later", "done"],
+      "properties": {
+        "open_next": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "open_later": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "done": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["can_read_files", "can_inspect_git", "can_mutate"],
+      "properties": {
+        "can_read_files": {
+          "type": "boolean"
+        },
+        "can_inspect_git": {
+          "type": "boolean"
+        },
+        "can_mutate": {
+          "type": "boolean"
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

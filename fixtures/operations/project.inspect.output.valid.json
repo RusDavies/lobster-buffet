@@ -1,0 +1,26 @@
+{
+  "project": {
+    "name": "lobster-buffet",
+    "kind": "software",
+    "lifecycle_state": "active",
+    "privacy": "public-candidate"
+  },
+  "repo": {
+    "is_git_repo": true,
+    "branch": "main",
+    "dirty": false,
+    "ahead": 0,
+    "behind": 0
+  },
+  "backlog": {
+    "open_next": 7,
+    "open_later": 8,
+    "done": 1
+  },
+  "capabilities": {
+    "can_read_files": true,
+    "can_inspect_git": true,
+    "can_mutate": false
+  },
+  "warnings": []
+}

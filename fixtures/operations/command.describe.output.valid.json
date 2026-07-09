@@ -1,0 +1,32 @@
+{
+  "operation": {
+    "name": "project.inspect",
+    "version": "0.1.0",
+    "stability": "draft"
+  },
+  "summary": "Inspect project context and return structured local state.",
+  "inputs": {
+    "schema_ref": "schemas/operations/project.inspect.input.v0.1.0.json"
+  },
+  "outputs": {
+    "schema_ref": "schemas/operations/project.inspect.output.v0.1.0.json"
+  },
+  "side_effects": [
+    "filesystem.read",
+    "git.read"
+  ],
+  "approval": {
+    "required": false,
+    "classes": []
+  },
+  "adapter_capabilities": [
+    "project.resolve",
+    "filesystem.read_project_metadata",
+    "git.inspect_status"
+  ],
+  "errors": [
+    "adapter.ambiguous_context",
+    "project.not_found",
+    "project.not_git_repo"
+  ]
+}

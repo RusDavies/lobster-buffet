@@ -386,7 +386,6 @@ The first implementation should prove:
 
 ## Deferred Work
 
-- Write machine-readable JSON Schema files for the input and output contracts.
 - Define a provider package manifest format with Lobster Portage.
 - Define the audit event schema for Warden and Armor evidence.
 - Decide the runtime transport after this schema slice has been reviewed.

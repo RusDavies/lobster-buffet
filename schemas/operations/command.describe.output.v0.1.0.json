@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/command.describe.output.v0.1.0.json",
+  "title": "command.describe output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "operation",
+    "summary",
+    "inputs",
+    "outputs",
+    "side_effects",
+    "approval",
+    "adapter_capabilities",
+    "errors"
+  ],
+  "properties": {
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "stability"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stability": {
+          "type": "string",
+          "enum": ["draft", "experimental", "stable", "deprecated"]
+        }
+      }
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_ref"],
+      "properties": {
+        "schema_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_ref"],
+      "properties": {
+        "schema_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "side_effects": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "none",
+          "filesystem.read",
+          "filesystem.write",
+          "git.read",
+          "git.write",
+          "network.read",
+          "network.write",
+          "message.visible_send",
+          "external.action",
+          "secret.read"
+        ]
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "classes"],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "classes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "external_action",
+              "public_release",
+              "destructive_change",
+              "secret_access",
+              "private_data_export",
+              "repo_mutation",
+              "visible_message_send"
+            ]
+          }
+        }
+      }
+    },
+    "adapter_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

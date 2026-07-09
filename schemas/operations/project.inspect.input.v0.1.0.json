@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/project.inspect.input.v0.1.0.json",
+  "title": "project.inspect input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["context"],
+  "properties": {
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["channel", "project", "path", "repo", "explicit"]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-facing context label. Local adapters resolve private identifiers."
+        },
+        "project": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "detail": {
+      "type": "string",
+      "enum": ["summary", "status", "full"],
+      "default": "summary"
+    }
+  }
+}

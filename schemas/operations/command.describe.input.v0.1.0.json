@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/command.describe.input.v0.1.0.json",
+  "title": "command.describe input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Operation or command name to describe."
+    },
+    "detail": {
+      "type": "string",
+      "enum": ["summary", "schema", "full"],
+      "default": "summary",
+      "description": "Requested description detail level."
+    }
+  }
+}
