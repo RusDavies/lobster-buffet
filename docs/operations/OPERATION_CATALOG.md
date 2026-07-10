@@ -1,6 +1,6 @@
 # Operation Catalog
 
-This catalog expands the initial schema slice into the planned Lobster Buffet operation families. It is intentionally draft-level: only `command.describe` and `project.inspect` currently have input/output schemas.
+This catalog expands the initial schema slice into the planned Lobster Buffet operation families. It is intentionally draft-level; read-only operations are being promoted to `schema_defined` before implementation.
 
 The machine-readable catalog lives at `manifests/operation-catalog.v0.1.0.json`.
 
@@ -62,11 +62,11 @@ The machine-readable catalog lives at `manifests/operation-catalog.v0.1.0.json`.
 
 ## Next Schema Candidates
 
-The next schema work should focus on high-leverage read-only operations:
+The next schema work should focus on the remaining high-leverage read-only operations:
 
-1. `command.list`
-2. `git.workflow.inspect`
-3. `alignment.scan`
-4. `incident.list`
+1. `review.list`
+2. `heartbeat.packet`
+3. `heartbeat.check`
+4. `git.workflow.guard`
 
 Mutating lifecycle operations should wait until the adapter contract and transport shape are clearer. A mutating provider without a firm gate model is just a footgun with a logo.

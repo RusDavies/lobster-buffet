@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/alignment.scan.output.v0.1.0.json",
+  "title": "alignment.scan output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "findings", "next_actions"],
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": ["aligned", "intentionally_evolving", "drifting", "blocked"]
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "severity", "summary"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["intent", "scope", "privacy", "backlog", "artifact", "unknown"]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["info", "warning", "blocker"]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

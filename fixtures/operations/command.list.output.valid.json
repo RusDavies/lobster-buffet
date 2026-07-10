@@ -1,0 +1,14 @@
+{
+  "operations": [
+    {
+      "name": "command.describe",
+      "version": "0.1.0",
+      "family": "command",
+      "stability": "draft",
+      "implementation_state": "schema_defined",
+      "read_only": true,
+      "side_effects": ["none"],
+      "summary": "Describe a known operation."
+    }
+  ]
+}

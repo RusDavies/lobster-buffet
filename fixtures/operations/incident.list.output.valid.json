@@ -1,0 +1,16 @@
+{
+  "counts": {
+    "active": 1,
+    "stale": 0,
+    "closed": 0
+  },
+  "incidents": [
+    {
+      "id": "incident-001",
+      "status": "active",
+      "severity": "medium",
+      "title": "Example incident",
+      "updated_at": "2026-07-09T00:00:00Z"
+    }
+  ]
+}

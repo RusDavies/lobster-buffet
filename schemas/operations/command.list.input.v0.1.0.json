@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/command.list.input.v0.1.0.json",
+  "title": "command.list input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "detail": {
+      "type": "string",
+      "enum": ["summary", "full"],
+      "default": "summary"
+    },
+    "include_deprecated": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

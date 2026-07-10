@@ -1,0 +1,8 @@
+{
+  "context": {
+    "source": "project",
+    "project": "lobster-buffet"
+  },
+  "current_plan_summary": "Add read-only operation schemas.",
+  "detail": "summary"
+}

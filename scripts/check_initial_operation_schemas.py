@@ -47,6 +47,38 @@ CHECKS = [
         ROOT / "schemas/operations/project.inspect.output.v0.1.0.json",
         ROOT / "fixtures/operations/project.inspect.output.valid.json",
     ),
+    (
+        ROOT / "schemas/operations/command.list.input.v0.1.0.json",
+        ROOT / "fixtures/operations/command.list.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/command.list.output.v0.1.0.json",
+        ROOT / "fixtures/operations/command.list.output.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/git.workflow.inspect.input.v0.1.0.json",
+        ROOT / "fixtures/operations/git.workflow.inspect.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/git.workflow.inspect.output.v0.1.0.json",
+        ROOT / "fixtures/operations/git.workflow.inspect.output.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/alignment.scan.input.v0.1.0.json",
+        ROOT / "fixtures/operations/alignment.scan.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/alignment.scan.output.v0.1.0.json",
+        ROOT / "fixtures/operations/alignment.scan.output.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/incident.list.input.v0.1.0.json",
+        ROOT / "fixtures/operations/incident.list.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/incident.list.output.v0.1.0.json",
+        ROOT / "fixtures/operations/incident.list.output.valid.json",
+    ),
 ]
 
 MANIFEST = ROOT / "manifests/provider-operations.v0.1.0.json"

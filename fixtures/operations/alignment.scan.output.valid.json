@@ -1,0 +1,13 @@
+{
+  "verdict": "aligned",
+  "findings": [
+    {
+      "kind": "scope",
+      "severity": "info",
+      "summary": "Work remains inside Lobster Buffet runtime/provider boundaries."
+    }
+  ],
+  "next_actions": [
+    "Proceed with the planned read-only schema slice."
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/command.list.output.v0.1.0.json",
+  "title": "command.list output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["operations"],
+  "properties": {
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "version", "family", "stability", "implementation_state", "read_only", "side_effects", "summary"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "family": {
+            "type": "string",
+            "minLength": 1
+          },
+          "stability": {
+            "type": "string",
+            "enum": ["draft", "experimental", "stable", "deprecated"]
+          },
+          "implementation_state": {
+            "type": "string",
+            "enum": ["planned", "schema_defined", "implemented", "deprecated"]
+          },
+          "read_only": {
+            "type": "boolean"
+          },
+          "side_effects": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "repo": {
+    "is_git_repo": true,
+    "branch": "main",
+    "dirty": false,
+    "ahead": 0,
+    "behind": 0
+  },
+  "worktree": {
+    "changed_count": 0,
+    "untracked_count": 0
+  },
+  "warnings": []
+}

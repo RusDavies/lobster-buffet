@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/alignment.scan.input.v0.1.0.json",
+  "title": "alignment.scan input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["context"],
+  "properties": {
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["project", "channel", "explicit"]
+        },
+        "project": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "current_plan_summary": {
+      "type": "string"
+    },
+    "detail": {
+      "type": "string",
+      "enum": ["summary", "full"],
+      "default": "summary"
+    }
+  }
+}

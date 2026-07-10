@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/incident.list.input.v0.1.0.json",
+  "title": "incident.list input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["active", "stale", "closed", "all"],
+      "default": "active"
+    },
+    "detail": {
+      "type": "string",
+      "enum": ["summary", "full"],
+      "default": "summary"
+    }
+  }
+}
