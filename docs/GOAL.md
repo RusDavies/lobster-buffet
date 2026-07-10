@@ -16,11 +16,14 @@ on long prompt procedures.
 - Identify how Lobster Portage should distribute or version the provider.
 - Preserve public open-source suitability from the start.
 
-## First Spike
+## First Implementation Slice
 
-Compare provider transport options using two candidate operations:
+Use the accepted CLI-core provider shape to prove two candidate operations:
 
 1. `command.describe(name)`
 2. `project.inspect(context)`
 
-The spike should produce a recommendation, implementation sketch, security/privacy boundary, and test plan.
+The implementation slice should produce executable CLI-core behavior, synthetic
+adapter fixtures, schema validation, operation plans, privacy-safe results, and
+a test path that wrapper transports can reuse without duplicating operation
+logic.
