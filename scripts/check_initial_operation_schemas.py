@@ -32,6 +32,10 @@ CHECKS = [
         ROOT / "manifests/distribution-handoff.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/local-adapter-fixture.v0.1.0.json",
+        ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/operations/command.describe.input.v0.1.0.json",
         ROOT / "fixtures/operations/command.describe.input.valid.json",
     ),
@@ -85,6 +89,7 @@ MANIFEST = ROOT / "manifests/provider-operations.v0.1.0.json"
 CATALOG = ROOT / "manifests/operation-catalog.v0.1.0.json"
 ADAPTER_CAPABILITIES = ROOT / "manifests/local-adapter-capabilities.v0.1.0.json"
 DISTRIBUTION_HANDOFF = ROOT / "manifests/distribution-handoff.v0.1.0.json"
+ADAPTER_FIXTURE = ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json"
 
 
 class ValidationError(Exception):
@@ -166,6 +171,7 @@ def main() -> int:
     catalog = load_json(CATALOG)
     adapter_capabilities = load_json(ADAPTER_CAPABILITIES)
     distribution_handoff = load_json(DISTRIBUTION_HANDOFF)
+    adapter_fixture = load_json(ADAPTER_FIXTURE)
     for operation in manifest["operations"]:
         for key in ("input_schema_ref", "output_schema_ref"):
             ref = ROOT / operation[key]
@@ -214,6 +220,33 @@ def main() -> int:
             if not path.exists():
                 all_errors.append(f"distribution handoff {section}: missing path {item['path']}")
 
+    required_fixture_capabilities = {
+        "project.resolve",
+        "filesystem.read_project_metadata",
+        "git.inspect_status",
+    }
+    fixture_capabilities = {item["name"]: item["envelope"] for item in adapter_fixture["capabilities"]}
+    for capability in sorted(required_fixture_capabilities):
+        envelope = fixture_capabilities.get(capability)
+        if envelope is None:
+            all_errors.append(f"adapter fixture missing capability {capability}")
+            continue
+        if envelope["capability"] != capability:
+            all_errors.append(f"adapter fixture {capability}: envelope capability mismatch")
+        if envelope["ok"] is not True:
+            all_errors.append(f"adapter fixture {capability}: expected ok=true")
+        private_data = envelope["private_data"]
+        if private_data["contains_private_values"]:
+            all_errors.append(f"adapter fixture {capability}: contains_private_values must be false")
+        if not private_data["private_refs_only"]:
+            all_errors.append(f"adapter fixture {capability}: private_refs_only must be true")
+
+    forbidden_fragments = ("channel:", "0000000000000000000", "/home/", "github.com/RusDavies")
+    fixture_text = ADAPTER_FIXTURE.read_text(encoding="utf-8")
+    for fragment in forbidden_fragments:
+        if fragment in fixture_text:
+            all_errors.append(f"adapter fixture contains forbidden private/local fragment {fragment!r}")
+
     if all_errors:
         print("\n".join(all_errors))
         return 1
@@ -223,7 +256,8 @@ def main() -> int:
         f"{len(manifest['operations'])} manifest operation(s), "
         f"{len(catalog['operations'])} catalog operation(s), "
         f"{len(adapter_capabilities['capabilities'])} adapter capability(ies), "
-        f"and {len(distribution_handoff['packageable_artifacts'])} handoff artifact(s)."
+        f"{len(distribution_handoff['packageable_artifacts'])} handoff artifact(s), "
+        f"and {len(adapter_fixture['capabilities'])} adapter fixture capability(ies)."
     )
     return 0
 

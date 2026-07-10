@@ -173,3 +173,8 @@ The first adapter fixture should support `project.inspect` with:
 
 It should prove that `project.inspect` can return useful state without exposing
 raw private channel IDs, local absolute paths, secrets, or unrelated memory.
+
+The current synthetic fixture is:
+
+- `fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json`
+- `schemas/local-adapter-fixture.v0.1.0.json`

@@ -1,0 +1,88 @@
+{
+  "schema": "lobster-buffet.local-adapter-fixture.v0.1.0",
+  "fixture_id": "synthetic-project-inspect-adapter",
+  "adapter_api": "lobster-buffet.local-adapter.v0",
+  "capabilities": [
+    {
+      "name": "project.resolve",
+      "envelope": {
+        "ok": true,
+        "capability": "project.resolve",
+        "result": {
+          "project_ref": "opaque-project-lobster-buffet",
+          "project_name": "lobster-buffet",
+          "kind": "software",
+          "lifecycle_state": "active",
+          "privacy": "public-candidate"
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "opaque_ref"
+        }
+      }
+    },
+    {
+      "name": "filesystem.read_project_metadata",
+      "envelope": {
+        "ok": true,
+        "capability": "filesystem.read_project_metadata",
+        "result": {
+          "project": {
+            "name": "lobster-buffet",
+            "kind": "software",
+            "lifecycle_state": "active",
+            "privacy": "public-candidate"
+          },
+          "backlog": {
+            "open_next": 1,
+            "open_later": 7,
+            "done": 12
+          },
+          "metadata_refs": [
+            "BACKLOG.md",
+            "docs/GOAL.md",
+            "docs/PRODUCT_BRIEF.md"
+          ]
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "redacted_summary"
+        }
+      }
+    },
+    {
+      "name": "git.inspect_status",
+      "envelope": {
+        "ok": true,
+        "capability": "git.inspect_status",
+        "result": {
+          "repo": {
+            "is_git_repo": true,
+            "branch": "main",
+            "dirty": false,
+            "ahead": 0,
+            "behind": 0
+          },
+          "worktree": {
+            "changed_count": 0,
+            "untracked_count": 0
+          },
+          "remote": {
+            "has_remote": true,
+            "remote_ref": "origin"
+          }
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "redacted_summary"
+        }
+      }
+    }
+  ]
+}
