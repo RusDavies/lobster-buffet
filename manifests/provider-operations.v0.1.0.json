@@ -255,6 +255,126 @@
         "operation_plan_required": true,
         "audit_event_required": false
       }
+    },
+    {
+      "name": "project.bootstrap",
+      "version": "0.1.0",
+      "stability": "draft",
+      "definition_ref": "docs/operations/OPERATION_CATALOG.md#project-lifecycle",
+      "read_only": false,
+      "input_schema_ref": "schemas/operations/project.lifecycle.input.v0.1.0.json",
+      "output_schema_ref": "schemas/operations/project.lifecycle.output.v0.1.0.json",
+      "side_effects": ["filesystem.write", "git.write"],
+      "approval": {
+        "required": true,
+        "classes": ["repo_mutation"]
+      },
+      "adapter_capabilities": ["project.resolve", "filesystem.write_project_files", "git.inspect_status", "git.write_branch"],
+      "errors": ["input.invalid", "project.already_exists", "adapter.capability_missing", "approval.required", "git.dirty_worktree"],
+      "portage": {
+        "package_manifest_required": true,
+        "doctor_checks": ["input_schema_exists", "output_schema_exists", "fixture_validates", "approval_required", "adapter_capabilities_declared"]
+      },
+      "redshield": {
+        "operation_plan_required": true,
+        "audit_event_required": true
+      }
+    },
+    {
+      "name": "project.adopt",
+      "version": "0.1.0",
+      "stability": "draft",
+      "definition_ref": "docs/operations/OPERATION_CATALOG.md#project-lifecycle",
+      "read_only": false,
+      "input_schema_ref": "schemas/operations/project.lifecycle.input.v0.1.0.json",
+      "output_schema_ref": "schemas/operations/project.lifecycle.output.v0.1.0.json",
+      "side_effects": ["filesystem.read", "filesystem.write", "git.read", "git.write"],
+      "approval": {
+        "required": true,
+        "classes": ["repo_mutation"]
+      },
+      "adapter_capabilities": ["project.resolve", "filesystem.read_project_metadata", "filesystem.write_project_files", "git.inspect_status", "git.write_branch"],
+      "errors": ["input.invalid", "project.not_found", "adapter.ambiguous_context", "approval.required", "git.dirty_worktree"],
+      "portage": {
+        "package_manifest_required": true,
+        "doctor_checks": ["input_schema_exists", "output_schema_exists", "fixture_validates", "approval_required", "adapter_capabilities_declared"]
+      },
+      "redshield": {
+        "operation_plan_required": true,
+        "audit_event_required": true
+      }
+    },
+    {
+      "name": "project.repair",
+      "version": "0.1.0",
+      "stability": "draft",
+      "definition_ref": "docs/operations/OPERATION_CATALOG.md#project-lifecycle",
+      "read_only": false,
+      "input_schema_ref": "schemas/operations/project.lifecycle.input.v0.1.0.json",
+      "output_schema_ref": "schemas/operations/project.lifecycle.output.v0.1.0.json",
+      "side_effects": ["filesystem.read", "filesystem.write", "git.read", "git.write"],
+      "approval": {
+        "required": true,
+        "classes": ["repo_mutation"]
+      },
+      "adapter_capabilities": ["project.resolve", "filesystem.read_project_metadata", "filesystem.write_project_files", "git.inspect_status", "git.write_branch"],
+      "errors": ["input.invalid", "project.not_found", "approval.required", "repair.conflict", "git.dirty_worktree"],
+      "portage": {
+        "package_manifest_required": true,
+        "doctor_checks": ["input_schema_exists", "output_schema_exists", "fixture_validates", "approval_required", "adapter_capabilities_declared"]
+      },
+      "redshield": {
+        "operation_plan_required": true,
+        "audit_event_required": true
+      }
+    },
+    {
+      "name": "project.migrate",
+      "version": "0.1.0",
+      "stability": "draft",
+      "definition_ref": "docs/operations/OPERATION_CATALOG.md#project-lifecycle",
+      "read_only": false,
+      "input_schema_ref": "schemas/operations/project.lifecycle.input.v0.1.0.json",
+      "output_schema_ref": "schemas/operations/project.lifecycle.output.v0.1.0.json",
+      "side_effects": ["filesystem.read", "filesystem.write", "git.read", "git.write"],
+      "approval": {
+        "required": true,
+        "classes": ["repo_mutation"]
+      },
+      "adapter_capabilities": ["project.resolve", "filesystem.read_project_metadata", "filesystem.write_project_files", "git.inspect_status", "git.write_branch"],
+      "errors": ["input.invalid", "project.not_found", "approval.required", "migration.conflict", "git.dirty_worktree"],
+      "portage": {
+        "package_manifest_required": true,
+        "doctor_checks": ["input_schema_exists", "output_schema_exists", "fixture_validates", "approval_required", "adapter_capabilities_declared"]
+      },
+      "redshield": {
+        "operation_plan_required": true,
+        "audit_event_required": true
+      }
+    },
+    {
+      "name": "project.archive",
+      "version": "0.1.0",
+      "stability": "draft",
+      "definition_ref": "docs/operations/OPERATION_CATALOG.md#project-lifecycle",
+      "read_only": false,
+      "input_schema_ref": "schemas/operations/project.lifecycle.input.v0.1.0.json",
+      "output_schema_ref": "schemas/operations/project.lifecycle.output.v0.1.0.json",
+      "side_effects": ["filesystem.write", "git.write"],
+      "approval": {
+        "required": true,
+        "classes": ["repo_mutation"]
+      },
+      "adapter_capabilities": ["project.resolve", "filesystem.write_project_files", "git.inspect_status", "git.write_branch"],
+      "errors": ["input.invalid", "project.not_found", "approval.required", "archive.conflict", "git.dirty_worktree"],
+      "portage": {
+        "package_manifest_required": true,
+        "doctor_checks": ["input_schema_exists", "output_schema_exists", "fixture_validates", "approval_required", "adapter_capabilities_declared"]
+      },
+      "redshield": {
+        "operation_plan_required": true,
+        "audit_event_required": true
+      }
     }
   ]
 }

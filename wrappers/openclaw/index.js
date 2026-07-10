@@ -3,6 +3,7 @@ const path = require("node:path");
 
 const DEFAULT_ADAPTER_FIXTURE = "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json";
 const DEFAULT_ADAPTER_CONFIG = "";
+const LIFECYCLE_ACTIONS = ["bootstrap", "adopt", "repair", "migrate", "archive"];
 
 function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -56,6 +57,14 @@ function requireParam(params, name) {
 function optionalSurface(value) {
   const surface = readString(value);
   return ["discord", "tui", "api", "cron", "unknown"].includes(surface) ? surface : "unknown";
+}
+
+function requireLifecycleAction(value) {
+  const action = readString(value);
+  if (!LIFECYCLE_ACTIONS.includes(action)) {
+    throw new Error(`Lifecycle action must be one of: ${LIFECYCLE_ACTIONS.join(", ")}`);
+  }
+  return action;
 }
 
 function createTool({ name, label, description, parameters, execute }) {
@@ -174,6 +183,39 @@ function tools(options) {
           args.push("--adapter-config", adapterConfig);
         } else {
           args.push("--adapter-fixture", options.defaultAdapterFixture);
+        }
+        return runCli(args, options);
+      },
+    }),
+    createTool({
+      name: "lobster_buffet_project_lifecycle",
+      label: "Lobster Buffet Project Lifecycle",
+      description: "Generate a lifecycle operation preview through the CLI core.",
+      parameters: {
+        type: "object",
+        additionalProperties: false,
+        required: ["action", "project_name"],
+        properties: {
+          action: {
+            type: "string",
+            description: "Lifecycle action.",
+            enum: LIFECYCLE_ACTIONS,
+          },
+          project_name: {
+            type: "string",
+            description: "Opaque or sanitized project name.",
+          },
+          reason: {
+            type: "string",
+            description: "Optional local reason for the lifecycle action.",
+          },
+        },
+      },
+      execute: (params) => {
+        const args = ["project", requireLifecycleAction(params.action), "--project-name", requireParam(params, "project_name")];
+        const reason = readString(params.reason);
+        if (reason) {
+          args.push("--reason", reason);
         }
         return runCli(args, options);
       },

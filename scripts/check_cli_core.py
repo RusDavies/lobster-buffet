@@ -35,6 +35,22 @@ COMMANDS = [
     ),
 ]
 
+for action in ("bootstrap", "adopt", "repair", "migrate", "archive"):
+    COMMANDS.append(
+        (
+            [
+                "python3",
+                "-m",
+                "lobster_buffet.cli",
+                "project",
+                action,
+                "--project-name",
+                "synthetic-project",
+            ],
+            ROOT / "schemas/operations/project.lifecycle.output.v0.1.0.json",
+        )
+    )
+
 
 def run_json(command: list[str]) -> Any:
     completed = subprocess.run(

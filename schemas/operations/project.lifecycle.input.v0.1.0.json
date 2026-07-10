@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/project.lifecycle.input.v0.1.0.json",
+  "title": "project lifecycle input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["operation", "mode", "project_name"],
+  "properties": {
+    "operation": {
+      "type": "string",
+      "enum": ["project.bootstrap", "project.adopt", "project.repair", "project.migrate", "project.archive"]
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["plan"]
+    },
+    "project_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

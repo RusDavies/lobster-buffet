@@ -27,6 +27,7 @@ The wrapper is intentionally thin:
 - `lobster_buffet_command_describe`
 - `lobster_buffet_operation_plan`
 - `lobster_buffet_project_inspect`
+- `lobster_buffet_project_lifecycle`
 
 These tools cover the current schema-backed executable CLI surface. The wrapper
 does not implement business logic directly; it shells out to:
@@ -59,3 +60,7 @@ local absolute paths, secrets, tokens, personal memory, or remote credentials.
 The wrapper may expose packageable metadata and synthetic fixture-backed
 results. Real local data must flow through local adapters once adapter loading
 exists.
+
+Lifecycle wrapper calls currently generate preview-only lifecycle plans. They
+return `status: requires_approval` and `mutates: false`; they do not execute
+filesystem or git writes.

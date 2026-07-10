@@ -52,6 +52,10 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
     )
+    for action in core.LIFECYCLE_ACTIONS:
+        lifecycle = project_subparsers.add_parser(action)
+        lifecycle.add_argument("--project-name", required=True)
+        lifecycle.add_argument("--reason", default=None)
 
     return parser
 
@@ -80,6 +84,10 @@ def run(argv: list[str] | None = None) -> int:
                     adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
                 )
             )
+            return 0
+
+        if args.group == "project" and args.action in core.LIFECYCLE_ACTIONS:
+            emit(core.project_lifecycle_preview(f"project.{args.action}", args.project_name, reason=args.reason))
             return 0
 
     except core.OperationError as error:

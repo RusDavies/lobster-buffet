@@ -9,6 +9,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ADAPTER_FIXTURE = "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json"
 ADAPTER_CONFIG_ENV = "LOBSTER_BUFFET_ADAPTER_CONFIG"
+LIFECYCLE_ACTIONS = ("bootstrap", "adopt", "repair", "migrate", "archive")
 
 
 class OperationError(Exception):
@@ -271,4 +272,88 @@ def project_inspect(
             "can_mutate": False,
         },
         "warnings": [] if project.get("project_ref") else ["project reference missing"],
+    }
+
+
+def lifecycle_preview_steps(action: str) -> list[dict[str, str]]:
+    summaries = {
+        "bootstrap": [
+            ("filesystem.write", "Create project skeleton and lifecycle files."),
+            ("git.write", "Prepare branch and commit for the new project skeleton."),
+        ],
+        "adopt": [
+            ("filesystem.read", "Inspect existing project metadata."),
+            ("filesystem.write", "Bind project lifecycle metadata to the existing project."),
+            ("git.write", "Prepare branch and commit for adoption metadata."),
+        ],
+        "repair": [
+            ("filesystem.read", "Inspect missing or inconsistent lifecycle metadata."),
+            ("filesystem.write", "Repair lifecycle files without changing unrelated project content."),
+            ("git.write", "Prepare branch and commit for repair metadata."),
+        ],
+        "migrate": [
+            ("filesystem.read", "Inspect current lifecycle layout."),
+            ("filesystem.write", "Plan lifecycle layout or naming migration."),
+            ("git.write", "Prepare branch and commit for migration metadata."),
+        ],
+        "archive": [
+            ("filesystem.write", "Mark the project archived without deleting data."),
+            ("git.write", "Prepare branch and commit for archive metadata."),
+        ],
+    }
+    return [
+        {
+            "kind": kind,
+            "path_policy": "category_only",
+            "summary": summary,
+        }
+        for kind, summary in summaries[action]
+    ]
+
+
+def project_lifecycle_preview(operation_name: str, project_name: str, reason: str | None = None) -> dict[str, Any]:
+    action = operation_name.removeprefix("project.")
+    if action not in LIFECYCLE_ACTIONS:
+        raise OperationError("catalog.command_not_found", f"Unsupported lifecycle operation: {operation_name}")
+    manifest_entry = manifest_operation(operation_name)
+    return {
+        "operation": {
+            "name": manifest_entry["name"],
+            "version": manifest_entry["version"],
+            "stability": manifest_entry["stability"],
+        },
+        "mode": "plan",
+        "status": "requires_approval",
+        "mutates": False,
+        "project": {
+            "name": project_name,
+            "ref_policy": "opaque_ref",
+        },
+        "approval": {
+            "required": True,
+            "classes": manifest_entry["approval"]["classes"],
+            "reason": "Lifecycle operations require approval before filesystem or git mutation.",
+        },
+        "side_effects": manifest_entry["side_effects"],
+        "adapter_capabilities": manifest_entry["adapter_capabilities"],
+        "preview": lifecycle_preview_steps(action),
+        "verification": [
+            {
+                "kind": "operation_plan",
+                "description": f"Generate and review an operation plan for {operation_name}.",
+            },
+            {
+                "kind": "approval_gate",
+                "description": "Require local approval before write-capable adapter execution.",
+            },
+            {
+                "kind": "schema",
+                "description": "Validate lifecycle result shape before execution handoff.",
+            },
+        ],
+        "warnings": [
+            "This preview does not perform filesystem or git mutations.",
+            "Apply-mode execution is blocked until write-capable local adapters and approval gates exist.",
+        ],
+        "reason": reason or "No local reason supplied.",
     }

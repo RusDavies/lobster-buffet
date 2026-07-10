@@ -1,0 +1,6 @@
+{
+  "operation": "project.archive",
+  "mode": "plan",
+  "project_name": "synthetic-project",
+  "reason": "Synthetic lifecycle preview fixture."
+}

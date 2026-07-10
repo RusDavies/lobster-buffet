@@ -14,6 +14,7 @@ for (const expected of [
   "lobster_buffet_command_describe",
   "lobster_buffet_operation_plan",
   "lobster_buffet_project_inspect",
+  "lobster_buffet_project_lifecycle",
 ]) {
   if (!byName.has(expected)) {
     throw new Error(`missing registered tool: ${expected}`);
@@ -54,7 +55,15 @@ async function main() {
     throw new Error("project inspect returned the wrong synthetic project");
   }
 
-  const serialized = JSON.stringify({ description, inspect, list, plan });
+  const lifecycle = await call("lobster_buffet_project_lifecycle", {
+    action: "archive",
+    project_name: "synthetic-project",
+  });
+  if (lifecycle.operation.name !== "project.archive" || lifecycle.status !== "requires_approval") {
+    throw new Error("project lifecycle wrapper returned the wrong preview");
+  }
+
+  const serialized = JSON.stringify({ description, inspect, lifecycle, list, plan });
   for (const fragment of ["channel:", "0000000000000000000", "/home/", "github.com/RusDavies"]) {
     if (serialized.includes(fragment)) {
       throw new Error(`wrapper output contains forbidden private/local fragment ${fragment}`);

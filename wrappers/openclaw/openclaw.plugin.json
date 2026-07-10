@@ -10,7 +10,8 @@
       "lobster_buffet_command_list",
       "lobster_buffet_command_describe",
       "lobster_buffet_operation_plan",
-      "lobster_buffet_project_inspect"
+      "lobster_buffet_project_inspect",
+      "lobster_buffet_project_lifecycle"
     ]
   },
   "configSchema": {

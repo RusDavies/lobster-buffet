@@ -60,6 +60,14 @@ CHECKS = [
         ROOT / "fixtures/operations/project.inspect.output.valid.json",
     ),
     (
+        ROOT / "schemas/operations/project.lifecycle.input.v0.1.0.json",
+        ROOT / "fixtures/operations/project.lifecycle.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/project.lifecycle.output.v0.1.0.json",
+        ROOT / "fixtures/operations/project.lifecycle.output.valid.json",
+    ),
+    (
         ROOT / "schemas/operations/command.list.input.v0.1.0.json",
         ROOT / "fixtures/operations/command.list.input.valid.json",
     ),
@@ -192,8 +200,8 @@ def main() -> int:
         if not (ROOT / definition_path).exists():
             all_errors.append(f"{operation['name']}: missing definition {operation['definition_ref']}")
 
-        if not operation["read_only"]:
-            all_errors.append(f"{operation['name']}: initial operations must be read-only")
+        if not operation["read_only"] and not operation["approval"]["required"]:
+            all_errors.append(f"{operation['name']}: mutating operations must require approval")
 
     operation_names = [operation["name"] for operation in catalog["operations"]]
     if len(operation_names) != len(set(operation_names)):

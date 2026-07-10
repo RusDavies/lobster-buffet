@@ -1,6 +1,6 @@
 # Operation Catalog
 
-This catalog expands the initial schema slice into the planned Lobster Buffet operation families. It is intentionally draft-level; read-only operations are being promoted to `schema_defined` before implementation.
+This catalog expands the initial schema slice into the planned Lobster Buffet operation families. It is intentionally draft-level; read-only operations and safe lifecycle previews are being promoted before write-capable adapters exist.
 
 The machine-readable catalog lives at `manifests/operation-catalog.v0.1.0.json`.
 
@@ -35,6 +35,11 @@ The machine-readable catalog lives at `manifests/operation-catalog.v0.1.0.json`.
 - `project.migrate`: move a project between lifecycle layouts or naming conventions.
 - `project.archive`: mark a project archived without deleting data.
 
+The current lifecycle implementation is preview-only. It emits structured
+approval-required plans and verification steps, but it does not perform
+filesystem or git mutations. Apply-mode lifecycle execution requires
+write-capable local adapters and an approval gate.
+
 ### Incident
 
 - `incident.list`: list active, stale, or recently closed incidents.
@@ -62,11 +67,15 @@ The machine-readable catalog lives at `manifests/operation-catalog.v0.1.0.json`.
 
 ## Next Schema Candidates
 
-The next schema work should focus on the remaining high-leverage read-only operations:
+The next schema work should focus on the remaining high-leverage read-only and state operations:
 
-1. `review.list`
-2. `heartbeat.packet`
-3. `heartbeat.check`
-4. `git.workflow.guard`
+1. `incident.update`
+2. `incident.close`
+3. `review.list`
+4. `heartbeat.packet`
+5. `heartbeat.check`
+6. `git.workflow.guard`
 
-Mutating lifecycle operations should wait until the adapter contract and transport shape are clearer. A mutating provider without a firm gate model is just a footgun with a logo.
+Lifecycle apply mode should wait until the write-capable adapter and approval
+gate are concrete. A mutating provider without a firm gate model is still just a
+footgun with a logo.
