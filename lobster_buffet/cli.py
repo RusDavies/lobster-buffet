@@ -27,6 +27,18 @@ def build_parser() -> argparse.ArgumentParser:
     command_describe = command_subparsers.add_parser("describe")
     command_describe.add_argument("--name", required=True)
 
+    operation = subparsers.add_parser("operation")
+    operation_subparsers = operation.add_subparsers(dest="action", required=True)
+
+    operation_plan = operation_subparsers.add_parser("plan")
+    operation_plan.add_argument("--name", required=True)
+    operation_plan.add_argument("--actor-ref", default="local-actor-ref")
+    operation_plan.add_argument(
+        "--surface",
+        choices=["discord", "tui", "api", "cron", "unknown"],
+        default="unknown",
+    )
+
     project = subparsers.add_parser("project")
     project_subparsers = project.add_subparsers(dest="action", required=True)
 
@@ -50,6 +62,10 @@ def run(argv: list[str] | None = None) -> int:
 
         if args.group == "command" and args.action == "describe":
             emit(core.command_describe(args.name))
+            return 0
+
+        if args.group == "operation" and args.action == "plan":
+            emit(core.operation_plan(args.name, actor_ref=args.actor_ref, surface=args.surface))
             return 0
 
         if args.group == "project" and args.action == "inspect":

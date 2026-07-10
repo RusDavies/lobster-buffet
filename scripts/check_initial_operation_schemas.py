@@ -36,6 +36,10 @@ CHECKS = [
         ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/operation-plan.v0.1.0.json",
+        ROOT / "fixtures/operations/operation.plan.output.valid.json",
+    ),
+    (
         ROOT / "schemas/operations/command.describe.input.v0.1.0.json",
         ROOT / "fixtures/operations/command.describe.input.valid.json",
     ),

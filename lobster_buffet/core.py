@@ -52,6 +52,94 @@ def manifest_operation(name: str) -> dict[str, Any]:
     raise OperationError("catalog.command_not_found", f"Operation has no schema-backed manifest entry: {name}")
 
 
+def affected_surfaces_for(operation: dict[str, Any]) -> list[dict[str, str]]:
+    kinds: list[str] = []
+    for capability in operation["adapter_capabilities"]:
+        if capability.startswith("project.") or capability.startswith("filesystem."):
+            kinds.append("project")
+        elif capability.startswith("git."):
+            kinds.append("repository")
+        elif capability.startswith("incident."):
+            kinds.append("incident_store")
+        elif capability.startswith("review."):
+            kinds.append("review_store")
+        elif capability.startswith("heartbeat."):
+            kinds.append("heartbeat_state")
+        elif capability.startswith("channel."):
+            kinds.append("channel")
+        elif capability.startswith("remote."):
+            kinds.append("remote")
+        elif capability.startswith("visible_message."):
+            kinds.append("visible_message")
+        elif capability.startswith("secret."):
+            kinds.append("secret")
+
+    if "message.visible_send" in operation["side_effects"]:
+        kinds.append("visible_message")
+    if "secret.read" in operation["side_effects"]:
+        kinds.append("secret")
+    if any(effect.startswith("network.") for effect in operation["side_effects"]):
+        kinds.append("network")
+
+    deduped = list(dict.fromkeys(kinds))
+    if not deduped:
+        deduped = ["operation_catalog"]
+    return [{"kind": kind, "ref_policy": "category_only"} for kind in deduped]
+
+
+def approval_reason(approval: dict[str, Any], read_only: bool) -> str:
+    if approval["required"]:
+        return "Operation declares approval classes before execution."
+    if read_only:
+        return "Read-only operation; no approval required before execution."
+    return "No approval required by current manifest."
+
+
+def operation_plan(name: str, actor_ref: str = "local-actor-ref", surface: str = "unknown") -> dict[str, Any]:
+    manifest_entry = manifest_operation(name)
+    catalog_entry = catalog_operation(name)
+    return {
+        "schema": "lobster-buffet.operation-plan.v0.1.0",
+        "plan_id": f"plan:{manifest_entry['name']}:v{manifest_entry['version']}",
+        "operation": {
+            "namespace": "lobster-buffet",
+            "name": manifest_entry["name"],
+            "version": manifest_entry["version"],
+            "stability": manifest_entry["stability"],
+        },
+        "requested_by": {
+            "actor_ref": actor_ref,
+            "surface": surface,
+        },
+        "input_summary": {
+            "redaction": "private_refs",
+            "fields": {
+                "operation": manifest_entry["name"],
+            },
+        },
+        "side_effects": manifest_entry["side_effects"],
+        "approval": {
+            "required": manifest_entry["approval"]["required"],
+            "classes": manifest_entry["approval"]["classes"],
+            "reason": approval_reason(manifest_entry["approval"], manifest_entry["read_only"]),
+        },
+        "adapter_capabilities": manifest_entry["adapter_capabilities"],
+        "affected_surfaces": affected_surfaces_for(manifest_entry),
+        "verification": [
+            {
+                "kind": "schema",
+                "description": f"Validate result against {manifest_entry['output_schema_ref']}.",
+            }
+        ],
+        "privacy": {
+            "contains_private_values": False,
+            "private_refs_only": True,
+            "disclosure_policy": "local_adapter_controlled",
+        },
+        "summary": catalog_entry["summary"],
+    }
+
+
 def command_list(include_deprecated: bool = False) -> dict[str, Any]:
     operations = []
     for operation in operation_catalog()["operations"]:

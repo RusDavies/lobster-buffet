@@ -29,6 +29,10 @@ COMMANDS = [
         ["python3", "-m", "lobster_buffet.cli", "project", "inspect"],
         ROOT / "schemas/operations/project.inspect.output.v0.1.0.json",
     ),
+    (
+        ["python3", "-m", "lobster_buffet.cli", "operation", "plan", "--name", "project.inspect"],
+        ROOT / "schemas/operation-plan.v0.1.0.json",
+    ),
 ]
 
 
@@ -55,7 +59,8 @@ def main() -> int:
             errors.extend(f"  {error}" for error in validation_errors)
 
     project_output = run_json(["python3", "-m", "lobster_buffet.cli", "project", "inspect"])
-    output_text = json.dumps(project_output, sort_keys=True)
+    plan_output = run_json(["python3", "-m", "lobster_buffet.cli", "operation", "plan", "--name", "project.inspect"])
+    output_text = json.dumps({"plan": plan_output, "project": project_output}, sort_keys=True)
     for fragment in ("channel:", "0000000000000000000", "/home/", "github.com/RusDavies"):
         if fragment in output_text:
             errors.append(f"project.inspect output contains forbidden private/local fragment {fragment!r}")

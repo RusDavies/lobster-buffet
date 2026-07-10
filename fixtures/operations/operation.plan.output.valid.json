@@ -1,0 +1,56 @@
+{
+  "schema": "lobster-buffet.operation-plan.v0.1.0",
+  "plan_id": "plan:project.inspect:v0.1.0",
+  "operation": {
+    "namespace": "lobster-buffet",
+    "name": "project.inspect",
+    "version": "0.1.0",
+    "stability": "draft"
+  },
+  "requested_by": {
+    "actor_ref": "local-actor-ref",
+    "surface": "unknown"
+  },
+  "input_summary": {
+    "redaction": "private_refs",
+    "fields": {
+      "operation": "project.inspect"
+    }
+  },
+  "side_effects": [
+    "filesystem.read",
+    "git.read"
+  ],
+  "approval": {
+    "required": false,
+    "classes": [],
+    "reason": "Read-only operation; no approval required before execution."
+  },
+  "adapter_capabilities": [
+    "project.resolve",
+    "filesystem.read_project_metadata",
+    "git.inspect_status"
+  ],
+  "affected_surfaces": [
+    {
+      "kind": "project",
+      "ref_policy": "category_only"
+    },
+    {
+      "kind": "repository",
+      "ref_policy": "category_only"
+    }
+  ],
+  "verification": [
+    {
+      "kind": "schema",
+      "description": "Validate result against schemas/operations/project.inspect.output.v0.1.0.json."
+    }
+  ],
+  "privacy": {
+    "contains_private_values": false,
+    "private_refs_only": true,
+    "disclosure_policy": "local_adapter_controlled"
+  },
+  "summary": "Resolve a project context and return compact structured state before mutation."
+}
