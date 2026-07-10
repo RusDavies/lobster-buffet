@@ -1,0 +1,28 @@
+{
+  "packet_id": "heartbeat:synthetic-project:2026-07-10T00:00:00Z",
+  "generated_at": "2026-07-10T00:00:00Z",
+  "overall_status": "blocked",
+  "sections": [
+    {
+      "kind": "project",
+      "status": "ok",
+      "summary": "Project metadata is readable.",
+      "count": 1
+    },
+    {
+      "kind": "incident",
+      "status": "attention",
+      "summary": "One stale incident should be resurfaced.",
+      "count": 1
+    },
+    {
+      "kind": "review",
+      "status": "blocked",
+      "summary": "One review session has a blocked apply gate.",
+      "count": 1
+    }
+  ],
+  "next_actions": [
+    "Resolve blocked review gates before continuing autonomous work."
+  ]
+}

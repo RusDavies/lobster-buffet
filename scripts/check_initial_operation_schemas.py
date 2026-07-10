@@ -123,6 +123,14 @@ CHECKS = [
         ROOT / "schemas/operations/review.list.output.v0.1.0.json",
         ROOT / "fixtures/operations/review.list.output.valid.json",
     ),
+    (
+        ROOT / "schemas/operations/heartbeat.packet.input.v0.1.0.json",
+        ROOT / "fixtures/operations/heartbeat.packet.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/heartbeat.packet.output.v0.1.0.json",
+        ROOT / "fixtures/operations/heartbeat.packet.output.valid.json",
+    ),
 ]
 
 MANIFEST = ROOT / "manifests/provider-operations.v0.1.0.json"
@@ -268,6 +276,7 @@ def main() -> int:
         "git.inspect_status",
         "incident.read_state",
         "review.read_state",
+        "heartbeat.read_state",
     }
     fixture_capabilities = {item["name"]: item["envelope"] for item in adapter_fixture["capabilities"]}
     for capability in sorted(required_fixture_capabilities):

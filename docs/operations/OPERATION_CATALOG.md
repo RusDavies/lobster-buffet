@@ -81,6 +81,12 @@ explicit.
 - `heartbeat.packet`: build compact periodic status across project, incident, review, and git state.
 - `heartbeat.check`: decide whether a project or incident needs a visible progress heartbeat.
 
+`heartbeat.packet` is implemented as a read-only provider operation. It
+combines adapter-provided project, repository, incident, review, and heartbeat
+state into a compact status packet. It does not send visible messages or make
+scheduling decisions. `heartbeat.check` remains planned until those local
+decision gates are explicit.
+
 ### Git Workflow
 
 - `git.workflow.inspect`: inspect repository boundary, branch, dirty state, and ahead/behind state.
@@ -90,9 +96,8 @@ explicit.
 
 The next schema work should focus on the remaining high-leverage read-only and state operations:
 
-1. `heartbeat.packet`
-2. `heartbeat.check`
-3. `git.workflow.guard`
+1. `heartbeat.check`
+2. `git.workflow.guard`
 
 Lifecycle apply mode should wait until the write-capable adapter and approval
 gate are concrete. A mutating provider without a firm gate model is still just a

@@ -462,6 +462,90 @@ def review_list(
     }
 
 
+def heartbeat_packet(
+    detail: str = "summary",
+    adapter_fixture_path: Path | None = None,
+    adapter_config_path: Path | None = None,
+) -> dict[str, Any]:
+    if detail not in {"summary", "full"}:
+        raise OperationError("input.invalid", f"Unsupported heartbeat detail level: {detail}")
+
+    fixture = load_adapter_fixture(
+        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    )
+    project = require_fixture_capability(fixture, "project.resolve")["result"]
+    metadata = require_fixture_capability(fixture, "filesystem.read_project_metadata")["result"]
+    git_status = require_fixture_capability(fixture, "git.inspect_status")["result"]
+    incident_state = require_fixture_capability(fixture, "incident.read_state")["result"]
+    review_state = require_fixture_capability(fixture, "review.read_state")["result"]
+    heartbeat_state = require_fixture_capability(fixture, "heartbeat.read_state")["result"]
+
+    incidents = incident_state.get("incidents", [])
+    reviews = review_state.get("reviews", [])
+    stale_incidents = [incident for incident in incidents if incident["status"] == "stale" or incident.get("resurface")]
+    blocked_reviews = [review for review in reviews if review["status"] == "blocked" or review["apply_gate"] == "blocked"]
+    dirty = bool(git_status["repo"].get("dirty"))
+    visible_progress_due = bool(heartbeat_state.get("visible_progress_due"))
+
+    sections = [
+        {
+            "kind": "project",
+            "status": "ok" if project.get("project_ref") else "blocked",
+            "summary": f"{metadata['project']['name']} project metadata is readable.",
+            "count": 1,
+        },
+        {
+            "kind": "repository",
+            "status": "attention" if dirty else "ok",
+            "summary": "Repository has uncommitted changes." if dirty else "Repository status is clean in adapter state.",
+            "count": git_status.get("worktree", {}).get("changed_count", 0),
+        },
+        {
+            "kind": "incident",
+            "status": "attention" if stale_incidents else "ok",
+            "summary": f"{len(stale_incidents)} incident(s) need resurfacing.",
+            "count": len(stale_incidents),
+        },
+        {
+            "kind": "review",
+            "status": "blocked" if blocked_reviews else "ok",
+            "summary": f"{len(blocked_reviews)} review session(s) are blocked.",
+            "count": len(blocked_reviews),
+        },
+        {
+            "kind": "heartbeat",
+            "status": "attention" if visible_progress_due else "ok",
+            "summary": "Visible progress heartbeat is due." if visible_progress_due else "No visible heartbeat is due.",
+            "count": heartbeat_state.get("due_count", 0),
+        },
+    ]
+    if detail == "summary":
+        sections = [section for section in sections if section["status"] != "ok"] or sections[:2]
+
+    statuses = {section["status"] for section in sections}
+    if "blocked" in statuses:
+        overall_status = "blocked"
+    elif "attention" in statuses:
+        overall_status = "attention"
+    else:
+        overall_status = "ok"
+
+    next_actions = {
+        "ok": ["Continue with the next provider-boundary backlog item."],
+        "attention": ["Review attention sections before claiming queues are clear."],
+        "blocked": ["Resolve blocked sections before continuing autonomous work."],
+    }[overall_status]
+
+    generated_at = heartbeat_state.get("generated_at", "1970-01-01T00:00:00Z")
+    return {
+        "packet_id": f"heartbeat:{project.get('project_ref', 'unknown')}:{generated_at}",
+        "generated_at": generated_at,
+        "overall_status": overall_status,
+        "sections": sections,
+        "next_actions": next_actions,
+    }
+
+
 def lifecycle_preview_steps(action: str) -> list[dict[str, str]]:
     summaries = {
         "bootstrap": [

@@ -53,6 +53,10 @@ COMMANDS = [
         ["python3", "-m", "lobster_buffet.cli", "review", "list"],
         ROOT / "schemas/operations/review.list.output.v0.1.0.json",
     ),
+    (
+        ["python3", "-m", "lobster_buffet.cli", "heartbeat", "packet"],
+        ROOT / "schemas/operations/heartbeat.packet.output.v0.1.0.json",
+    ),
 ]
 
 for action in ("bootstrap", "adopt", "repair", "migrate", "archive"):
@@ -98,10 +102,12 @@ def main() -> int:
     incident_output = run_json(["python3", "-m", "lobster_buffet.cli", "incident", "list"])
     alignment_output = run_json(["python3", "-m", "lobster_buffet.cli", "alignment", "scan"])
     review_output = run_json(["python3", "-m", "lobster_buffet.cli", "review", "list"])
+    heartbeat_output = run_json(["python3", "-m", "lobster_buffet.cli", "heartbeat", "packet"])
     plan_output = run_json(["python3", "-m", "lobster_buffet.cli", "operation", "plan", "--name", "project.inspect"])
     output_text = json.dumps(
         {
             "alignment": alignment_output,
+            "heartbeat": heartbeat_output,
             "incident": incident_output,
             "plan": plan_output,
             "project": project_output,
@@ -121,6 +127,9 @@ def main() -> int:
 
     if not any(review["status"] == "active" and review["apply_gate"] == "pending" for review in review_output["reviews"]):
         errors.append("review.list did not include an active review with a pending apply gate")
+
+    if heartbeat_output["overall_status"] != "blocked":
+        errors.append("heartbeat.packet did not return blocked status for the synthetic blocked review")
 
     if errors:
         print("\n".join(errors))

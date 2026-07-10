@@ -334,6 +334,49 @@
       }
     },
     {
+      "name": "heartbeat.packet",
+      "version": "0.1.0",
+      "stability": "draft",
+      "definition_ref": "docs/operations/OPERATION_CATALOG.md#heartbeat",
+      "read_only": true,
+      "input_schema_ref": "schemas/operations/heartbeat.packet.input.v0.1.0.json",
+      "output_schema_ref": "schemas/operations/heartbeat.packet.output.v0.1.0.json",
+      "side_effects": [
+        "filesystem.read",
+        "git.read"
+      ],
+      "approval": {
+        "required": false,
+        "classes": []
+      },
+      "adapter_capabilities": [
+        "project.resolve",
+        "filesystem.read_project_metadata",
+        "git.inspect_status",
+        "incident.read_state",
+        "review.read_state",
+        "heartbeat.read_state"
+      ],
+      "errors": [
+        "input.invalid",
+        "adapter.capability_missing"
+      ],
+      "portage": {
+        "package_manifest_required": true,
+        "doctor_checks": [
+          "input_schema_exists",
+          "output_schema_exists",
+          "fixture_validates",
+          "operation_is_read_only",
+          "adapter_capabilities_declared"
+        ]
+      },
+      "redshield": {
+        "operation_plan_required": true,
+        "audit_event_required": false
+      }
+    },
+    {
       "name": "project.inspect",
       "version": "0.1.0",
       "stability": "draft",

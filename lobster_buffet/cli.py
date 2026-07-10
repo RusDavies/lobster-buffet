@@ -111,6 +111,22 @@ def build_parser() -> argparse.ArgumentParser:
         help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
     )
 
+    heartbeat = subparsers.add_parser("heartbeat")
+    heartbeat_subparsers = heartbeat.add_subparsers(dest="action", required=True)
+
+    heartbeat_packet = heartbeat_subparsers.add_parser("packet")
+    heartbeat_packet.add_argument("--detail", choices=["summary", "full"], default="summary")
+    heartbeat_packet.add_argument(
+        "--adapter-fixture",
+        default=None,
+        help="Adapter fixture path. Overrides adapter config.",
+    )
+    heartbeat_packet.add_argument(
+        "--adapter-config",
+        default=None,
+        help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
+    )
+
     return parser
 
 
@@ -173,6 +189,16 @@ def run(argv: list[str] | None = None) -> int:
             emit(
                 core.review_list(
                     status=args.status,
+                    detail=args.detail,
+                    adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
+                    adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
+                )
+            )
+            return 0
+
+        if args.group == "heartbeat" and args.action == "packet":
+            emit(
+                core.heartbeat_packet(
                     detail=args.detail,
                     adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
                     adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,

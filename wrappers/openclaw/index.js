@@ -388,6 +388,43 @@ function tools(options) {
         return runCli(args, options);
       },
     }),
+    createTool({
+      name: "lobster_buffet_heartbeat_packet",
+      label: "Lobster Buffet Heartbeat Packet",
+      description: "Build a compact read-only status packet through the CLI core and configured adapter fixture.",
+      parameters: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          detail: {
+            type: "string",
+            description: "Heartbeat detail level.",
+            enum: ["summary", "full"],
+          },
+          adapter_fixture: {
+            type: "string",
+            description: "Optional adapter fixture path relative to the project root.",
+          },
+          adapter_config: {
+            type: "string",
+            description: "Optional adapter config path relative to the project root.",
+          },
+        },
+      },
+      execute: (params) => {
+        const args = ["heartbeat", "packet", "--detail", optionalDetail(params.detail)];
+        const adapterFixture = readString(params.adapter_fixture);
+        const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
+        if (adapterFixture) {
+          args.push("--adapter-fixture", adapterFixture);
+        } else if (adapterConfig) {
+          args.push("--adapter-config", adapterConfig);
+        } else {
+          args.push("--adapter-fixture", options.defaultAdapterFixture);
+        }
+        return runCli(args, options);
+      },
+    }),
   ];
 }
 

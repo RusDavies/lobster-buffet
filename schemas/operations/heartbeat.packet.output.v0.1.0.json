@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/heartbeat.packet.output.v0.1.0.json",
+  "title": "heartbeat.packet output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["packet_id", "generated_at", "overall_status", "sections", "next_actions"],
+  "properties": {
+    "packet_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "overall_status": {
+      "type": "string",
+      "enum": ["ok", "attention", "blocked"]
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "status", "summary", "count"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["project", "repository", "incident", "review", "heartbeat"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ok", "attention", "blocked"]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
