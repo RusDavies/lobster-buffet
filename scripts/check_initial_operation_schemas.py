@@ -32,6 +32,10 @@ CHECKS = [
         ROOT / "manifests/distribution-handoff.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/release-compatibility.v0.1.0.json",
+        ROOT / "manifests/release-compatibility.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/local-adapter-fixture.v0.1.0.json",
         ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
     ),
@@ -137,6 +141,7 @@ MANIFEST = ROOT / "manifests/provider-operations.v0.1.0.json"
 CATALOG = ROOT / "manifests/operation-catalog.v0.1.0.json"
 ADAPTER_CAPABILITIES = ROOT / "manifests/local-adapter-capabilities.v0.1.0.json"
 DISTRIBUTION_HANDOFF = ROOT / "manifests/distribution-handoff.v0.1.0.json"
+RELEASE_COMPATIBILITY = ROOT / "manifests/release-compatibility.v0.1.0.json"
 ADAPTER_FIXTURE = ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json"
 ADAPTER_CONFIG = ROOT / "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json"
 
@@ -220,6 +225,7 @@ def main() -> int:
     catalog = load_json(CATALOG)
     adapter_capabilities = load_json(ADAPTER_CAPABILITIES)
     distribution_handoff = load_json(DISTRIBUTION_HANDOFF)
+    release_compatibility = load_json(RELEASE_COMPATIBILITY)
     adapter_fixture = load_json(ADAPTER_FIXTURE)
     adapter_config = load_json(ADAPTER_CONFIG)
     for operation in manifest["operations"]:
@@ -270,6 +276,10 @@ def main() -> int:
             if not path.exists():
                 all_errors.append(f"distribution handoff {section}: missing path {item['path']}")
 
+    for ref in release_compatibility["portage_handoff"]["inspectable_refs"]:
+        if not (ROOT / ref).exists():
+            all_errors.append(f"release compatibility handoff: missing inspectable ref {ref}")
+
     required_fixture_capabilities = {
         "project.resolve",
         "filesystem.read_project_metadata",
@@ -314,6 +324,7 @@ def main() -> int:
         f"{len(catalog['operations'])} catalog operation(s), "
         f"{len(adapter_capabilities['capabilities'])} adapter capability(ies), "
         f"{len(distribution_handoff['packageable_artifacts'])} handoff artifact(s), "
+        f"{len(release_compatibility['release_gates'])} release gate(s), "
         f"and {len(adapter_fixture['capabilities'])} adapter fixture capability(ies)."
     )
     return 0

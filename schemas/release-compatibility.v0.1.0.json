@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/release-compatibility.v0.1.0.json",
+  "title": "Lobster Buffet release compatibility manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "package",
+    "version_surfaces",
+    "compatibility_classes",
+    "release_gates",
+    "portage_handoff"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["lobster-buffet.release-compatibility.v0.1.0"]
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "provider_api", "stability", "public_release_ready"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider_api": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stability": {
+          "type": "string",
+          "enum": ["draft", "experimental", "stable", "deprecated"]
+        },
+        "public_release_ready": {
+          "type": "boolean"
+        }
+      }
+    },
+    "version_surfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "current", "compatibility_policy"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "current": {
+            "type": "string",
+            "minLength": 1
+          },
+          "compatibility_policy": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "compatibility_classes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["class", "examples"],
+        "properties": {
+          "class": {
+            "type": "string",
+            "enum": ["compatible", "breaking"]
+          },
+          "examples": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "release_gates": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "portage_handoff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inspectable_refs", "portage_owned"],
+      "properties": {
+        "inspectable_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "portage_owned": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

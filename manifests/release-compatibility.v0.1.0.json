@@ -1,0 +1,74 @@
+{
+  "schema": "lobster-buffet.release-compatibility.v0.1.0",
+  "package": {
+    "name": "lobster-buffet",
+    "provider_api": "lobster-buffet.provider.v0",
+    "stability": "draft",
+    "public_release_ready": false
+  },
+  "version_surfaces": [
+    {
+      "name": "provider_api",
+      "current": "lobster-buffet.provider.v0",
+      "compatibility_policy": "Change the provider API name for incompatible transport-level contracts."
+    },
+    {
+      "name": "local_adapter_api",
+      "current": "lobster-buffet.local-adapter.v0",
+      "compatibility_policy": "Change the adapter API name for incompatible local capability envelope contracts."
+    },
+    {
+      "name": "operation_contracts",
+      "current": "0.1.0",
+      "compatibility_policy": "Version operation schemas, fixtures, and manifest refs together."
+    },
+    {
+      "name": "wrapper",
+      "current": "wrappers/openclaw/openclaw.plugin.json",
+      "compatibility_policy": "Wrapper releases must declare the provider API they support."
+    }
+  ],
+  "compatibility_classes": [
+    {
+      "class": "compatible",
+      "examples": [
+        "Add a new draft read-only operation.",
+        "Add an optional input field with a safe default.",
+        "Add wrapper support for an existing schema-backed operation."
+      ]
+    },
+    {
+      "class": "breaking",
+      "examples": [
+        "Remove or rename an operation, required field, error code, side effect, or adapter capability.",
+        "Change an operation from read-only to mutating.",
+        "Embed private local data in shared artifacts."
+      ]
+    }
+  ],
+  "release_gates": [
+    "schema_manifest_fixture_validation_passes",
+    "cli_core_regression_passes",
+    "wrapper_regression_passes",
+    "local_only_boundary_review_passes",
+    "mutating_operations_declare_gates",
+    "handoff_metadata_current"
+  ],
+  "portage_handoff": {
+    "inspectable_refs": [
+      "manifests/release-compatibility.v0.1.0.json",
+      "manifests/distribution-handoff.v0.1.0.json",
+      "manifests/provider-operations.v0.1.0.json",
+      "manifests/operation-catalog.v0.1.0.json",
+      "manifests/local-adapter-capabilities.v0.1.0.json"
+    ],
+    "portage_owned": [
+      "package",
+      "install",
+      "doctor",
+      "release",
+      "rollback",
+      "distribution implementation"
+    ]
+  }
+}

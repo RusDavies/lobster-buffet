@@ -33,6 +33,11 @@
       "role": "Optional adjacent policy and hardening gate contract."
     },
     {
+      "path": "docs/operations/RELEASE_COMPATIBILITY_POLICY.md",
+      "kind": "doc",
+      "role": "Human-readable release, versioning, and compatibility policy."
+    },
+    {
       "path": "schemas/",
       "kind": "schema",
       "role": "Machine-readable JSON Schemas for operations, manifests, adapters, and handoff metadata."
@@ -83,13 +88,27 @@
   "version_metadata": {
     "operation_contract_versions": [
       "command.describe@0.1.0",
-      "project.inspect@0.1.0"
+      "command.list@0.1.0",
+      "project.inspect@0.1.0",
+      "project.bootstrap@0.1.0",
+      "project.adopt@0.1.0",
+      "project.repair@0.1.0",
+      "project.migrate@0.1.0",
+      "project.archive@0.1.0",
+      "incident.list@0.1.0",
+      "incident.update@0.1.0",
+      "incident.close@0.1.0",
+      "alignment.scan@0.1.0",
+      "review.list@0.1.0",
+      "heartbeat.packet@0.1.0",
+      "git.workflow.inspect@0.1.0"
     ],
     "manifest_versions": [
       "provider-operation-manifest@0.1.0",
       "operation-catalog@0.1.0",
       "local-adapter-capabilities@0.1.0",
-      "distribution-handoff@0.1.0"
+      "distribution-handoff@0.1.0",
+      "release-compatibility@0.1.0"
     ],
     "adapter_api": "lobster-buffet.local-adapter.v0"
   },
@@ -116,6 +135,10 @@
     {
       "path": "manifests/distribution-handoff.v0.1.0.json",
       "purpose": "Discover packageable artifacts, local-only boundaries, and compatibility guarantees."
+    },
+    {
+      "path": "manifests/release-compatibility.v0.1.0.json",
+      "purpose": "Discover release gates, version surfaces, compatibility classes, and Portage handoff expectations."
     },
     {
       "path": "scripts/check_initial_operation_schemas.py",

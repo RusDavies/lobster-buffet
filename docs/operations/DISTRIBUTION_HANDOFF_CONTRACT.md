@@ -22,7 +22,7 @@ Buffet may expose:
 
 - operation docs under `docs/operations/`
 - JSON Schemas under `schemas/`
-- provider and catalog manifests under `manifests/`
+- provider, catalog, handoff, and compatibility manifests under `manifests/`
 - synthetic fixtures under `fixtures/`
 - validation scripts under `scripts/`
 
@@ -51,6 +51,7 @@ The handoff contract exposes:
 - operation contract versions such as `command.describe@0.1.0`
 - manifest versions such as `operation-catalog@0.1.0`
 - adapter API version such as `lobster-buffet.local-adapter.v0`
+- release compatibility policy version such as `release-compatibility@0.1.0`
 
 Version updates should change related schemas, manifests, fixtures, and
 validation together.
@@ -77,6 +78,7 @@ Another tool may inspect:
 - `manifests/operation-catalog.v0.1.0.json`
 - `manifests/local-adapter-capabilities.v0.1.0.json`
 - `manifests/distribution-handoff.v0.1.0.json`
+- `manifests/release-compatibility.v0.1.0.json`
 - `scripts/check_initial_operation_schemas.py`
 
 That inspection should answer what Buffet exposes and what remains local-only.
