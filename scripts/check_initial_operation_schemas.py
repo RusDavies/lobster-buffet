@@ -140,6 +140,14 @@ CHECKS = [
         ROOT / "fixtures/operations/review.list.output.valid.json",
     ),
     (
+        ROOT / "schemas/operations/review.update.input.v0.1.0.json",
+        ROOT / "fixtures/operations/review.update.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/review.update.output.v0.1.0.json",
+        ROOT / "fixtures/operations/review.update.output.valid.json",
+    ),
+    (
         ROOT / "schemas/operations/heartbeat.packet.input.v0.1.0.json",
         ROOT / "fixtures/operations/heartbeat.packet.input.valid.json",
     ),

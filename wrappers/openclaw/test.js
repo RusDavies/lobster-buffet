@@ -19,6 +19,7 @@ for (const expected of [
   "lobster_buffet_incident_list",
   "lobster_buffet_alignment_scan",
   "lobster_buffet_review_list",
+  "lobster_buffet_review_update",
   "lobster_buffet_heartbeat_packet",
   "lobster_buffet_heartbeat_check",
 ]) {
@@ -99,6 +100,17 @@ async function main() {
     throw new Error("review list did not return the expected active review");
   }
 
+  const reviewUpdate = await call("lobster_buffet_review_update", {
+    adapter_config: "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
+    review_id: "review-001",
+    kind: "approval",
+    summary: "Plan approval after review evidence is accepted.",
+    apply_gate: "approved",
+  });
+  if (reviewUpdate.status !== "requires_approval" || reviewUpdate.mutates !== false) {
+    throw new Error("review update did not return the expected planning preview");
+  }
+
   const heartbeat = await call("lobster_buffet_heartbeat_packet", {
     adapter_config: "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
   });
@@ -125,6 +137,7 @@ async function main() {
     list,
     plan,
     reviews,
+    reviewUpdate,
   });
   for (const fragment of ["channel:", "0000000000000000000", "/home/", "github.com/RusDavies"]) {
     if (serialized.includes(fragment)) {

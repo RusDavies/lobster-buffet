@@ -128,6 +128,23 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
     )
+    review_update = review_subparsers.add_parser("update")
+    review_update.add_argument("--review-id", required=True)
+    review_update.add_argument("--kind", choices=core.REVIEW_UPDATE_KINDS, required=True)
+    review_update.add_argument("--summary", required=True)
+    review_update.add_argument("--mode", choices=["plan", "apply"], default="plan")
+    review_update.add_argument("--apply-gate", choices=core.REVIEW_APPLY_GATES, default=None)
+    review_update.add_argument("--reason", default=None)
+    review_update.add_argument(
+        "--adapter-fixture",
+        default=None,
+        help="Adapter fixture path. Overrides adapter config.",
+    )
+    review_update.add_argument(
+        "--adapter-config",
+        default=None,
+        help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
+    )
 
     heartbeat = subparsers.add_parser("heartbeat")
     heartbeat_subparsers = heartbeat.add_subparsers(dest="action", required=True)
@@ -232,6 +249,21 @@ def run(argv: list[str] | None = None) -> int:
                 core.review_list(
                     status=args.status,
                     detail=args.detail,
+                    adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
+                    adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
+                )
+            )
+            return 0
+
+        if args.group == "review" and args.action == "update":
+            emit(
+                core.review_update_preview(
+                    review_id=args.review_id,
+                    kind=args.kind,
+                    summary=args.summary,
+                    mode=args.mode,
+                    apply_gate=args.apply_gate,
+                    reason=args.reason,
                     adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
                     adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
                 )

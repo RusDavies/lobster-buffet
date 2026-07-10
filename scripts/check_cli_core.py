@@ -58,6 +58,24 @@ COMMANDS = [
         ROOT / "schemas/operations/review.list.output.v0.1.0.json",
     ),
     (
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "review",
+            "update",
+            "--review-id",
+            "review-001",
+            "--kind",
+            "approval",
+            "--summary",
+            "Plan approval after review evidence is accepted.",
+            "--apply-gate",
+            "approved",
+        ],
+        ROOT / "schemas/operations/review.update.output.v0.1.0.json",
+    ),
+    (
         ["python3", "-m", "lobster_buffet.cli", "heartbeat", "packet"],
         ROOT / "schemas/operations/heartbeat.packet.output.v0.1.0.json",
     ),
@@ -110,6 +128,23 @@ def main() -> int:
     incident_output = run_json(["python3", "-m", "lobster_buffet.cli", "incident", "list"])
     alignment_output = run_json(["python3", "-m", "lobster_buffet.cli", "alignment", "scan"])
     review_output = run_json(["python3", "-m", "lobster_buffet.cli", "review", "list"])
+    review_update_output = run_json(
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "review",
+            "update",
+            "--review-id",
+            "review-001",
+            "--kind",
+            "approval",
+            "--summary",
+            "Plan approval after review evidence is accepted.",
+            "--apply-gate",
+            "approved",
+        ]
+    )
     heartbeat_output = run_json(["python3", "-m", "lobster_buffet.cli", "heartbeat", "packet"])
     heartbeat_check_output = run_json(["python3", "-m", "lobster_buffet.cli", "heartbeat", "check"])
     git_guard_output = run_json(["python3", "-m", "lobster_buffet.cli", "git", "workflow-guard"])
@@ -124,6 +159,7 @@ def main() -> int:
             "plan": plan_output,
             "project": project_output,
             "review": review_output,
+            "review_update": review_update_output,
         },
         sort_keys=True,
     )
@@ -139,6 +175,9 @@ def main() -> int:
 
     if not any(review["status"] == "active" and review["apply_gate"] == "pending" for review in review_output["reviews"]):
         errors.append("review.list did not include an active review with a pending apply gate")
+
+    if review_update_output["status"] != "requires_approval" or review_update_output["mutates"] is not False:
+        errors.append("review.update did not return a non-mutating approval preview")
 
     if heartbeat_output["overall_status"] != "blocked":
         errors.append("heartbeat.packet did not return blocked status for the synthetic blocked review")

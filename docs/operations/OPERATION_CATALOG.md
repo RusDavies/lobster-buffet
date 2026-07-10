@@ -79,8 +79,12 @@ exposing local paths or private channel data.
 `review.list` is implemented as a read-only provider operation. It reads local
 review-session summaries through `review.read_state` and returns counts,
 pending comment totals, and apply-gate status without exposing private review
-storage. `review.update` remains planned until write-capable review gates are
-explicit.
+storage.
+
+`review.update` is implemented as write planning only. It reads review state,
+builds a gated preview for comments, decisions, approvals, blockers, or notes,
+and declares the future `review.write_state` effect, but it does not write
+review state until approval and write-capable adapters are exercised.
 
 ### Heartbeat
 
@@ -110,7 +114,7 @@ lifecycle changes.
 
 The next schema work should focus on the remaining high-leverage read-only and state operations:
 
-1. `review.update`
+1. `project.lifecycle` apply mode
 
 Lifecycle apply mode should wait until the write-capable adapter and approval
 gate are concrete. A mutating provider without a firm gate model is still just a

@@ -5,6 +5,8 @@ const DEFAULT_ADAPTER_FIXTURE = "fixtures/adapters/synthetic-project-inspect-ada
 const DEFAULT_ADAPTER_CONFIG = "";
 const LIFECYCLE_ACTIONS = ["bootstrap", "adopt", "repair", "migrate", "archive"];
 const GIT_WORKFLOW_ACTIONS = ["branch", "commit", "merge", "push", "release", "lifecycle_apply"];
+const REVIEW_UPDATE_KINDS = ["comment", "decision", "approval", "blocker", "note"];
+const REVIEW_APPLY_GATES = ["none", "pending", "approved", "blocked"];
 
 function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -81,6 +83,19 @@ function optionalIncidentStatus(value) {
 function optionalReviewStatus(value) {
   const status = readString(value);
   return ["active", "blocked", "closed", "all"].includes(status) ? status : "active";
+}
+
+function requireReviewUpdateKind(value) {
+  const kind = readString(value);
+  if (!REVIEW_UPDATE_KINDS.includes(kind)) {
+    throw new Error(`Review update kind must be one of: ${REVIEW_UPDATE_KINDS.join(", ")}`);
+  }
+  return kind;
+}
+
+function optionalReviewApplyGate(value) {
+  const gate = readString(value);
+  return REVIEW_APPLY_GATES.includes(gate) ? gate : undefined;
 }
 
 function optionalDetail(value) {
@@ -436,6 +451,85 @@ function tools(options) {
       },
       execute: (params) => {
         const args = ["review", "list", "--status", optionalReviewStatus(params.status), "--detail", optionalDetail(params.detail)];
+        const adapterFixture = readString(params.adapter_fixture);
+        const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
+        if (adapterFixture) {
+          args.push("--adapter-fixture", adapterFixture);
+        } else if (adapterConfig) {
+          args.push("--adapter-config", adapterConfig);
+        } else {
+          args.push("--adapter-fixture", options.defaultAdapterFixture);
+        }
+        return runCli(args, options);
+      },
+    }),
+    createTool({
+      name: "lobster_buffet_review_update",
+      label: "Lobster Buffet Review Update",
+      description: "Generate a gated review.update write preview through the CLI core.",
+      parameters: {
+        type: "object",
+        additionalProperties: false,
+        required: ["review_id", "kind", "summary"],
+        properties: {
+          review_id: {
+            type: "string",
+            description: "Opaque review id.",
+          },
+          kind: {
+            type: "string",
+            description: "Review update kind.",
+            enum: REVIEW_UPDATE_KINDS,
+          },
+          summary: {
+            type: "string",
+            description: "Update summary.",
+          },
+          mode: {
+            type: "string",
+            description: "Review update mode.",
+            enum: ["plan", "apply"],
+          },
+          apply_gate: {
+            type: "string",
+            description: "Optional target apply gate.",
+            enum: REVIEW_APPLY_GATES,
+          },
+          reason: {
+            type: "string",
+            description: "Optional local reason for the review update.",
+          },
+          adapter_fixture: {
+            type: "string",
+            description: "Optional adapter fixture path relative to the project root.",
+          },
+          adapter_config: {
+            type: "string",
+            description: "Optional adapter config path relative to the project root.",
+          },
+        },
+      },
+      execute: (params) => {
+        const args = [
+          "review",
+          "update",
+          "--review-id",
+          requireParam(params, "review_id"),
+          "--kind",
+          requireReviewUpdateKind(params.kind),
+          "--summary",
+          requireParam(params, "summary"),
+          "--mode",
+          readString(params.mode) === "apply" ? "apply" : "plan",
+        ];
+        const applyGate = optionalReviewApplyGate(params.apply_gate);
+        const reason = readString(params.reason);
+        if (applyGate) {
+          args.push("--apply-gate", applyGate);
+        }
+        if (reason) {
+          args.push("--reason", reason);
+        }
         const adapterFixture = readString(params.adapter_fixture);
         const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
         if (adapterFixture) {

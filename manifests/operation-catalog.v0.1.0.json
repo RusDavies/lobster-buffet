@@ -181,7 +181,7 @@
       "name": "review.update",
       "version": "0.1.0",
       "stability": "draft",
-      "implementation_state": "planned",
+      "implementation_state": "implemented",
       "read_only": false,
       "side_effects": ["filesystem.write"],
       "approval_classes": [],

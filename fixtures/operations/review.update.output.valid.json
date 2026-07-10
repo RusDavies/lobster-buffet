@@ -1,0 +1,52 @@
+{
+  "operation": {
+    "name": "review.update",
+    "version": "0.1.0",
+    "stability": "draft"
+  },
+  "mode": "plan",
+  "status": "requires_approval",
+  "mutates": false,
+  "review": {
+    "id": "review-001",
+    "ref_policy": "opaque_ref",
+    "current_status": "active",
+    "current_apply_gate": "pending",
+    "target_apply_gate": "approved",
+    "update_kind": "approval"
+  },
+  "approval": {
+    "required": true,
+    "classes": [],
+    "reason": "Review updates require approval before local review state is written."
+  },
+  "side_effects": [
+    "filesystem.write"
+  ],
+  "adapter_capabilities": [
+    "review.read_state",
+    "review.write_state"
+  ],
+  "preview": [
+    {
+      "kind": "filesystem.write",
+      "path_policy": "category_only",
+      "summary": "Record approval update for the review session after gates pass."
+    }
+  ],
+  "verification": [
+    {
+      "kind": "approval_gate",
+      "description": "Require local approval before writing review state."
+    },
+    {
+      "kind": "schema",
+      "description": "Validate review update result shape before execution handoff."
+    }
+  ],
+  "warnings": [
+    "This preview does not write review state.",
+    "Apply-mode execution is blocked until write-capable review adapters and approval gates are exercised."
+  ],
+  "reason": "Synthetic review update planning fixture."
+}

@@ -1,0 +1,11 @@
+{
+  "operation": "review.update",
+  "mode": "plan",
+  "review_id": "review-001",
+  "update": {
+    "kind": "approval",
+    "summary": "Plan an apply-gate approval after review evidence is accepted.",
+    "apply_gate": "approved"
+  },
+  "reason": "Synthetic review update planning fixture."
+}

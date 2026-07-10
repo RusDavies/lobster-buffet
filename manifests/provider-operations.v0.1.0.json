@@ -373,6 +373,47 @@
       }
     },
     {
+      "name": "review.update",
+      "version": "0.1.0",
+      "stability": "draft",
+      "definition_ref": "docs/operations/OPERATION_CATALOG.md#review",
+      "read_only": false,
+      "input_schema_ref": "schemas/operations/review.update.input.v0.1.0.json",
+      "output_schema_ref": "schemas/operations/review.update.output.v0.1.0.json",
+      "side_effects": [
+        "filesystem.write"
+      ],
+      "approval": {
+        "required": true,
+        "classes": []
+      },
+      "adapter_capabilities": [
+        "review.read_state",
+        "review.write_state"
+      ],
+      "errors": [
+        "input.invalid",
+        "review.not_found",
+        "review.state_conflict",
+        "adapter.capability_missing",
+        "approval.required"
+      ],
+      "portage": {
+        "package_manifest_required": true,
+        "doctor_checks": [
+          "input_schema_exists",
+          "output_schema_exists",
+          "fixture_validates",
+          "approval_required",
+          "adapter_capabilities_declared"
+        ]
+      },
+      "redshield": {
+        "operation_plan_required": true,
+        "audit_event_required": true
+      }
+    },
+    {
       "name": "heartbeat.packet",
       "version": "0.1.0",
       "stability": "draft",

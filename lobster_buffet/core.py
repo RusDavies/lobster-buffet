@@ -11,6 +11,8 @@ DEFAULT_ADAPTER_FIXTURE = "fixtures/adapters/synthetic-project-inspect-adapter.v
 ADAPTER_CONFIG_ENV = "LOBSTER_BUFFET_ADAPTER_CONFIG"
 LIFECYCLE_ACTIONS = ("bootstrap", "adopt", "repair", "migrate", "archive")
 GIT_WORKFLOW_ACTIONS = ("branch", "commit", "merge", "push", "release", "lifecycle_apply")
+REVIEW_UPDATE_KINDS = ("comment", "decision", "approval", "blocker", "note")
+REVIEW_APPLY_GATES = ("none", "pending", "approved", "blocked")
 
 
 class OperationError(Exception):
@@ -568,6 +570,94 @@ def review_list(
             }
             for review in filtered
         ],
+    }
+
+
+def review_update_preview(
+    review_id: str,
+    kind: str,
+    summary: str,
+    mode: str = "plan",
+    apply_gate: str | None = None,
+    reason: str | None = None,
+    adapter_fixture_path: Path | None = None,
+    adapter_config_path: Path | None = None,
+) -> dict[str, Any]:
+    if mode not in {"plan", "apply"}:
+        raise OperationError("input.invalid", f"Unsupported review update mode: {mode}")
+    if kind not in REVIEW_UPDATE_KINDS:
+        raise OperationError("input.invalid", f"Unsupported review update kind: {kind}")
+    if not review_id:
+        raise OperationError("input.invalid", "Review id is required.")
+    if not summary:
+        raise OperationError("input.invalid", "Review update summary is required.")
+    if apply_gate is not None and apply_gate not in REVIEW_APPLY_GATES:
+        raise OperationError("input.invalid", f"Unsupported review apply gate: {apply_gate}")
+
+    fixture = load_adapter_fixture(
+        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    )
+    review_state = require_fixture_capability(fixture, "review.read_state")["result"]
+    review = next((item for item in review_state.get("reviews", []) if item["id"] == review_id), None)
+    if review is None:
+        raise OperationError("review.not_found", f"Review not found: {review_id}")
+
+    manifest_entry = manifest_operation("review.update")
+    target_gate = apply_gate
+    if target_gate is None and kind == "approval":
+        target_gate = "approved"
+    elif target_gate is None and kind == "blocker":
+        target_gate = "blocked"
+
+    review_result = {
+        "id": review_id,
+        "ref_policy": "opaque_ref",
+        "current_status": review["status"],
+        "current_apply_gate": review["apply_gate"],
+        "update_kind": kind,
+    }
+    if target_gate is not None:
+        review_result["target_apply_gate"] = target_gate
+
+    return {
+        "operation": {
+            "name": manifest_entry["name"],
+            "version": manifest_entry["version"],
+            "stability": manifest_entry["stability"],
+        },
+        "mode": mode,
+        "status": "requires_approval",
+        "mutates": False,
+        "review": review_result,
+        "approval": {
+            "required": True,
+            "classes": manifest_entry["approval"]["classes"],
+            "reason": "Review updates require approval before local review state is written.",
+        },
+        "side_effects": manifest_entry["side_effects"],
+        "adapter_capabilities": manifest_entry["adapter_capabilities"],
+        "preview": [
+            {
+                "kind": "filesystem.write",
+                "path_policy": "category_only",
+                "summary": f"Record {kind} update for the review session after gates pass.",
+            }
+        ],
+        "verification": [
+            {
+                "kind": "approval_gate",
+                "description": "Require local approval before writing review state.",
+            },
+            {
+                "kind": "schema",
+                "description": "Validate review update result shape before execution handoff.",
+            },
+        ],
+        "warnings": [
+            "This preview does not write review state.",
+            "Apply-mode execution is blocked until write-capable review adapters and approval gates are exercised.",
+        ],
+        "reason": reason or "No local reason supplied.",
     }
 
 
