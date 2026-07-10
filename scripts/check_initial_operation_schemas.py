@@ -242,6 +242,7 @@ def main() -> int:
         "project.resolve",
         "filesystem.read_project_metadata",
         "git.inspect_status",
+        "incident.read_state",
     }
     fixture_capabilities = {item["name"]: item["envelope"] for item in adapter_fixture["capabilities"]}
     for capability in sorted(required_fixture_capabilities):

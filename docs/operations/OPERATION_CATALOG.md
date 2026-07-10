@@ -46,6 +46,11 @@ write-capable local adapters and an approval gate.
 - `incident.update`: append status, blockers, evidence, or next action.
 - `incident.close`: close an incident with resolution and follow-up state.
 
+`incident.list` is implemented as a read-only provider operation. It reads
+local incident state through `incident.read_state`, returns counts plus
+redacted incident summaries, and includes stale incidents marked for
+resurfacing in the default active view.
+
 ### Alignment
 
 - `alignment.scan`: compare current work against project goal, backlog, docs, and artifacts.

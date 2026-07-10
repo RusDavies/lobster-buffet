@@ -10,7 +10,8 @@
       "status": "active",
       "severity": "medium",
       "title": "Example incident",
-      "updated_at": "2026-07-09T00:00:00Z"
+      "updated_at": "2026-07-09T00:00:00Z",
+      "resurface": false
     }
   ]
 }

@@ -275,6 +275,51 @@ def project_inspect(
     }
 
 
+def incident_list(
+    status: str = "active",
+    detail: str = "summary",
+    adapter_fixture_path: Path | None = None,
+    adapter_config_path: Path | None = None,
+) -> dict[str, Any]:
+    if status not in {"active", "stale", "closed", "all"}:
+        raise OperationError("input.invalid", f"Unsupported incident status filter: {status}")
+    if detail not in {"summary", "full"}:
+        raise OperationError("input.invalid", f"Unsupported incident detail level: {detail}")
+
+    fixture = load_adapter_fixture(
+        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    )
+    incident_state = require_fixture_capability(fixture, "incident.read_state")["result"]
+    incidents = incident_state.get("incidents", [])
+    counts = {
+        "active": sum(1 for incident in incidents if incident["status"] == "active"),
+        "stale": sum(1 for incident in incidents if incident["status"] == "stale"),
+        "closed": sum(1 for incident in incidents if incident["status"] == "closed"),
+    }
+
+    filtered = [
+        incident
+        for incident in incidents
+        if status == "all" or incident["status"] == status or (status == "active" and incident.get("resurface") is True)
+    ]
+    filtered.sort(key=lambda incident: (not incident.get("resurface", False), incident["updated_at"], incident["id"]))
+
+    return {
+        "counts": counts,
+        "incidents": [
+            {
+                "id": incident["id"],
+                "status": incident["status"],
+                "severity": incident["severity"],
+                "title": incident["title"],
+                "updated_at": incident["updated_at"],
+                "resurface": bool(incident.get("resurface", incident["status"] == "stale")),
+            }
+            for incident in filtered
+        ],
+    }
+
+
 def lifecycle_preview_steps(action: str) -> list[dict[str, str]]:
     summaries = {
         "bootstrap": [

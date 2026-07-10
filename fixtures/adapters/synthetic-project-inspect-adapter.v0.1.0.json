@@ -83,6 +83,47 @@
           "disclosure_policy": "redacted_summary"
         }
       }
+    },
+    {
+      "name": "incident.read_state",
+      "envelope": {
+        "ok": true,
+        "capability": "incident.read_state",
+        "result": {
+          "incidents": [
+            {
+              "id": "incident-001",
+              "status": "active",
+              "severity": "medium",
+              "title": "Example active incident",
+              "updated_at": "2026-07-09T00:00:00Z",
+              "resurface": false
+            },
+            {
+              "id": "incident-002",
+              "status": "stale",
+              "severity": "high",
+              "title": "Example stale incident",
+              "updated_at": "2026-07-07T00:00:00Z",
+              "resurface": true
+            },
+            {
+              "id": "incident-003",
+              "status": "closed",
+              "severity": "low",
+              "title": "Example closed incident",
+              "updated_at": "2026-07-08T00:00:00Z",
+              "resurface": false
+            }
+          ]
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "redacted_summary"
+        }
+      }
     }
   ]
 }

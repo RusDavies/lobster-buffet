@@ -57,6 +57,23 @@ def build_parser() -> argparse.ArgumentParser:
         lifecycle.add_argument("--project-name", required=True)
         lifecycle.add_argument("--reason", default=None)
 
+    incident = subparsers.add_parser("incident")
+    incident_subparsers = incident.add_subparsers(dest="action", required=True)
+
+    incident_list = incident_subparsers.add_parser("list")
+    incident_list.add_argument("--status", choices=["active", "stale", "closed", "all"], default="active")
+    incident_list.add_argument("--detail", choices=["summary", "full"], default="summary")
+    incident_list.add_argument(
+        "--adapter-fixture",
+        default=None,
+        help="Adapter fixture path. Overrides adapter config.",
+    )
+    incident_list.add_argument(
+        "--adapter-config",
+        default=None,
+        help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
+    )
+
     return parser
 
 
@@ -88,6 +105,17 @@ def run(argv: list[str] | None = None) -> int:
 
         if args.group == "project" and args.action in core.LIFECYCLE_ACTIONS:
             emit(core.project_lifecycle_preview(f"project.{args.action}", args.project_name, reason=args.reason))
+            return 0
+
+        if args.group == "incident" and args.action == "list":
+            emit(
+                core.incident_list(
+                    status=args.status,
+                    detail=args.detail,
+                    adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
+                    adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
+                )
+            )
             return 0
 
     except core.OperationError as error:

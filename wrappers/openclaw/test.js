@@ -15,6 +15,7 @@ for (const expected of [
   "lobster_buffet_operation_plan",
   "lobster_buffet_project_inspect",
   "lobster_buffet_project_lifecycle",
+  "lobster_buffet_incident_list",
 ]) {
   if (!byName.has(expected)) {
     throw new Error(`missing registered tool: ${expected}`);
@@ -63,7 +64,14 @@ async function main() {
     throw new Error("project lifecycle wrapper returned the wrong preview");
   }
 
-  const serialized = JSON.stringify({ description, inspect, lifecycle, list, plan });
+  const incidents = await call("lobster_buffet_incident_list", {
+    adapter_config: "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
+  });
+  if (!incidents.incidents.some((incident) => incident.status === "stale" && incident.resurface === true)) {
+    throw new Error("incident list did not surface stale incident state");
+  }
+
+  const serialized = JSON.stringify({ description, incidents, inspect, lifecycle, list, plan });
   for (const fragment of ["channel:", "0000000000000000000", "/home/", "github.com/RusDavies"]) {
     if (serialized.includes(fragment)) {
       throw new Error(`wrapper output contains forbidden private/local fragment ${fragment}`);

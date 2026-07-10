@@ -30,7 +30,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "status", "severity", "title", "updated_at"],
+        "required": ["id", "status", "severity", "title", "updated_at", "resurface"],
         "properties": {
           "id": {
             "type": "string",
@@ -51,6 +51,9 @@
           "updated_at": {
             "type": "string",
             "minLength": 1
+          },
+          "resurface": {
+            "type": "boolean"
           }
         }
       }

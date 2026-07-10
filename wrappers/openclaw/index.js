@@ -67,6 +67,16 @@ function requireLifecycleAction(value) {
   return action;
 }
 
+function optionalIncidentStatus(value) {
+  const status = readString(value);
+  return ["active", "stale", "closed", "all"].includes(status) ? status : "active";
+}
+
+function optionalDetail(value) {
+  const detail = readString(value);
+  return ["summary", "full"].includes(detail) ? detail : "summary";
+}
+
 function createTool({ name, label, description, parameters, execute }) {
   return {
     name,
@@ -216,6 +226,48 @@ function tools(options) {
         const reason = readString(params.reason);
         if (reason) {
           args.push("--reason", reason);
+        }
+        return runCli(args, options);
+      },
+    }),
+    createTool({
+      name: "lobster_buffet_incident_list",
+      label: "Lobster Buffet Incident List",
+      description: "List active, stale, or closed incidents through the CLI core and configured adapter fixture.",
+      parameters: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          status: {
+            type: "string",
+            description: "Incident status filter.",
+            enum: ["active", "stale", "closed", "all"],
+          },
+          detail: {
+            type: "string",
+            description: "Incident detail level.",
+            enum: ["summary", "full"],
+          },
+          adapter_fixture: {
+            type: "string",
+            description: "Optional adapter fixture path relative to the project root.",
+          },
+          adapter_config: {
+            type: "string",
+            description: "Optional adapter config path relative to the project root.",
+          },
+        },
+      },
+      execute: (params) => {
+        const args = ["incident", "list", "--status", optionalIncidentStatus(params.status), "--detail", optionalDetail(params.detail)];
+        const adapterFixture = readString(params.adapter_fixture);
+        const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
+        if (adapterFixture) {
+          args.push("--adapter-fixture", adapterFixture);
+        } else if (adapterConfig) {
+          args.push("--adapter-config", adapterConfig);
+        } else {
+          args.push("--adapter-fixture", options.defaultAdapterFixture);
         }
         return runCli(args, options);
       },
