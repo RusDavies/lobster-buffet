@@ -15,6 +15,7 @@ for (const expected of [
   "lobster_buffet_operation_plan",
   "lobster_buffet_project_inspect",
   "lobster_buffet_project_lifecycle",
+  "lobster_buffet_git_workflow_guard",
   "lobster_buffet_incident_list",
   "lobster_buffet_alignment_scan",
   "lobster_buffet_review_list",
@@ -68,6 +69,14 @@ async function main() {
     throw new Error("project lifecycle wrapper returned the wrong preview");
   }
 
+  const guard = await call("lobster_buffet_git_workflow_guard", {
+    adapter_config: "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
+    requested_action: "lifecycle_apply",
+  });
+  if (guard.decision !== "allowed" || guard.requested_action !== "lifecycle_apply") {
+    throw new Error("git workflow guard did not return the expected synthetic decision");
+  }
+
   const incidents = await call("lobster_buffet_incident_list", {
     adapter_config: "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
   });
@@ -107,6 +116,7 @@ async function main() {
   const serialized = JSON.stringify({
     alignment,
     description,
+    guard,
     heartbeat,
     heartbeatCheck,
     incidents,

@@ -4,6 +4,7 @@ const path = require("node:path");
 const DEFAULT_ADAPTER_FIXTURE = "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json";
 const DEFAULT_ADAPTER_CONFIG = "";
 const LIFECYCLE_ACTIONS = ["bootstrap", "adopt", "repair", "migrate", "archive"];
+const GIT_WORKFLOW_ACTIONS = ["branch", "commit", "merge", "push", "release", "lifecycle_apply"];
 
 function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -65,6 +66,11 @@ function requireLifecycleAction(value) {
     throw new Error(`Lifecycle action must be one of: ${LIFECYCLE_ACTIONS.join(", ")}`);
   }
   return action;
+}
+
+function optionalGitAction(value) {
+  const action = readString(value);
+  return GIT_WORKFLOW_ACTIONS.includes(action) ? action : "lifecycle_apply";
 }
 
 function optionalIncidentStatus(value) {
@@ -241,6 +247,55 @@ function tools(options) {
         const reason = readString(params.reason);
         if (reason) {
           args.push("--reason", reason);
+        }
+        return runCli(args, options);
+      },
+    }),
+    createTool({
+      name: "lobster_buffet_git_workflow_guard",
+      label: "Lobster Buffet Git Workflow Guard",
+      description: "Evaluate whether a requested git workflow step is allowed before mutation.",
+      parameters: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          requested_action: {
+            type: "string",
+            description: "Git workflow action being considered.",
+            enum: GIT_WORKFLOW_ACTIONS,
+          },
+          detail: {
+            type: "string",
+            description: "Guard detail level.",
+            enum: ["summary", "full"],
+          },
+          adapter_fixture: {
+            type: "string",
+            description: "Optional adapter fixture path relative to the project root.",
+          },
+          adapter_config: {
+            type: "string",
+            description: "Optional adapter config path relative to the project root.",
+          },
+        },
+      },
+      execute: (params) => {
+        const args = [
+          "git",
+          "workflow-guard",
+          "--requested-action",
+          optionalGitAction(params.requested_action),
+          "--detail",
+          optionalDetail(params.detail),
+        ];
+        const adapterFixture = readString(params.adapter_fixture);
+        const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
+        if (adapterFixture) {
+          args.push("--adapter-fixture", adapterFixture);
+        } else if (adapterConfig) {
+          args.push("--adapter-config", adapterConfig);
+        } else {
+          args.push("--adapter-fixture", options.defaultAdapterFixture);
         }
         return runCli(args, options);
       },

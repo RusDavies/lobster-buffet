@@ -92,6 +92,14 @@ CHECKS = [
         ROOT / "fixtures/operations/git.workflow.inspect.output.valid.json",
     ),
     (
+        ROOT / "schemas/operations/git.workflow.guard.input.v0.1.0.json",
+        ROOT / "fixtures/operations/git.workflow.guard.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/git.workflow.guard.output.v0.1.0.json",
+        ROOT / "fixtures/operations/git.workflow.guard.output.valid.json",
+    ),
+    (
         ROOT / "schemas/operations/alignment.scan.input.v0.1.0.json",
         ROOT / "fixtures/operations/alignment.scan.input.valid.json",
     ),

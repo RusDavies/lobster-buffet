@@ -52,6 +52,24 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
     )
+
+    git = subparsers.add_parser("git")
+    git_subparsers = git.add_subparsers(dest="action", required=True)
+
+    git_workflow_guard = git_subparsers.add_parser("workflow-guard")
+    git_workflow_guard.add_argument("--requested-action", choices=core.GIT_WORKFLOW_ACTIONS, default="lifecycle_apply")
+    git_workflow_guard.add_argument("--detail", choices=["summary", "full"], default="summary")
+    git_workflow_guard.add_argument(
+        "--adapter-fixture",
+        default=None,
+        help="Adapter fixture path. Overrides adapter config.",
+    )
+    git_workflow_guard.add_argument(
+        "--adapter-config",
+        default=None,
+        help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
+    )
+
     for action in core.LIFECYCLE_ACTIONS:
         lifecycle = project_subparsers.add_parser(action)
         lifecycle.add_argument("--project-name", required=True)
@@ -171,6 +189,17 @@ def run(argv: list[str] | None = None) -> int:
 
         if args.group == "project" and args.action in core.LIFECYCLE_ACTIONS:
             emit(core.project_lifecycle_preview(f"project.{args.action}", args.project_name, reason=args.reason))
+            return 0
+
+        if args.group == "git" and args.action == "workflow-guard":
+            emit(
+                core.git_workflow_guard(
+                    requested_action=args.requested_action,
+                    detail=args.detail,
+                    adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
+                    adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
+                )
+            )
             return 0
 
         if args.group == "incident" and args.action == "list":

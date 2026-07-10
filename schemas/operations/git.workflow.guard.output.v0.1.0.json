@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/git.workflow.guard.output.v0.1.0.json",
+  "title": "git.workflow.guard output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["requested_action", "decision", "checks", "next_actions"],
+  "properties": {
+    "requested_action": {
+      "type": "string",
+      "enum": ["branch", "commit", "merge", "push", "release", "lifecycle_apply"]
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["allowed", "blocked"]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "status", "summary"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["repo", "worktree", "sync", "action"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pass", "warning", "blocker"]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "next_actions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

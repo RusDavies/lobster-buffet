@@ -101,11 +101,16 @@ but it does not send messages, schedule jobs, or mark heartbeat state handled.
 - `git.workflow.inspect`: inspect repository boundary, branch, dirty state, and ahead/behind state.
 - `git.workflow.guard`: evaluate whether a requested git workflow step is allowed before mutation.
 
+`git.workflow.guard` is implemented as a read-only traffic-light operation. It
+uses adapter-provided git status to return allowed or blocked with reasons for a
+requested workflow step, but it does not branch, commit, merge, push, or apply
+lifecycle changes.
+
 ## Next Schema Candidates
 
 The next schema work should focus on the remaining high-leverage read-only and state operations:
 
-1. `git.workflow.guard`
+1. `review.update`
 
 Lifecycle apply mode should wait until the write-capable adapter and approval
 gate are concrete. A mutating provider without a firm gate model is still just a

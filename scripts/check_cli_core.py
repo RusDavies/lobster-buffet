@@ -34,6 +34,10 @@ COMMANDS = [
         ROOT / "schemas/operation-plan.v0.1.0.json",
     ),
     (
+        ["python3", "-m", "lobster_buffet.cli", "git", "workflow-guard"],
+        ROOT / "schemas/operations/git.workflow.guard.output.v0.1.0.json",
+    ),
+    (
         ["python3", "-m", "lobster_buffet.cli", "incident", "list"],
         ROOT / "schemas/operations/incident.list.output.v0.1.0.json",
     ),
@@ -108,12 +112,14 @@ def main() -> int:
     review_output = run_json(["python3", "-m", "lobster_buffet.cli", "review", "list"])
     heartbeat_output = run_json(["python3", "-m", "lobster_buffet.cli", "heartbeat", "packet"])
     heartbeat_check_output = run_json(["python3", "-m", "lobster_buffet.cli", "heartbeat", "check"])
+    git_guard_output = run_json(["python3", "-m", "lobster_buffet.cli", "git", "workflow-guard"])
     plan_output = run_json(["python3", "-m", "lobster_buffet.cli", "operation", "plan", "--name", "project.inspect"])
     output_text = json.dumps(
         {
             "alignment": alignment_output,
             "heartbeat": heartbeat_output,
             "heartbeat_check": heartbeat_check_output,
+            "git_guard": git_guard_output,
             "incident": incident_output,
             "plan": plan_output,
             "project": project_output,
@@ -139,6 +145,9 @@ def main() -> int:
 
     if heartbeat_check_output["status"] != "not_due" or heartbeat_check_output["due"] is not False:
         errors.append("heartbeat.check did not return not_due for synthetic heartbeat state")
+
+    if git_guard_output["decision"] != "allowed":
+        errors.append("git.workflow.guard did not return allowed for synthetic clean git state")
 
     if errors:
         print("\n".join(errors))

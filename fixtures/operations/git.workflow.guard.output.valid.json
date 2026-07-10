@@ -1,0 +1,19 @@
+{
+  "requested_action": "lifecycle_apply",
+  "decision": "allowed",
+  "checks": [
+    {
+      "kind": "repo",
+      "status": "pass",
+      "summary": "Repository is available."
+    },
+    {
+      "kind": "worktree",
+      "status": "pass",
+      "summary": "Worktree is clean in synthetic adapter state."
+    }
+  ],
+  "next_actions": [
+    "Proceed to the next operation gate before mutation."
+  ]
+}

@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ADAPTER_FIXTURE = "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json"
 ADAPTER_CONFIG_ENV = "LOBSTER_BUFFET_ADAPTER_CONFIG"
 LIFECYCLE_ACTIONS = ("bootstrap", "adopt", "repair", "migrate", "archive")
+GIT_WORKFLOW_ACTIONS = ("branch", "commit", "merge", "push", "release", "lifecycle_apply")
 
 
 class OperationError(Exception):
@@ -272,6 +273,114 @@ def project_inspect(
             "can_mutate": False,
         },
         "warnings": [] if project.get("project_ref") else ["project reference missing"],
+    }
+
+
+def git_workflow_guard(
+    requested_action: str = "lifecycle_apply",
+    detail: str = "summary",
+    adapter_fixture_path: Path | None = None,
+    adapter_config_path: Path | None = None,
+) -> dict[str, Any]:
+    if requested_action not in GIT_WORKFLOW_ACTIONS:
+        raise OperationError("input.invalid", f"Unsupported git workflow action: {requested_action}")
+    if detail not in {"summary", "full"}:
+        raise OperationError("input.invalid", f"Unsupported git workflow guard detail level: {detail}")
+
+    fixture = load_adapter_fixture(
+        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    )
+    git_status = require_fixture_capability(fixture, "git.inspect_status")["result"]
+    repo = git_status.get("repo", {})
+    worktree = git_status.get("worktree", {})
+    sync = git_status.get("sync", {})
+
+    checks: list[dict[str, str]] = []
+    if not repo.get("is_git_repo", True):
+        checks.append(
+            {
+                "kind": "repo",
+                "status": "blocker",
+                "summary": "Project reference is not a git repository.",
+            }
+        )
+    else:
+        checks.append(
+            {
+                "kind": "repo",
+                "status": "pass",
+                "summary": f"Git repository is readable on branch {repo.get('branch', 'unknown')}.",
+            }
+        )
+
+    changed_count = int(worktree.get("changed_count", 0))
+    untracked_count = int(worktree.get("untracked_count", 0))
+    if repo.get("dirty") or changed_count or untracked_count:
+        checks.append(
+            {
+                "kind": "worktree",
+                "status": "blocker",
+                "summary": f"Worktree has {changed_count} changed and {untracked_count} untracked file(s).",
+            }
+        )
+    else:
+        checks.append(
+            {
+                "kind": "worktree",
+                "status": "pass",
+                "summary": "Worktree is clean in adapter state.",
+            }
+        )
+
+    ahead = int(sync.get("ahead", 0))
+    behind = int(sync.get("behind", 0))
+    if behind:
+        checks.append(
+            {
+                "kind": "sync",
+                "status": "blocker",
+                "summary": f"Branch is behind upstream by {behind} commit(s).",
+            }
+        )
+    elif ahead:
+        checks.append(
+            {
+                "kind": "sync",
+                "status": "warning",
+                "summary": f"Branch is ahead of upstream by {ahead} commit(s).",
+            }
+        )
+    elif detail == "full":
+        checks.append(
+            {
+                "kind": "sync",
+                "status": "pass",
+                "summary": "Branch is in sync with upstream in adapter state.",
+            }
+        )
+
+    blocked = any(check["status"] == "blocker" for check in checks)
+    checks.append(
+        {
+            "kind": "action",
+            "status": "blocker" if blocked else "pass",
+            "summary": (
+                f"{requested_action} is blocked until guard blockers are resolved."
+                if blocked
+                else f"{requested_action} can proceed to its next operation gate."
+            ),
+        }
+    )
+
+    return {
+        "requested_action": requested_action,
+        "decision": "blocked" if blocked else "allowed",
+        "checks": checks,
+        "next_actions": (
+            ["Resolve blocker checks before mutation."]
+            if blocked
+            else ["Proceed to the next operation gate before mutation."]
+        ),
     }
 
 

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/git.workflow.guard.input.v0.1.0.json",
+  "title": "git.workflow.guard input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "requested_action": {
+      "type": "string",
+      "enum": ["branch", "commit", "merge", "push", "release", "lifecycle_apply"],
+      "default": "lifecycle_apply"
+    },
+    "detail": {
+      "type": "string",
+      "enum": ["summary", "full"],
+      "default": "summary"
+    }
+  }
+}
