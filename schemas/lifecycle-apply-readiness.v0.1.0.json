@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/lifecycle-apply-readiness.v0.1.0.json",
+  "title": "Lobster Buffet lifecycle apply-mode readiness",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "operation_family",
+    "mode",
+    "status",
+    "required_approval",
+    "required_capabilities",
+    "guards",
+    "verification",
+    "privacy"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["lobster-buffet.lifecycle-apply-readiness.v0.1.0"]
+    },
+    "operation_family": {
+      "type": "string",
+      "enum": ["project_lifecycle"]
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["apply"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ready", "blocked"]
+    },
+    "required_approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "scope", "completion_required"],
+      "properties": {
+        "class": {
+          "type": "string",
+          "enum": ["repo_mutation"]
+        },
+        "scope": {
+          "type": "string",
+          "enum": ["operation_plan"]
+        },
+        "completion_required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "required_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "project.resolve",
+          "filesystem.read_project_metadata",
+          "filesystem.write_project_files",
+          "git.inspect_status",
+          "git.write_branch",
+          "approval.request"
+        ]
+      }
+    },
+    "guards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "status", "summary"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": ["required", "passed", "blocked"]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "summary"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["private_refs_only", "disclosure_policy"],
+      "properties": {
+        "private_refs_only": {
+          "type": "boolean"
+        },
+        "disclosure_policy": {
+          "type": "string",
+          "enum": ["local_adapter_controlled"]
+        }
+      }
+    }
+  }
+}

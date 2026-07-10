@@ -36,6 +36,10 @@ CHECKS = [
         ROOT / "manifests/release-compatibility.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/lifecycle-apply-readiness.v0.1.0.json",
+        ROOT / "fixtures/adapters/synthetic-lifecycle-apply-readiness.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/local-adapter-fixture.v0.1.0.json",
         ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
     ),

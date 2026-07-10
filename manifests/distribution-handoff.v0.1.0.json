@@ -38,6 +38,11 @@
       "role": "Human-readable release, versioning, and compatibility policy."
     },
     {
+      "path": "docs/operations/LIFECYCLE_APPLY_READINESS.md",
+      "kind": "doc",
+      "role": "Human-readable lifecycle apply-mode readiness contract."
+    },
+    {
       "path": "schemas/",
       "kind": "schema",
       "role": "Machine-readable JSON Schemas for operations, manifests, adapters, and handoff metadata."

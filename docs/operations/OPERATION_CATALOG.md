@@ -40,6 +40,12 @@ approval-required plans and verification steps, but it does not perform
 filesystem or git mutations. Apply-mode lifecycle execution requires
 write-capable local adapters and an approval gate.
 
+Lifecycle apply-mode readiness is defined in
+`docs/operations/LIFECYCLE_APPLY_READINESS.md` and validated with
+`fixtures/adapters/synthetic-lifecycle-apply-readiness.v0.1.0.json`. The
+synthetic fixture is intentionally `blocked`; it defines the required shape but
+does not complete approval or execute writes.
+
 ### Incident
 
 - `incident.list`: list active, stale, or recently closed incidents.

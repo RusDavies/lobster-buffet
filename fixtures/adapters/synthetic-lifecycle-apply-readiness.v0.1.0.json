@@ -1,0 +1,55 @@
+{
+  "schema": "lobster-buffet.lifecycle-apply-readiness.v0.1.0",
+  "operation_family": "project_lifecycle",
+  "mode": "apply",
+  "status": "blocked",
+  "required_approval": {
+    "class": "repo_mutation",
+    "scope": "operation_plan",
+    "completion_required": true
+  },
+  "required_capabilities": [
+    "project.resolve",
+    "filesystem.read_project_metadata",
+    "filesystem.write_project_files",
+    "git.inspect_status",
+    "git.write_branch",
+    "approval.request"
+  ],
+  "guards": [
+    {
+      "name": "operation_plan",
+      "status": "required",
+      "summary": "Apply mode requires a reviewed operation plan."
+    },
+    {
+      "name": "approval_completion",
+      "status": "blocked",
+      "summary": "Synthetic fixture does not include completed repo-mutation approval."
+    },
+    {
+      "name": "write_capability",
+      "status": "required",
+      "summary": "Local adapter must provide filesystem and git write capabilities."
+    },
+    {
+      "name": "dirty_worktree",
+      "status": "required",
+      "summary": "Git status must be inspected before mutation."
+    }
+  ],
+  "verification": [
+    {
+      "kind": "schema",
+      "summary": "Validate apply-mode readiness before execution."
+    },
+    {
+      "kind": "post_write",
+      "summary": "Validate lifecycle files and git status after adapter writes."
+    }
+  ],
+  "privacy": {
+    "private_refs_only": true,
+    "disclosure_policy": "local_adapter_controlled"
+  }
+}
