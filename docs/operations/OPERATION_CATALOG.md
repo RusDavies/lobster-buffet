@@ -51,6 +51,11 @@ local incident state through `incident.read_state`, returns counts plus
 redacted incident summaries, and includes stale incidents marked for
 resurfacing in the default active view.
 
+`incident.update` and `incident.close` are schema-defined only. Their contracts
+describe local incident-state writes as approval-gated operations with
+state-conflict verification; they do not yet execute mutations through the CLI
+core or OpenClaw wrapper.
+
 ### Alignment
 
 - `alignment.scan`: compare current work against project goal, backlog, docs, and artifacts.
@@ -74,12 +79,10 @@ resurfacing in the default active view.
 
 The next schema work should focus on the remaining high-leverage read-only and state operations:
 
-1. `incident.update`
-2. `incident.close`
-3. `review.list`
-4. `heartbeat.packet`
-5. `heartbeat.check`
-6. `git.workflow.guard`
+1. `review.list`
+2. `heartbeat.packet`
+3. `heartbeat.check`
+4. `git.workflow.guard`
 
 Lifecycle apply mode should wait until the write-capable adapter and approval
 gate are concrete. A mutating provider without a firm gate model is still just a

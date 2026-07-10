@@ -129,12 +129,12 @@
       "name": "incident.update",
       "version": "0.1.0",
       "stability": "draft",
-      "implementation_state": "planned",
+      "implementation_state": "schema_defined",
       "read_only": false,
       "side_effects": ["filesystem.write"],
       "approval_classes": [],
       "adapter_capabilities": ["incident.read_state", "incident.write_state"],
-      "errors": ["input.invalid", "incident.not_found", "incident.state_conflict", "adapter.capability_missing"],
+      "errors": ["input.invalid", "incident.not_found", "incident.state_conflict", "adapter.capability_missing", "approval.required"],
       "summary": "Append an incident update, status transition, blocker, or next action."
     },
     {
@@ -142,12 +142,12 @@
       "name": "incident.close",
       "version": "0.1.0",
       "stability": "draft",
-      "implementation_state": "planned",
+      "implementation_state": "schema_defined",
       "read_only": false,
       "side_effects": ["filesystem.write"],
       "approval_classes": [],
       "adapter_capabilities": ["incident.read_state", "incident.write_state"],
-      "errors": ["input.invalid", "incident.not_found", "incident.close_blocked", "adapter.capability_missing"],
+      "errors": ["input.invalid", "incident.not_found", "incident.close_blocked", "incident.state_conflict", "adapter.capability_missing", "approval.required"],
       "summary": "Close an incident with resolution, evidence refs, and follow-up state."
     },
     {

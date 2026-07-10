@@ -1,0 +1,49 @@
+{
+  "operation": {
+    "name": "incident.update",
+    "version": "0.1.0",
+    "stability": "draft"
+  },
+  "mode": "plan",
+  "status": "requires_approval",
+  "mutates": false,
+  "incident": {
+    "id": "incident-002",
+    "ref_policy": "opaque_ref",
+    "current_status": "stale",
+    "update_kind": "next_action"
+  },
+  "approval": {
+    "required": true,
+    "classes": [],
+    "reason": "Incident updates write local incident state and require an explicit apply gate."
+  },
+  "side_effects": [
+    "filesystem.write"
+  ],
+  "adapter_capabilities": [
+    "incident.read_state",
+    "incident.write_state"
+  ],
+  "preview": [
+    {
+      "kind": "filesystem.write",
+      "path_policy": "category_only",
+      "summary": "Append a redacted incident update record."
+    }
+  ],
+  "verification": [
+    {
+      "kind": "schema",
+      "description": "Validate the incident update result shape before execution handoff."
+    },
+    {
+      "kind": "state_conflict",
+      "description": "Confirm the incident has not changed since planning."
+    }
+  ],
+  "warnings": [
+    "This fixture describes planned mutation only; it does not write incident state."
+  ],
+  "reason": "Incident has exceeded the local resurfacing threshold."
+}

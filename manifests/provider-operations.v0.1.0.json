@@ -213,6 +213,89 @@
       }
     },
     {
+      "name": "incident.update",
+      "version": "0.1.0",
+      "stability": "draft",
+      "definition_ref": "docs/operations/OPERATION_CATALOG.md#incident",
+      "read_only": false,
+      "input_schema_ref": "schemas/operations/incident.update.input.v0.1.0.json",
+      "output_schema_ref": "schemas/operations/incident.update.output.v0.1.0.json",
+      "side_effects": [
+        "filesystem.write"
+      ],
+      "approval": {
+        "required": true,
+        "classes": []
+      },
+      "adapter_capabilities": [
+        "incident.read_state",
+        "incident.write_state"
+      ],
+      "errors": [
+        "input.invalid",
+        "incident.not_found",
+        "incident.state_conflict",
+        "adapter.capability_missing",
+        "approval.required"
+      ],
+      "portage": {
+        "package_manifest_required": true,
+        "doctor_checks": [
+          "input_schema_exists",
+          "output_schema_exists",
+          "fixture_validates",
+          "approval_required",
+          "adapter_capabilities_declared"
+        ]
+      },
+      "redshield": {
+        "operation_plan_required": true,
+        "audit_event_required": true
+      }
+    },
+    {
+      "name": "incident.close",
+      "version": "0.1.0",
+      "stability": "draft",
+      "definition_ref": "docs/operations/OPERATION_CATALOG.md#incident",
+      "read_only": false,
+      "input_schema_ref": "schemas/operations/incident.close.input.v0.1.0.json",
+      "output_schema_ref": "schemas/operations/incident.close.output.v0.1.0.json",
+      "side_effects": [
+        "filesystem.write"
+      ],
+      "approval": {
+        "required": true,
+        "classes": []
+      },
+      "adapter_capabilities": [
+        "incident.read_state",
+        "incident.write_state"
+      ],
+      "errors": [
+        "input.invalid",
+        "incident.not_found",
+        "incident.close_blocked",
+        "incident.state_conflict",
+        "adapter.capability_missing",
+        "approval.required"
+      ],
+      "portage": {
+        "package_manifest_required": true,
+        "doctor_checks": [
+          "input_schema_exists",
+          "output_schema_exists",
+          "fixture_validates",
+          "approval_required",
+          "adapter_capabilities_declared"
+        ]
+      },
+      "redshield": {
+        "operation_plan_required": true,
+        "audit_event_required": true
+      }
+    },
+    {
       "name": "project.inspect",
       "version": "0.1.0",
       "stability": "draft",

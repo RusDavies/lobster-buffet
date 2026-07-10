@@ -99,6 +99,22 @@ CHECKS = [
         ROOT / "schemas/operations/incident.list.output.v0.1.0.json",
         ROOT / "fixtures/operations/incident.list.output.valid.json",
     ),
+    (
+        ROOT / "schemas/operations/incident.update.input.v0.1.0.json",
+        ROOT / "fixtures/operations/incident.update.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/incident.update.output.v0.1.0.json",
+        ROOT / "fixtures/operations/incident.update.output.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/incident.close.input.v0.1.0.json",
+        ROOT / "fixtures/operations/incident.close.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/incident.close.output.v0.1.0.json",
+        ROOT / "fixtures/operations/incident.close.output.valid.json",
+    ),
 ]
 
 MANIFEST = ROOT / "manifests/provider-operations.v0.1.0.json"

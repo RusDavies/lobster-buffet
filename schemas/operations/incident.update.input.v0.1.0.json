@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/incident.update.input.v0.1.0.json",
+  "title": "incident.update input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["operation", "mode", "incident_id", "update"],
+  "properties": {
+    "operation": {
+      "type": "string",
+      "enum": ["incident.update"]
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["plan", "apply"]
+    },
+    "incident_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "update": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "summary"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["status", "blocker", "next_action", "evidence", "note"]
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "stale", "closed"]
+        }
+      }
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

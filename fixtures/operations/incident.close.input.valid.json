@@ -1,0 +1,11 @@
+{
+  "operation": "incident.close",
+  "mode": "plan",
+  "incident_id": "incident-002",
+  "resolution": {
+    "outcome": "resolved",
+    "summary": "Stale incident was reviewed and no longer needs resurfacing.",
+    "follow_up_required": false
+  },
+  "reason": "Incident has a recorded resolution."
+}

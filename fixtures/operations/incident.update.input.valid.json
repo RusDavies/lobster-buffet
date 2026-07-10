@@ -1,0 +1,10 @@
+{
+  "operation": "incident.update",
+  "mode": "plan",
+  "incident_id": "incident-002",
+  "update": {
+    "kind": "next_action",
+    "summary": "Resurface stale incident for visible triage."
+  },
+  "reason": "Incident has exceeded the local resurfacing threshold."
+}

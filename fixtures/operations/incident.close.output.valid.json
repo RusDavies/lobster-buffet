@@ -1,0 +1,51 @@
+{
+  "operation": {
+    "name": "incident.close",
+    "version": "0.1.0",
+    "stability": "draft"
+  },
+  "mode": "plan",
+  "status": "requires_approval",
+  "mutates": false,
+  "incident": {
+    "id": "incident-002",
+    "ref_policy": "opaque_ref",
+    "current_status": "stale",
+    "target_status": "closed",
+    "outcome": "resolved",
+    "follow_up_required": false
+  },
+  "approval": {
+    "required": true,
+    "classes": [],
+    "reason": "Incident closure writes local incident state and requires an explicit apply gate."
+  },
+  "side_effects": [
+    "filesystem.write"
+  ],
+  "adapter_capabilities": [
+    "incident.read_state",
+    "incident.write_state"
+  ],
+  "preview": [
+    {
+      "kind": "filesystem.write",
+      "path_policy": "category_only",
+      "summary": "Append a closure record and mark the incident closed."
+    }
+  ],
+  "verification": [
+    {
+      "kind": "schema",
+      "description": "Validate the incident close result shape before execution handoff."
+    },
+    {
+      "kind": "state_conflict",
+      "description": "Confirm the incident has not changed since planning."
+    }
+  ],
+  "warnings": [
+    "This fixture describes planned mutation only; it does not write incident state."
+  ],
+  "reason": "Incident has a recorded resolution."
+}

@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/incident.update.output.v0.1.0.json",
+  "title": "incident.update output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "operation",
+    "mode",
+    "status",
+    "mutates",
+    "incident",
+    "approval",
+    "side_effects",
+    "adapter_capabilities",
+    "preview",
+    "verification",
+    "warnings",
+    "reason"
+  ],
+  "properties": {
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "stability"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["incident.update"]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stability": {
+          "type": "string",
+          "enum": ["draft", "experimental", "stable", "deprecated"]
+        }
+      }
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["plan", "apply"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["requires_approval", "applied"]
+    },
+    "mutates": {
+      "type": "boolean"
+    },
+    "incident": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "ref_policy", "current_status", "update_kind"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ref_policy": {
+          "type": "string",
+          "enum": ["opaque_ref"]
+        },
+        "current_status": {
+          "type": "string",
+          "enum": ["active", "stale", "closed"]
+        },
+        "target_status": {
+          "type": "string",
+          "enum": ["active", "stale", "closed"]
+        },
+        "update_kind": {
+          "type": "string",
+          "enum": ["status", "blocker", "next_action", "evidence", "note"]
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "classes", "reason"],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "classes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "side_effects": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["filesystem.write"]
+      }
+    },
+    "adapter_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "preview": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "path_policy", "summary"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "path_policy": {
+            "type": "string",
+            "enum": ["category_only"]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "description"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
