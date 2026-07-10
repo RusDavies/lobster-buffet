@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/heartbeat.check.output.v0.1.0.json",
+  "title": "heartbeat.check output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["due", "status", "reason", "checks"],
+  "properties": {
+    "due": {
+      "type": "boolean"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["due", "not_due", "blocked"]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "status", "summary"],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": ["project", "incident", "review", "heartbeat"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["ok", "attention", "blocked"]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

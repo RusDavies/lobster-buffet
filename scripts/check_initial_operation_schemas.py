@@ -139,6 +139,14 @@ CHECKS = [
         ROOT / "schemas/operations/heartbeat.packet.output.v0.1.0.json",
         ROOT / "fixtures/operations/heartbeat.packet.output.valid.json",
     ),
+    (
+        ROOT / "schemas/operations/heartbeat.check.input.v0.1.0.json",
+        ROOT / "fixtures/operations/heartbeat.check.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/heartbeat.check.output.v0.1.0.json",
+        ROOT / "fixtures/operations/heartbeat.check.output.valid.json",
+    ),
 ]
 
 MANIFEST = ROOT / "manifests/provider-operations.v0.1.0.json"

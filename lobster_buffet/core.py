@@ -546,6 +546,54 @@ def heartbeat_packet(
     }
 
 
+def heartbeat_check(
+    scope: str = "all",
+    detail: str = "summary",
+    adapter_fixture_path: Path | None = None,
+    adapter_config_path: Path | None = None,
+) -> dict[str, Any]:
+    if scope not in {"project", "incident", "review", "all"}:
+        raise OperationError("input.invalid", f"Unsupported heartbeat check scope: {scope}")
+    if detail not in {"summary", "full"}:
+        raise OperationError("input.invalid", f"Unsupported heartbeat check detail level: {detail}")
+
+    fixture = load_adapter_fixture(
+        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    )
+    heartbeat_state = require_fixture_capability(fixture, "heartbeat.read_state")["result"]
+    due = bool(heartbeat_state.get("visible_progress_due"))
+    due_count = heartbeat_state.get("due_count", 0)
+    status = "due" if due else "not_due"
+    summary = "Visible progress heartbeat is due." if due else "No visible heartbeat is due."
+
+    checks = [
+        {
+            "kind": "heartbeat",
+            "status": "attention" if due else "ok",
+            "summary": summary,
+        }
+    ]
+    if detail == "full":
+        checks.append(
+            {
+                "kind": "project",
+                "status": "ok",
+                "summary": f"Heartbeat scope {scope!r} evaluated with {due_count} due item(s).",
+            }
+        )
+
+    return {
+        "due": due,
+        "status": status,
+        "reason": (
+            f"{due_count} visible heartbeat item(s) are due."
+            if due
+            else "No visible heartbeat is due in synthetic heartbeat state."
+        ),
+        "checks": checks,
+    }
+
+
 def lifecycle_preview_steps(action: str) -> list[dict[str, str]]:
     summaries = {
         "bootstrap": [

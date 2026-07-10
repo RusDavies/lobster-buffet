@@ -57,6 +57,10 @@ COMMANDS = [
         ["python3", "-m", "lobster_buffet.cli", "heartbeat", "packet"],
         ROOT / "schemas/operations/heartbeat.packet.output.v0.1.0.json",
     ),
+    (
+        ["python3", "-m", "lobster_buffet.cli", "heartbeat", "check"],
+        ROOT / "schemas/operations/heartbeat.check.output.v0.1.0.json",
+    ),
 ]
 
 for action in ("bootstrap", "adopt", "repair", "migrate", "archive"):
@@ -103,11 +107,13 @@ def main() -> int:
     alignment_output = run_json(["python3", "-m", "lobster_buffet.cli", "alignment", "scan"])
     review_output = run_json(["python3", "-m", "lobster_buffet.cli", "review", "list"])
     heartbeat_output = run_json(["python3", "-m", "lobster_buffet.cli", "heartbeat", "packet"])
+    heartbeat_check_output = run_json(["python3", "-m", "lobster_buffet.cli", "heartbeat", "check"])
     plan_output = run_json(["python3", "-m", "lobster_buffet.cli", "operation", "plan", "--name", "project.inspect"])
     output_text = json.dumps(
         {
             "alignment": alignment_output,
             "heartbeat": heartbeat_output,
+            "heartbeat_check": heartbeat_check_output,
             "incident": incident_output,
             "plan": plan_output,
             "project": project_output,
@@ -130,6 +136,9 @@ def main() -> int:
 
     if heartbeat_output["overall_status"] != "blocked":
         errors.append("heartbeat.packet did not return blocked status for the synthetic blocked review")
+
+    if heartbeat_check_output["status"] != "not_due" or heartbeat_check_output["due"] is not False:
+        errors.append("heartbeat.check did not return not_due for synthetic heartbeat state")
 
     if errors:
         print("\n".join(errors))

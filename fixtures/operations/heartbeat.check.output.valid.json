@@ -1,0 +1,12 @@
+{
+  "due": false,
+  "status": "not_due",
+  "reason": "No visible heartbeat is due in synthetic heartbeat state.",
+  "checks": [
+    {
+      "kind": "heartbeat",
+      "status": "ok",
+      "summary": "No visible heartbeat is due."
+    }
+  ]
+}

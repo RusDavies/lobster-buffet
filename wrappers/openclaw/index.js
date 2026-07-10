@@ -87,6 +87,11 @@ function optionalAlignmentSource(value) {
   return ["project", "channel", "explicit"].includes(source) ? source : "project";
 }
 
+function optionalHeartbeatScope(value) {
+  const scope = readString(value);
+  return ["project", "incident", "review", "all"].includes(scope) ? scope : "all";
+}
+
 function createTool({ name, label, description, parameters, execute }) {
   return {
     name,
@@ -413,6 +418,48 @@ function tools(options) {
       },
       execute: (params) => {
         const args = ["heartbeat", "packet", "--detail", optionalDetail(params.detail)];
+        const adapterFixture = readString(params.adapter_fixture);
+        const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
+        if (adapterFixture) {
+          args.push("--adapter-fixture", adapterFixture);
+        } else if (adapterConfig) {
+          args.push("--adapter-config", adapterConfig);
+        } else {
+          args.push("--adapter-fixture", options.defaultAdapterFixture);
+        }
+        return runCli(args, options);
+      },
+    }),
+    createTool({
+      name: "lobster_buffet_heartbeat_check",
+      label: "Lobster Buffet Heartbeat Check",
+      description: "Check whether a visible heartbeat is due through the CLI core and configured adapter fixture.",
+      parameters: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          scope: {
+            type: "string",
+            description: "Heartbeat check scope.",
+            enum: ["project", "incident", "review", "all"],
+          },
+          detail: {
+            type: "string",
+            description: "Heartbeat detail level.",
+            enum: ["summary", "full"],
+          },
+          adapter_fixture: {
+            type: "string",
+            description: "Optional adapter fixture path relative to the project root.",
+          },
+          adapter_config: {
+            type: "string",
+            description: "Optional adapter config path relative to the project root.",
+          },
+        },
+      },
+      execute: (params) => {
+        const args = ["heartbeat", "check", "--scope", optionalHeartbeatScope(params.scope), "--detail", optionalDetail(params.detail)];
         const adapterFixture = readString(params.adapter_fixture);
         const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
         if (adapterFixture) {

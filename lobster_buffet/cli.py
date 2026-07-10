@@ -126,6 +126,19 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
     )
+    heartbeat_check = heartbeat_subparsers.add_parser("check")
+    heartbeat_check.add_argument("--scope", choices=["project", "incident", "review", "all"], default="all")
+    heartbeat_check.add_argument("--detail", choices=["summary", "full"], default="summary")
+    heartbeat_check.add_argument(
+        "--adapter-fixture",
+        default=None,
+        help="Adapter fixture path. Overrides adapter config.",
+    )
+    heartbeat_check.add_argument(
+        "--adapter-config",
+        default=None,
+        help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
+    )
 
     return parser
 
@@ -199,6 +212,17 @@ def run(argv: list[str] | None = None) -> int:
         if args.group == "heartbeat" and args.action == "packet":
             emit(
                 core.heartbeat_packet(
+                    detail=args.detail,
+                    adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
+                    adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
+                )
+            )
+            return 0
+
+        if args.group == "heartbeat" and args.action == "check":
+            emit(
+                core.heartbeat_check(
+                    scope=args.scope,
                     detail=args.detail,
                     adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
                     adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
