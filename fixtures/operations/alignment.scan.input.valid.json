@@ -3,6 +3,6 @@
     "source": "project",
     "project": "lobster-buffet"
   },
-  "current_plan_summary": "Add read-only operation schemas.",
+  "current_plan_summary": "Implement an intent-alignment scanner.",
   "detail": "summary"
 }

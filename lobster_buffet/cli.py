@@ -74,6 +74,26 @@ def build_parser() -> argparse.ArgumentParser:
         help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
     )
 
+    alignment = subparsers.add_parser("alignment")
+    alignment_subparsers = alignment.add_subparsers(dest="action", required=True)
+
+    alignment_scan = alignment_subparsers.add_parser("scan")
+    alignment_scan.add_argument("--source", choices=["project", "channel", "explicit"], default="project")
+    alignment_scan.add_argument("--project", default=None)
+    alignment_scan.add_argument("--label", default=None)
+    alignment_scan.add_argument("--current-plan-summary", default=None)
+    alignment_scan.add_argument("--detail", choices=["summary", "full"], default="summary")
+    alignment_scan.add_argument(
+        "--adapter-fixture",
+        default=None,
+        help="Adapter fixture path. Overrides adapter config.",
+    )
+    alignment_scan.add_argument(
+        "--adapter-config",
+        default=None,
+        help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
+    )
+
     return parser
 
 
@@ -111,6 +131,20 @@ def run(argv: list[str] | None = None) -> int:
             emit(
                 core.incident_list(
                     status=args.status,
+                    detail=args.detail,
+                    adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
+                    adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
+                )
+            )
+            return 0
+
+        if args.group == "alignment" and args.action == "scan":
+            emit(
+                core.alignment_scan(
+                    source=args.source,
+                    project=args.project,
+                    label=args.label,
+                    current_plan_summary=args.current_plan_summary,
                     detail=args.detail,
                     adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
                     adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,

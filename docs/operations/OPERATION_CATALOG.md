@@ -60,6 +60,11 @@ core or OpenClaw wrapper.
 
 - `alignment.scan`: compare current work against project goal, backlog, docs, and artifacts.
 
+`alignment.scan` is implemented as a read-only provider operation. It reads
+project metadata and git status through local adapter capabilities, returns an
+aligned / drifting / blocked verdict, and reports compact evidence without
+exposing local paths or private channel data.
+
 ### Review
 
 - `review.list`: list active review sessions, pending comments, and apply gates.

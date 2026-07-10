@@ -2,12 +2,17 @@
   "verdict": "aligned",
   "findings": [
     {
-      "kind": "scope",
+      "kind": "intent",
       "severity": "info",
-      "summary": "Work remains inside Lobster Buffet runtime/provider boundaries."
+      "summary": "Build a portable shared-provider layer for OpenClaw process operations."
+    },
+    {
+      "kind": "backlog",
+      "severity": "info",
+      "summary": "Backlog has a current next item inside the provider boundary."
     }
   ],
   "next_actions": [
-    "Proceed with the planned read-only schema slice."
+    "Proceed with the current provider-boundary work item."
   ]
 }

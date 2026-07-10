@@ -16,6 +16,7 @@ for (const expected of [
   "lobster_buffet_project_inspect",
   "lobster_buffet_project_lifecycle",
   "lobster_buffet_incident_list",
+  "lobster_buffet_alignment_scan",
 ]) {
   if (!byName.has(expected)) {
     throw new Error(`missing registered tool: ${expected}`);
@@ -71,7 +72,15 @@ async function main() {
     throw new Error("incident list did not surface stale incident state");
   }
 
-  const serialized = JSON.stringify({ description, incidents, inspect, lifecycle, list, plan });
+  const alignment = await call("lobster_buffet_alignment_scan", {
+    adapter_config: "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
+    current_plan_summary: "Implement an intent-alignment scanner.",
+  });
+  if (alignment.verdict !== "aligned") {
+    throw new Error("alignment scan did not return the expected synthetic verdict");
+  }
+
+  const serialized = JSON.stringify({ alignment, description, incidents, inspect, lifecycle, list, plan });
   for (const fragment of ["channel:", "0000000000000000000", "/home/", "github.com/RusDavies"]) {
     if (serialized.includes(fragment)) {
       throw new Error(`wrapper output contains forbidden private/local fragment ${fragment}`);

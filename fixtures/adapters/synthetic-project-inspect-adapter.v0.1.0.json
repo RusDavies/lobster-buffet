@@ -40,6 +40,15 @@
             "open_later": 7,
             "done": 12
           },
+          "intent": {
+            "goal": "Build a portable shared-provider layer for OpenClaw process operations.",
+            "current_priority": "Keep work centered on Lobster Buffet's runtime/provider boundary.",
+            "non_goals": [
+              "Do not move Lobster Portage packaging work into this backlog.",
+              "Do not store private workspace data in shared provider artifacts.",
+              "Do not make Redshield policy layers part of the provider core."
+            ]
+          },
           "metadata_refs": [
             "BACKLOG.md",
             "docs/GOAL.md",

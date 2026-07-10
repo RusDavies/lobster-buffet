@@ -37,6 +37,18 @@ COMMANDS = [
         ["python3", "-m", "lobster_buffet.cli", "incident", "list"],
         ROOT / "schemas/operations/incident.list.output.v0.1.0.json",
     ),
+    (
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "alignment",
+            "scan",
+            "--current-plan-summary",
+            "Implement an intent-alignment scanner.",
+        ],
+        ROOT / "schemas/operations/alignment.scan.output.v0.1.0.json",
+    ),
 ]
 
 for action in ("bootstrap", "adopt", "repair", "migrate", "archive"):
@@ -80,14 +92,21 @@ def main() -> int:
 
     project_output = run_json(["python3", "-m", "lobster_buffet.cli", "project", "inspect"])
     incident_output = run_json(["python3", "-m", "lobster_buffet.cli", "incident", "list"])
+    alignment_output = run_json(["python3", "-m", "lobster_buffet.cli", "alignment", "scan"])
     plan_output = run_json(["python3", "-m", "lobster_buffet.cli", "operation", "plan", "--name", "project.inspect"])
-    output_text = json.dumps({"incident": incident_output, "plan": plan_output, "project": project_output}, sort_keys=True)
+    output_text = json.dumps(
+        {"alignment": alignment_output, "incident": incident_output, "plan": plan_output, "project": project_output},
+        sort_keys=True,
+    )
     for fragment in ("channel:", "0000000000000000000", "/home/", "github.com/RusDavies"):
         if fragment in output_text:
             errors.append(f"project.inspect output contains forbidden private/local fragment {fragment!r}")
 
     if not any(incident["status"] == "stale" and incident["resurface"] for incident in incident_output["incidents"]):
         errors.append("incident.list did not include a stale incident marked for resurfacing")
+
+    if alignment_output["verdict"] != "aligned":
+        errors.append("alignment.scan did not return an aligned verdict for synthetic provider-boundary work")
 
     if errors:
         print("\n".join(errors))

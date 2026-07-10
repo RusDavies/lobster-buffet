@@ -77,6 +77,11 @@ function optionalDetail(value) {
   return ["summary", "full"].includes(detail) ? detail : "summary";
 }
 
+function optionalAlignmentSource(value) {
+  const source = readString(value);
+  return ["project", "channel", "explicit"].includes(source) ? source : "project";
+}
+
 function createTool({ name, label, description, parameters, execute }) {
   return {
     name,
@@ -260,6 +265,70 @@ function tools(options) {
       },
       execute: (params) => {
         const args = ["incident", "list", "--status", optionalIncidentStatus(params.status), "--detail", optionalDetail(params.detail)];
+        const adapterFixture = readString(params.adapter_fixture);
+        const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
+        if (adapterFixture) {
+          args.push("--adapter-fixture", adapterFixture);
+        } else if (adapterConfig) {
+          args.push("--adapter-config", adapterConfig);
+        } else {
+          args.push("--adapter-fixture", options.defaultAdapterFixture);
+        }
+        return runCli(args, options);
+      },
+    }),
+    createTool({
+      name: "lobster_buffet_alignment_scan",
+      label: "Lobster Buffet Alignment Scan",
+      description: "Scan project intent, backlog, and artifact evidence through the CLI core.",
+      parameters: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          source: {
+            type: "string",
+            description: "Alignment context source.",
+            enum: ["project", "channel", "explicit"],
+          },
+          project: {
+            type: "string",
+            description: "Optional project label or opaque reference.",
+          },
+          label: {
+            type: "string",
+            description: "Optional context label.",
+          },
+          current_plan_summary: {
+            type: "string",
+            description: "Short summary of the work being checked.",
+          },
+          detail: {
+            type: "string",
+            description: "Alignment detail level.",
+            enum: ["summary", "full"],
+          },
+          adapter_fixture: {
+            type: "string",
+            description: "Optional adapter fixture path relative to the project root.",
+          },
+          adapter_config: {
+            type: "string",
+            description: "Optional adapter config path relative to the project root.",
+          },
+        },
+      },
+      execute: (params) => {
+        const args = ["alignment", "scan", "--source", optionalAlignmentSource(params.source), "--detail", optionalDetail(params.detail)];
+        for (const [paramName, flagName] of [
+          ["project", "--project"],
+          ["label", "--label"],
+          ["current_plan_summary", "--current-plan-summary"],
+        ]) {
+          const value = readString(params[paramName]);
+          if (value) {
+            args.push(flagName, value);
+          }
+        }
         const adapterFixture = readString(params.adapter_fixture);
         const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
         if (adapterFixture) {

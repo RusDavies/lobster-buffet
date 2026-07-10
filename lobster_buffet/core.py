@@ -320,6 +320,107 @@ def incident_list(
     }
 
 
+def alignment_scan(
+    source: str = "project",
+    project: str | None = None,
+    label: str | None = None,
+    current_plan_summary: str | None = None,
+    detail: str = "summary",
+    adapter_fixture_path: Path | None = None,
+    adapter_config_path: Path | None = None,
+) -> dict[str, Any]:
+    if source not in {"project", "channel", "explicit"}:
+        raise OperationError("input.invalid", f"Unsupported alignment context source: {source}")
+    if detail not in {"summary", "full"}:
+        raise OperationError("input.invalid", f"Unsupported alignment detail level: {detail}")
+
+    fixture = load_adapter_fixture(
+        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    )
+    project_ref = require_fixture_capability(fixture, "project.resolve")["result"]
+    metadata = require_fixture_capability(fixture, "filesystem.read_project_metadata")["result"]
+    git_status = require_fixture_capability(fixture, "git.inspect_status")["result"]
+
+    findings: list[dict[str, str]] = []
+    intent = metadata.get("intent", {})
+    plan = (current_plan_summary or metadata.get("intent", {}).get("current_priority") or "").lower()
+    non_goal_terms = {
+        "portage packaging": "Plan appears to move Lobster Portage packaging work into the Buffet backlog.",
+        "redshield implementation": "Plan appears to implement Redshield behavior inside the Buffet provider core.",
+        "private workspace data": "Plan appears to include private workspace data in shared provider artifacts.",
+        "hosted service": "Plan appears to introduce hosted-service scope before requirements are updated.",
+    }
+
+    if not project_ref.get("project_ref"):
+        findings.append(
+            {
+                "kind": "unknown",
+                "severity": "blocker",
+                "summary": "Adapter did not return an opaque project reference.",
+            }
+        )
+
+    if not intent:
+        findings.append(
+            {
+                "kind": "intent",
+                "severity": "warning",
+                "summary": "Project metadata did not include an intent summary.",
+            }
+        )
+    else:
+        findings.append(
+            {
+                "kind": "intent",
+                "severity": "info",
+                "summary": intent.get("goal", "Project metadata includes an intent summary."),
+            }
+        )
+
+    for term, summary in non_goal_terms.items():
+        if term in plan:
+            findings.append({"kind": "scope", "severity": "warning", "summary": summary})
+
+    if git_status["repo"].get("dirty"):
+        findings.append(
+            {
+                "kind": "artifact",
+                "severity": "warning",
+                "summary": "Repository has uncommitted changes; alignment evidence may be in flux.",
+            }
+        )
+
+    if metadata.get("backlog", {}).get("open_next", 0) > 0:
+        findings.append(
+            {
+                "kind": "backlog",
+                "severity": "info",
+                "summary": "Backlog has a current next item inside the provider boundary.",
+            }
+        )
+
+    blocker_count = sum(1 for finding in findings if finding["severity"] == "blocker")
+    warning_count = sum(1 for finding in findings if finding["severity"] == "warning")
+    if blocker_count:
+        verdict = "blocked"
+    elif warning_count:
+        verdict = "drifting"
+    else:
+        verdict = "aligned"
+
+    next_actions = {
+        "aligned": ["Proceed with the current provider-boundary work item."],
+        "drifting": ["Pause and reconcile the plan against project intent before implementation."],
+        "blocked": ["Resolve missing adapter evidence before continuing."],
+    }[verdict]
+
+    return {
+        "verdict": verdict,
+        "findings": findings if detail == "full" else findings[:3],
+        "next_actions": next_actions,
+    }
+
+
 def lifecycle_preview_steps(action: str) -> list[dict[str, str]]:
     summaries = {
         "bootstrap": [

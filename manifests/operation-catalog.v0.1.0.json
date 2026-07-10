@@ -155,7 +155,7 @@
       "name": "alignment.scan",
       "version": "0.1.0",
       "stability": "draft",
-      "implementation_state": "schema_defined",
+      "implementation_state": "implemented",
       "read_only": true,
       "side_effects": ["filesystem.read", "git.read"],
       "approval_classes": [],
