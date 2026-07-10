@@ -1,0 +1,17 @@
+{
+  "counts": {
+    "active": 1,
+    "blocked": 1,
+    "closed": 1
+  },
+  "reviews": [
+    {
+      "id": "review-001",
+      "status": "active",
+      "title": "Example active review",
+      "updated_at": "2026-07-09T00:00:00Z",
+      "pending_comments": 2,
+      "apply_gate": "pending"
+    }
+  ]
+}

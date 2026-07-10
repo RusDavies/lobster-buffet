@@ -17,6 +17,7 @@ for (const expected of [
   "lobster_buffet_project_lifecycle",
   "lobster_buffet_incident_list",
   "lobster_buffet_alignment_scan",
+  "lobster_buffet_review_list",
 ]) {
   if (!byName.has(expected)) {
     throw new Error(`missing registered tool: ${expected}`);
@@ -80,7 +81,14 @@ async function main() {
     throw new Error("alignment scan did not return the expected synthetic verdict");
   }
 
-  const serialized = JSON.stringify({ alignment, description, incidents, inspect, lifecycle, list, plan });
+  const reviews = await call("lobster_buffet_review_list", {
+    adapter_config: "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
+  });
+  if (!reviews.reviews.some((review) => review.status === "active" && review.apply_gate === "pending")) {
+    throw new Error("review list did not return the expected active review");
+  }
+
+  const serialized = JSON.stringify({ alignment, description, incidents, inspect, lifecycle, list, plan, reviews });
   for (const fragment of ["channel:", "0000000000000000000", "/home/", "github.com/RusDavies"]) {
     if (serialized.includes(fragment)) {
       throw new Error(`wrapper output contains forbidden private/local fragment ${fragment}`);

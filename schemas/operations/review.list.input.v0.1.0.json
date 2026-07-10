@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/review.list.input.v0.1.0.json",
+  "title": "review.list input",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["active", "blocked", "closed", "all"],
+      "default": "active"
+    },
+    "detail": {
+      "type": "string",
+      "enum": ["summary", "full"],
+      "default": "summary"
+    }
+  }
+}

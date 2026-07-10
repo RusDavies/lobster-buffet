@@ -133,6 +133,47 @@
           "disclosure_policy": "redacted_summary"
         }
       }
+    },
+    {
+      "name": "review.read_state",
+      "envelope": {
+        "ok": true,
+        "capability": "review.read_state",
+        "result": {
+          "reviews": [
+            {
+              "id": "review-001",
+              "status": "active",
+              "title": "Example active review",
+              "updated_at": "2026-07-09T00:00:00Z",
+              "pending_comments": 2,
+              "apply_gate": "pending"
+            },
+            {
+              "id": "review-002",
+              "status": "blocked",
+              "title": "Example blocked review",
+              "updated_at": "2026-07-08T00:00:00Z",
+              "pending_comments": 1,
+              "apply_gate": "blocked"
+            },
+            {
+              "id": "review-003",
+              "status": "closed",
+              "title": "Example closed review",
+              "updated_at": "2026-07-07T00:00:00Z",
+              "pending_comments": 0,
+              "apply_gate": "approved"
+            }
+          ]
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "redacted_summary"
+        }
+      }
     }
   ]
 }

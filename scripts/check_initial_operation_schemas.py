@@ -115,6 +115,14 @@ CHECKS = [
         ROOT / "schemas/operations/incident.close.output.v0.1.0.json",
         ROOT / "fixtures/operations/incident.close.output.valid.json",
     ),
+    (
+        ROOT / "schemas/operations/review.list.input.v0.1.0.json",
+        ROOT / "fixtures/operations/review.list.input.valid.json",
+    ),
+    (
+        ROOT / "schemas/operations/review.list.output.v0.1.0.json",
+        ROOT / "fixtures/operations/review.list.output.valid.json",
+    ),
 ]
 
 MANIFEST = ROOT / "manifests/provider-operations.v0.1.0.json"
@@ -259,6 +267,7 @@ def main() -> int:
         "filesystem.read_project_metadata",
         "git.inspect_status",
         "incident.read_state",
+        "review.read_state",
     }
     fixture_capabilities = {item["name"]: item["envelope"] for item in adapter_fixture["capabilities"]}
     for capability in sorted(required_fixture_capabilities):

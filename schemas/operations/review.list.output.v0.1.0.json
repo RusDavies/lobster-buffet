@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/operations/review.list.output.v0.1.0.json",
+  "title": "review.list output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["counts", "reviews"],
+  "properties": {
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["active", "blocked", "closed"],
+      "properties": {
+        "active": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blocked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "closed": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "reviews": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "title", "updated_at", "pending_comments", "apply_gate"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "blocked", "closed"]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "updated_at": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pending_comments": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "apply_gate": {
+            "type": "string",
+            "enum": ["none", "pending", "approved", "blocked"]
+          }
+        }
+      }
+    }
+  }
+}

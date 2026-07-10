@@ -94,6 +94,23 @@ def build_parser() -> argparse.ArgumentParser:
         help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
     )
 
+    review = subparsers.add_parser("review")
+    review_subparsers = review.add_subparsers(dest="action", required=True)
+
+    review_list = review_subparsers.add_parser("list")
+    review_list.add_argument("--status", choices=["active", "blocked", "closed", "all"], default="active")
+    review_list.add_argument("--detail", choices=["summary", "full"], default="summary")
+    review_list.add_argument(
+        "--adapter-fixture",
+        default=None,
+        help="Adapter fixture path. Overrides adapter config.",
+    )
+    review_list.add_argument(
+        "--adapter-config",
+        default=None,
+        help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
+    )
+
     return parser
 
 
@@ -145,6 +162,17 @@ def run(argv: list[str] | None = None) -> int:
                     project=args.project,
                     label=args.label,
                     current_plan_summary=args.current_plan_summary,
+                    detail=args.detail,
+                    adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
+                    adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
+                )
+            )
+            return 0
+
+        if args.group == "review" and args.action == "list":
+            emit(
+                core.review_list(
+                    status=args.status,
                     detail=args.detail,
                     adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
                     adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,

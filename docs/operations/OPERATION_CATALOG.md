@@ -70,6 +70,12 @@ exposing local paths or private channel data.
 - `review.list`: list active review sessions, pending comments, and apply gates.
 - `review.update`: record review comments, decisions, approvals, or blockers.
 
+`review.list` is implemented as a read-only provider operation. It reads local
+review-session summaries through `review.read_state` and returns counts,
+pending comment totals, and apply-gate status without exposing private review
+storage. `review.update` remains planned until write-capable review gates are
+explicit.
+
 ### Heartbeat
 
 - `heartbeat.packet`: build compact periodic status across project, incident, review, and git state.
@@ -84,10 +90,9 @@ exposing local paths or private channel data.
 
 The next schema work should focus on the remaining high-leverage read-only and state operations:
 
-1. `review.list`
-2. `heartbeat.packet`
-3. `heartbeat.check`
-4. `git.workflow.guard`
+1. `heartbeat.packet`
+2. `heartbeat.check`
+3. `git.workflow.guard`
 
 Lifecycle apply mode should wait until the write-capable adapter and approval
 gate are concrete. A mutating provider without a firm gate model is still just a

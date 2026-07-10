@@ -421,6 +421,47 @@ def alignment_scan(
     }
 
 
+def review_list(
+    status: str = "active",
+    detail: str = "summary",
+    adapter_fixture_path: Path | None = None,
+    adapter_config_path: Path | None = None,
+) -> dict[str, Any]:
+    if status not in {"active", "blocked", "closed", "all"}:
+        raise OperationError("input.invalid", f"Unsupported review status filter: {status}")
+    if detail not in {"summary", "full"}:
+        raise OperationError("input.invalid", f"Unsupported review detail level: {detail}")
+
+    fixture = load_adapter_fixture(
+        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    )
+    review_state = require_fixture_capability(fixture, "review.read_state")["result"]
+    reviews = review_state.get("reviews", [])
+    counts = {
+        "active": sum(1 for review in reviews if review["status"] == "active"),
+        "blocked": sum(1 for review in reviews if review["status"] == "blocked"),
+        "closed": sum(1 for review in reviews if review["status"] == "closed"),
+    }
+
+    filtered = [review for review in reviews if status == "all" or review["status"] == status]
+    filtered.sort(key=lambda review: (review["status"] != "blocked", review["updated_at"], review["id"]))
+
+    return {
+        "counts": counts,
+        "reviews": [
+            {
+                "id": review["id"],
+                "status": review["status"],
+                "title": review["title"],
+                "updated_at": review["updated_at"],
+                "pending_comments": review["pending_comments"],
+                "apply_gate": review["apply_gate"],
+            }
+            for review in filtered
+        ],
+    }
+
+
 def lifecycle_preview_steps(action: str) -> list[dict[str, str]]:
     summaries = {
         "bootstrap": [
