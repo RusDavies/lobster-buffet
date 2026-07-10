@@ -25,6 +25,9 @@
       },
       "defaultAdapterFixture": {
         "type": "string"
+      },
+      "defaultAdapterConfig": {
+        "type": "string"
       }
     }
   }

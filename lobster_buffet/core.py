@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_ADAPTER_FIXTURE = "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json"
+ADAPTER_CONFIG_ENV = "LOBSTER_BUFFET_ADAPTER_CONFIG"
 
 
 class OperationError(Exception):
@@ -28,6 +31,13 @@ class OperationError(Exception):
 def load_json(path: Path) -> Any:
     with path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
+
+
+def resolve_path(value: str | Path, base: Path = ROOT) -> Path:
+    path = Path(value)
+    if path.is_absolute():
+        return path
+    return base / path
 
 
 def operation_catalog() -> dict[str, Any]:
@@ -188,6 +198,44 @@ def load_adapter_fixture(path: Path) -> dict[str, Any]:
     return {item["name"]: item["envelope"] for item in fixture["capabilities"]}
 
 
+def default_adapter_config_path() -> Path | None:
+    configured = os.environ.get(ADAPTER_CONFIG_ENV)
+    if not configured:
+        return None
+    return Path(configured)
+
+
+def load_adapter_config(path: Path) -> dict[str, Any]:
+    config = load_json(path)
+    if config.get("schema") != "lobster-buffet.local-adapter-config.v0.1.0":
+        raise OperationError("adapter.config_invalid", f"Unsupported adapter config schema: {path}")
+    if config.get("adapter_api") != "lobster-buffet.local-adapter.v0":
+        raise OperationError("adapter.config_invalid", f"Unsupported adapter API in config: {path}")
+    if config.get("backend", {}).get("kind") != "fixture":
+        raise OperationError("adapter.config_invalid", "Only fixture-backed adapter config is implemented.")
+    fixture_path = config["backend"].get("fixture_path")
+    if not fixture_path:
+        raise OperationError("adapter.config_invalid", "Adapter config is missing backend.fixture_path.")
+    return {
+        "fixture_path": resolve_path(fixture_path, path.parent),
+    }
+
+
+def resolve_adapter_fixture_path(
+    adapter_fixture_path: Path | None = None,
+    adapter_config_path: Path | None = None,
+) -> Path:
+    if adapter_fixture_path is not None:
+        return resolve_path(adapter_fixture_path)
+
+    config_path = adapter_config_path or default_adapter_config_path()
+    if config_path is not None:
+        config = load_adapter_config(resolve_path(config_path))
+        return config["fixture_path"]
+
+    return resolve_path(DEFAULT_ADAPTER_FIXTURE)
+
+
 def require_fixture_capability(fixture: dict[str, Any], capability: str) -> dict[str, Any]:
     envelope = fixture.get(capability)
     if envelope is None:
@@ -197,8 +245,13 @@ def require_fixture_capability(fixture: dict[str, Any], capability: str) -> dict
     return envelope
 
 
-def project_inspect(adapter_fixture_path: Path) -> dict[str, Any]:
-    fixture = load_adapter_fixture(adapter_fixture_path)
+def project_inspect(
+    adapter_fixture_path: Path | None = None,
+    adapter_config_path: Path | None = None,
+) -> dict[str, Any]:
+    fixture = load_adapter_fixture(
+        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    )
     project = require_fixture_capability(fixture, "project.resolve")["result"]
     metadata = require_fixture_capability(fixture, "filesystem.read_project_metadata")["result"]
     git_status = require_fixture_capability(fixture, "git.inspect_status")["result"]

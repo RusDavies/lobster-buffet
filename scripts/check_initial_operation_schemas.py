@@ -36,6 +36,10 @@ CHECKS = [
         ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/local-adapter-config.v0.1.0.json",
+        ROOT / "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/operation-plan.v0.1.0.json",
         ROOT / "fixtures/operations/operation.plan.output.valid.json",
     ),
@@ -94,6 +98,7 @@ CATALOG = ROOT / "manifests/operation-catalog.v0.1.0.json"
 ADAPTER_CAPABILITIES = ROOT / "manifests/local-adapter-capabilities.v0.1.0.json"
 DISTRIBUTION_HANDOFF = ROOT / "manifests/distribution-handoff.v0.1.0.json"
 ADAPTER_FIXTURE = ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json"
+ADAPTER_CONFIG = ROOT / "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json"
 
 
 class ValidationError(Exception):
@@ -176,6 +181,7 @@ def main() -> int:
     adapter_capabilities = load_json(ADAPTER_CAPABILITIES)
     distribution_handoff = load_json(DISTRIBUTION_HANDOFF)
     adapter_fixture = load_json(ADAPTER_FIXTURE)
+    adapter_config = load_json(ADAPTER_CONFIG)
     for operation in manifest["operations"]:
         for key in ("input_schema_ref", "output_schema_ref"):
             ref = ROOT / operation[key]
@@ -245,8 +251,12 @@ def main() -> int:
         if not private_data["private_refs_only"]:
             all_errors.append(f"adapter fixture {capability}: private_refs_only must be true")
 
+    fixture_ref = ADAPTER_CONFIG.parent / adapter_config["backend"]["fixture_path"]
+    if not fixture_ref.exists():
+        all_errors.append(f"adapter config references missing fixture {adapter_config['backend']['fixture_path']}")
+
     forbidden_fragments = ("channel:", "0000000000000000000", "/home/", "github.com/RusDavies")
-    fixture_text = ADAPTER_FIXTURE.read_text(encoding="utf-8")
+    fixture_text = ADAPTER_FIXTURE.read_text(encoding="utf-8") + ADAPTER_CONFIG.read_text(encoding="utf-8")
     for fragment in forbidden_fragments:
         if fragment in fixture_text:
             all_errors.append(f"adapter fixture contains forbidden private/local fragment {fragment!r}")

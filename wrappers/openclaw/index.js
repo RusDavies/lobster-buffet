@@ -2,6 +2,7 @@ const { execFileSync } = require("node:child_process");
 const path = require("node:path");
 
 const DEFAULT_ADAPTER_FIXTURE = "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json";
+const DEFAULT_ADAPTER_CONFIG = "";
 
 function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -31,6 +32,7 @@ function createOptions(config) {
     projectRoot: readString(config.projectRoot) || defaultProjectRoot(),
     python: readString(config.python) || "python3",
     defaultAdapterFixture: readString(config.defaultAdapterFixture) || DEFAULT_ADAPTER_FIXTURE,
+    defaultAdapterConfig: readString(config.defaultAdapterConfig) || DEFAULT_ADAPTER_CONFIG,
   };
 }
 
@@ -156,13 +158,24 @@ function tools(options) {
             type: "string",
             description: "Optional adapter fixture path relative to the project root.",
           },
+          adapter_config: {
+            type: "string",
+            description: "Optional adapter config path relative to the project root.",
+          },
         },
       },
       execute: (params) => {
-        return runCli(
-          ["project", "inspect", "--adapter-fixture", readString(params.adapter_fixture) || options.defaultAdapterFixture],
-          options,
-        );
+        const args = ["project", "inspect"];
+        const adapterFixture = readString(params.adapter_fixture);
+        const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
+        if (adapterFixture) {
+          args.push("--adapter-fixture", adapterFixture);
+        } else if (adapterConfig) {
+          args.push("--adapter-config", adapterConfig);
+        } else {
+          args.push("--adapter-fixture", options.defaultAdapterFixture);
+        }
+        return runCli(args, options);
       },
     }),
   ];

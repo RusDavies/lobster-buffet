@@ -43,10 +43,13 @@ Supported plugin configuration:
 - `python`: optional Python executable name or path.
 - `defaultAdapterFixture`: optional adapter fixture path relative to
   `projectRoot`.
+- `defaultAdapterConfig`: optional adapter config path relative to
+  `projectRoot`.
 
-Local adapter configuration is not implemented yet. Until that exists,
-`project.inspect` uses the synthetic fixture unless a caller supplies another
-fixture path.
+`project.inspect` uses a caller-supplied `adapter_config`, then
+`defaultAdapterConfig`, then a caller-supplied `adapter_fixture`, then
+`defaultAdapterFixture`. The fixture path remains a development/test escape
+hatch for now; real local deployments should prefer adapter config.
 
 ## Boundary
 

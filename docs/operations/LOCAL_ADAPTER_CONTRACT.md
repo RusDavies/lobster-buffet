@@ -178,3 +178,27 @@ The current synthetic fixture is:
 
 - `fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json`
 - `schemas/local-adapter-fixture.v0.1.0.json`
+
+## Adapter Config Loading
+
+The first implemented adapter loader is fixture-backed:
+
+- `schemas/local-adapter-config.v0.1.0.json`
+- `fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json`
+
+The CLI accepts:
+
+```bash
+python3 -m lobster_buffet.cli project inspect --adapter-config fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json
+```
+
+If `--adapter-config` is omitted, the CLI also checks
+`LOBSTER_BUFFET_ADAPTER_CONFIG`.
+
+`--adapter-fixture` remains available as an explicit test/development override.
+When both are provided, the fixture override wins.
+
+Shared example adapter config must not contain private workspace paths, channel
+IDs, secrets, tokens, or remote credentials. Real local deployments may point at
+local-only config files, but shared operation outputs must still obey the
+capability disclosure policies.

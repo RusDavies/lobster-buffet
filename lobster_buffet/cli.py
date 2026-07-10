@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -45,7 +44,13 @@ def build_parser() -> argparse.ArgumentParser:
     project_inspect = project_subparsers.add_parser("inspect")
     project_inspect.add_argument(
         "--adapter-fixture",
-        default="fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
+        default=None,
+        help="Adapter fixture path. Overrides adapter config.",
+    )
+    project_inspect.add_argument(
+        "--adapter-config",
+        default=None,
+        help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set.",
     )
 
     return parser
@@ -69,7 +74,12 @@ def run(argv: list[str] | None = None) -> int:
             return 0
 
         if args.group == "project" and args.action == "inspect":
-            emit(core.project_inspect(Path(args.adapter_fixture)))
+            emit(
+                core.project_inspect(
+                    adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
+                    adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
+                )
+            )
             return 0
 
     except core.OperationError as error:

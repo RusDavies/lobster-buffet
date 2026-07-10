@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/local-adapter-config.v0.1.0.json",
+  "title": "Lobster Buffet local adapter config",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "adapter_api", "backend", "private_data"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["lobster-buffet.local-adapter-config.v0.1.0"]
+    },
+    "adapter_api": {
+      "type": "string",
+      "enum": ["lobster-buffet.local-adapter.v0"]
+    },
+    "backend": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "fixture_path"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["fixture"]
+        },
+        "fixture_path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "private_data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contains_private_values", "private_refs_only", "disclosure_policy"],
+      "properties": {
+        "contains_private_values": {
+          "type": "boolean"
+        },
+        "private_refs_only": {
+          "type": "boolean"
+        },
+        "disclosure_policy": {
+          "type": "string",
+          "enum": ["local_only"]
+        }
+      }
+    }
+  }
+}

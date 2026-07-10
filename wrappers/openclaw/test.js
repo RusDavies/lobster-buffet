@@ -47,7 +47,9 @@ async function main() {
     throw new Error("operation plan did not preserve the caller surface");
   }
 
-  const inspect = await call("lobster_buffet_project_inspect", {});
+  const inspect = await call("lobster_buffet_project_inspect", {
+    adapter_config: "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
+  });
   if (inspect.project.name !== "lobster-buffet") {
     throw new Error("project inspect returned the wrong synthetic project");
   }
