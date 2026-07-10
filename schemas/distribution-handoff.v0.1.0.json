@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/distribution-handoff.v0.1.0.json",
+  "title": "Lobster Buffet distribution handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "package",
+    "packageable_artifacts",
+    "local_only_boundaries",
+    "version_metadata",
+    "compatibility_guarantees",
+    "inspectable_refs"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["lobster-buffet.distribution-handoff.v0.1.0"]
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "provider_api", "stability", "public_release_ready"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "provider_api": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stability": {
+          "type": "string",
+          "enum": ["draft", "experimental", "stable", "deprecated"]
+        },
+        "public_release_ready": {
+          "type": "boolean"
+        }
+      }
+    },
+    "packageable_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "kind", "role"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["doc", "schema", "manifest", "fixture", "script"]
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "local_only_boundaries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "reason"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "version_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation_contract_versions", "manifest_versions", "adapter_api"],
+      "properties": {
+        "operation_contract_versions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "manifest_versions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "adapter_api": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "compatibility_guarantees": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "inspectable_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "purpose"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

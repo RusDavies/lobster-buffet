@@ -1,0 +1,120 @@
+{
+  "schema": "lobster-buffet.distribution-handoff.v0.1.0",
+  "package": {
+    "name": "lobster-buffet",
+    "provider_api": "lobster-buffet.provider.v0",
+    "stability": "draft",
+    "public_release_ready": false
+  },
+  "packageable_artifacts": [
+    {
+      "path": "docs/operations/INITIAL_SCHEMA_SLICE.md",
+      "kind": "doc",
+      "role": "Human-readable initial operation contract."
+    },
+    {
+      "path": "docs/operations/OPERATION_CATALOG.md",
+      "kind": "doc",
+      "role": "Human-readable draft operation catalog."
+    },
+    {
+      "path": "docs/operations/LOCAL_ADAPTER_CONTRACT.md",
+      "kind": "doc",
+      "role": "Human-readable local adapter boundary contract."
+    },
+    {
+      "path": "docs/operations/PROVIDER_TRANSPORT_DECISION.md",
+      "kind": "doc",
+      "role": "Accepted provider transport decision."
+    },
+    {
+      "path": "docs/operations/REDSHIELD_OPERATION_GATE_CONTRACT.md",
+      "kind": "doc",
+      "role": "Optional adjacent policy and hardening gate contract."
+    },
+    {
+      "path": "schemas/",
+      "kind": "schema",
+      "role": "Machine-readable JSON Schemas for operations, manifests, adapters, and handoff metadata."
+    },
+    {
+      "path": "manifests/",
+      "kind": "manifest",
+      "role": "Machine-readable catalogs and packageable metadata."
+    },
+    {
+      "path": "fixtures/",
+      "kind": "fixture",
+      "role": "Synthetic validation fixtures without private workspace data."
+    },
+    {
+      "path": "scripts/check_initial_operation_schemas.py",
+      "kind": "script",
+      "role": "Dependency-free validation of schemas, manifests, fixtures, and references."
+    }
+  ],
+  "local_only_boundaries": [
+    {
+      "name": "local adapter configuration",
+      "reason": "Contains private workspace paths, channel maps, visible-message destinations, local policy, and credentials."
+    },
+    {
+      "name": "secrets and tokens",
+      "reason": "Must remain in local secret stores or CI/runtime secret mechanisms."
+    },
+    {
+      "name": "private workspace memory",
+      "reason": "Not required for portable operation contracts and unsafe to distribute."
+    },
+    {
+      "name": "Portage release mechanics",
+      "reason": "Portage owns packaging, doctor, install, release, rollback, and distribution implementation."
+    },
+    {
+      "name": "Redshield enterprise configuration",
+      "reason": "Warden/Armor policy packs, tenant IDs, signing keys, and customer evidence belong to adjacent products or local deployments."
+    }
+  ],
+  "version_metadata": {
+    "operation_contract_versions": [
+      "command.describe@0.1.0",
+      "project.inspect@0.1.0"
+    ],
+    "manifest_versions": [
+      "provider-operation-manifest@0.1.0",
+      "operation-catalog@0.1.0",
+      "local-adapter-capabilities@0.1.0",
+      "distribution-handoff@0.1.0"
+    ],
+    "adapter_api": "lobster-buffet.local-adapter.v0"
+  },
+  "compatibility_guarantees": [
+    "Draft v0.x contracts may evolve, but changes should update manifest versions and fixtures together.",
+    "Packageable artifacts must not require private local adapter data to validate.",
+    "Shared manifests may name adapter capabilities but must not embed local adapter configuration.",
+    "Operation schemas must declare side effects, approval gates, adapter capabilities, and error states before implementation.",
+    "Mutating operations must retain preview, gate, and fail-safe expectations as schemas are added."
+  ],
+  "inspectable_refs": [
+    {
+      "path": "manifests/provider-operations.v0.1.0.json",
+      "purpose": "Discover schema-backed operations and their refs."
+    },
+    {
+      "path": "manifests/operation-catalog.v0.1.0.json",
+      "purpose": "Discover planned and schema-defined operation families."
+    },
+    {
+      "path": "manifests/local-adapter-capabilities.v0.1.0.json",
+      "purpose": "Discover adapter capability names and disclosure policies."
+    },
+    {
+      "path": "manifests/distribution-handoff.v0.1.0.json",
+      "purpose": "Discover packageable artifacts, local-only boundaries, and compatibility guarantees."
+    },
+    {
+      "path": "scripts/check_initial_operation_schemas.py",
+      "purpose": "Validate the current public/packageable contract set."
+    }
+  ]
+}

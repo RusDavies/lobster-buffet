@@ -76,6 +76,10 @@ Lobster Portage should remain the distribution and managed-file layer. Lobster B
 - conservative doctor/diff/apply behavior.
 - release and rollback discipline.
 
+The Buffet-side distribution handoff contract is defined in
+`docs/operations/DISTRIBUTION_HANDOFF_CONTRACT.md`, with machine-readable
+metadata in `manifests/distribution-handoff.v0.1.0.json`.
+
 ## Redshield Touchpoint
 
 Lobster Buffet should make operation plans inspectable before execution. Plans should include enough metadata for adjacent Redshield tools to reason about policy and security without reading private workspace state directly:

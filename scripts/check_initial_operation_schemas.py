@@ -28,6 +28,10 @@ CHECKS = [
         ROOT / "manifests/local-adapter-capabilities.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/distribution-handoff.v0.1.0.json",
+        ROOT / "manifests/distribution-handoff.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/operations/command.describe.input.v0.1.0.json",
         ROOT / "fixtures/operations/command.describe.input.valid.json",
     ),
@@ -48,6 +52,7 @@ CHECKS = [
 MANIFEST = ROOT / "manifests/provider-operations.v0.1.0.json"
 CATALOG = ROOT / "manifests/operation-catalog.v0.1.0.json"
 ADAPTER_CAPABILITIES = ROOT / "manifests/local-adapter-capabilities.v0.1.0.json"
+DISTRIBUTION_HANDOFF = ROOT / "manifests/distribution-handoff.v0.1.0.json"
 
 
 class ValidationError(Exception):
@@ -128,6 +133,7 @@ def main() -> int:
     manifest = load_json(MANIFEST)
     catalog = load_json(CATALOG)
     adapter_capabilities = load_json(ADAPTER_CAPABILITIES)
+    distribution_handoff = load_json(DISTRIBUTION_HANDOFF)
     for operation in manifest["operations"]:
         for key in ("input_schema_ref", "output_schema_ref"):
             ref = ROOT / operation[key]
@@ -170,6 +176,12 @@ def main() -> int:
                         f"{operation['name']}: {source} references undefined adapter capability {capability!r}"
                     )
 
+    for section in ("packageable_artifacts", "inspectable_refs"):
+        for item in distribution_handoff[section]:
+            path = ROOT / item["path"]
+            if not path.exists():
+                all_errors.append(f"distribution handoff {section}: missing path {item['path']}")
+
     if all_errors:
         print("\n".join(all_errors))
         return 1
@@ -178,7 +190,8 @@ def main() -> int:
         f"Validated {len(CHECKS)} schema fixture(s), "
         f"{len(manifest['operations'])} manifest operation(s), "
         f"{len(catalog['operations'])} catalog operation(s), "
-        f"and {len(adapter_capabilities['capabilities'])} adapter capability(ies)."
+        f"{len(adapter_capabilities['capabilities'])} adapter capability(ies), "
+        f"and {len(distribution_handoff['packageable_artifacts'])} handoff artifact(s)."
     )
     return 0
 
