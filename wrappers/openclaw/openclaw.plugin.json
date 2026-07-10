@@ -1,0 +1,31 @@
+{
+  "id": "lobster-buffet",
+  "name": "Lobster Buffet",
+  "description": "OpenClaw dynamic tool wrapper for Lobster Buffet CLI-core operations.",
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": [
+      "lobster_buffet_command_list",
+      "lobster_buffet_command_describe",
+      "lobster_buffet_operation_plan",
+      "lobster_buffet_project_inspect"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "projectRoot": {
+        "type": "string"
+      },
+      "python": {
+        "type": "string"
+      },
+      "defaultAdapterFixture": {
+        "type": "string"
+      }
+    }
+  }
+}

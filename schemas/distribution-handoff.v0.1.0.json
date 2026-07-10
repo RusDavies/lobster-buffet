@@ -53,7 +53,7 @@
           },
           "kind": {
             "type": "string",
-            "enum": ["doc", "schema", "manifest", "fixture", "script"]
+            "enum": ["doc", "schema", "manifest", "fixture", "script", "wrapper"]
           },
           "role": {
             "type": "string",

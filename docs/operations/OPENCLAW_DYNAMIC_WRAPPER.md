@@ -1,0 +1,58 @@
+# OpenClaw Dynamic Wrapper
+
+Status: Draft v0.1 wrapper slice.
+
+## Purpose
+
+The OpenClaw wrapper exposes selected Lobster Buffet CLI-core operations as
+OpenClaw dynamic tools without duplicating operation logic.
+
+The wrapper is intentionally thin:
+
+- register OpenClaw tool metadata;
+- translate tool arguments into CLI-core arguments;
+- return compact JSON tool results;
+- preserve operation-plan, side-effect, approval, adapter capability, and
+  privacy metadata produced by the CLI core.
+
+## Wrapper Location
+
+- `wrappers/openclaw/openclaw.plugin.json`
+- `wrappers/openclaw/index.js`
+- `wrappers/openclaw/test.js`
+
+## Initial Tools
+
+- `lobster_buffet_command_list`
+- `lobster_buffet_command_describe`
+- `lobster_buffet_operation_plan`
+- `lobster_buffet_project_inspect`
+
+These tools cover the current schema-backed executable CLI surface. The wrapper
+does not implement business logic directly; it shells out to:
+
+```bash
+python3 -m lobster_buffet.cli ...
+```
+
+## Configuration
+
+Supported plugin configuration:
+
+- `projectRoot`: optional local path to the Lobster Buffet repo/package root.
+- `python`: optional Python executable name or path.
+- `defaultAdapterFixture`: optional adapter fixture path relative to
+  `projectRoot`.
+
+Local adapter configuration is not implemented yet. Until that exists,
+`project.inspect` uses the synthetic fixture unless a caller supplies another
+fixture path.
+
+## Boundary
+
+The wrapper must not contain private workspace data, Discord channel maps,
+local absolute paths, secrets, tokens, personal memory, or remote credentials.
+
+The wrapper may expose packageable metadata and synthetic fixture-backed
+results. Real local data must flow through local adapters once adapter loading
+exists.

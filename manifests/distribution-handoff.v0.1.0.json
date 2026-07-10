@@ -51,6 +51,11 @@
       "path": "scripts/check_initial_operation_schemas.py",
       "kind": "script",
       "role": "Dependency-free validation of schemas, manifests, fixtures, and references."
+    },
+    {
+      "path": "wrappers/openclaw/",
+      "kind": "wrapper",
+      "role": "OpenClaw dynamic tool wrapper that delegates to the CLI core."
     }
   ],
   "local_only_boundaries": [
@@ -115,6 +120,10 @@
     {
       "path": "scripts/check_initial_operation_schemas.py",
       "purpose": "Validate the current public/packageable contract set."
+    },
+    {
+      "path": "wrappers/openclaw/openclaw.plugin.json",
+      "purpose": "Discover OpenClaw dynamic tool wrapper metadata."
     }
   ]
 }
