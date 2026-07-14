@@ -51,6 +51,7 @@
     "cli_core_regression_passes",
     "wrapper_regression_passes",
     "lifecycle_write_conformance_passes",
+    "command_adapter_failure_conformance_passes",
     "local_only_boundary_review_passes",
     "mutating_operations_declare_gates",
     "handoff_metadata_current"

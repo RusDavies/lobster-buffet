@@ -67,3 +67,6 @@ mode, they pass through the CLI core and local adapter config. Wrapper
 regression coverage exercises command-backed approved apply, missing approval,
 dirty git, and stale approval cases so blocked command-backed adapters cannot
 quietly mutate.
+
+CLI conformance separately covers command transport failures such as invalid
+JSON, nonzero exit, timeout, and missing required capabilities.

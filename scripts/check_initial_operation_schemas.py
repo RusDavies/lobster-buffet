@@ -211,6 +211,10 @@ COMMAND_ADAPTER_CONFIGS = [
     ROOT / "fixtures/adapters/synthetic-command-lifecycle-apply-approval-missing-config.v0.1.0.json",
     ROOT / "fixtures/adapters/synthetic-command-lifecycle-apply-dirty-git-config.v0.1.0.json",
     ROOT / "fixtures/adapters/synthetic-command-lifecycle-apply-stale-approval-config.v0.1.0.json",
+    ROOT / "fixtures/adapters/synthetic-command-invalid-json-config.v0.1.0.json",
+    ROOT / "fixtures/adapters/synthetic-command-missing-capability-config.v0.1.0.json",
+    ROOT / "fixtures/adapters/synthetic-command-nonzero-exit-config.v0.1.0.json",
+    ROOT / "fixtures/adapters/synthetic-command-timeout-config.v0.1.0.json",
 ]
 LIFECYCLE_APPLY_APPROVED_FIXTURE = ROOT / "fixtures/adapters/synthetic-lifecycle-apply-approved.v0.1.0.json"
 

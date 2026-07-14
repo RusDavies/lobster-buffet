@@ -68,9 +68,19 @@
       "role": "Validate lifecycle write adapter fixtures against apply-mode approval, receipt, and privacy expectations."
     },
     {
+      "path": "scripts/check_command_adapter_failure_conformance.py",
+      "kind": "script",
+      "role": "Validate command-backed adapter failure handling for invalid JSON, nonzero exit, timeout, and missing capabilities."
+    },
+    {
       "path": "scripts/synthetic_local_adapter_command.py",
       "kind": "script",
       "role": "Synthetic command-backed local adapter used to validate adapter invocation contracts."
+    },
+    {
+      "path": "scripts/synthetic_local_adapter_failure_command.py",
+      "kind": "script",
+      "role": "Synthetic command-backed local adapter used to validate failure-path conformance."
     },
     {
       "path": "wrappers/openclaw/",

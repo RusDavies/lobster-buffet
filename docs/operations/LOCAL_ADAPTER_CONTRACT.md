@@ -219,6 +219,10 @@ The adapter loader supports two backend kinds:
 - `fixtures/adapters/synthetic-command-lifecycle-apply-approval-missing-config.v0.1.0.json`
 - `fixtures/adapters/synthetic-command-lifecycle-apply-dirty-git-config.v0.1.0.json`
 - `fixtures/adapters/synthetic-command-lifecycle-apply-stale-approval-config.v0.1.0.json`
+- `fixtures/adapters/synthetic-command-invalid-json-config.v0.1.0.json`
+- `fixtures/adapters/synthetic-command-missing-capability-config.v0.1.0.json`
+- `fixtures/adapters/synthetic-command-nonzero-exit-config.v0.1.0.json`
+- `fixtures/adapters/synthetic-command-timeout-config.v0.1.0.json`
 
 The CLI accepts:
 
@@ -262,6 +266,17 @@ python3 -m lobster_buffet.cli project archive \
 The conformance suite also runs command-backed negative apply cases for missing
 approval, dirty git state, and stale approval scope. Those cases must stop
 before write execution and return `mutates: false`.
+
+Command-backend failure conformance is covered by:
+
+```bash
+python3 scripts/check_command_adapter_failure_conformance.py
+```
+
+That suite validates invalid JSON, nonzero command exit, command timeout, and
+missing-capability results. Transport-level command failures must return a JSON
+error envelope from the CLI, while valid adapter output that lacks a required
+capability must become a non-mutating blocked lifecycle result.
 
 Shared example adapter config must not contain private workspace paths, channel
 IDs, secrets, tokens, or remote credentials. Real local deployments may point at
