@@ -26,6 +26,11 @@
       "name": "wrapper",
       "current": "wrappers/openclaw/openclaw.plugin.json",
       "compatibility_policy": "Wrapper releases must declare the provider API they support."
+    },
+    {
+      "name": "mcp_wrapper_target",
+      "current": "docs/operations/MCP_WRAPPER_COMPATIBILITY.md",
+      "compatibility_policy": "MCP wrapper releases must remain compatible with the documented CLI delegation and structured result target."
     }
   ],
   "compatibility_classes": [

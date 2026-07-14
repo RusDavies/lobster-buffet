@@ -102,6 +102,12 @@ tools. It should:
 An MCP-style wrapper can follow once the CLI core and adapter contracts are
 stable. It should reuse the same operation registry and schemas.
 
+The compatibility target is defined in
+`docs/operations/MCP_WRAPPER_COMPATIBILITY.md`. Implementation should wait
+until the target's delegation, naming, error propagation, adapter configuration,
+and local-only boundaries are satisfied without creating wrapper-specific
+operation semantics.
+
 ## Redshield Integration
 
 The CLI core should be able to produce operation plans before execution. Those

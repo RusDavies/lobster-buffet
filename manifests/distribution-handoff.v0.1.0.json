@@ -43,6 +43,11 @@
       "role": "Human-readable lifecycle apply-mode readiness contract."
     },
     {
+      "path": "docs/operations/MCP_WRAPPER_COMPATIBILITY.md",
+      "kind": "doc",
+      "role": "Human-readable MCP-style wrapper compatibility target."
+    },
+    {
       "path": "schemas/",
       "kind": "schema",
       "role": "Machine-readable JSON Schemas for operations, manifests, adapters, and handoff metadata."
@@ -172,6 +177,10 @@
     {
       "path": "wrappers/openclaw/openclaw.plugin.json",
       "purpose": "Discover OpenClaw dynamic tool wrapper metadata."
+    },
+    {
+      "path": "docs/operations/MCP_WRAPPER_COMPATIBILITY.md",
+      "purpose": "Discover the MCP-style wrapper compatibility target."
     }
   ]
 }

@@ -30,6 +30,9 @@ wrapper should expose selected operations as OpenClaw dynamic tools. MCP-style
 support can follow later as another wrapper once the operation and adapter
 contracts are stable.
 
+The MCP-style wrapper compatibility target is defined in
+`docs/operations/MCP_WRAPPER_COMPATIBILITY.md`.
+
 See `docs/operations/PROVIDER_TRANSPORT_DECISION.md`.
 
 ## Initial Operations
