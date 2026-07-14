@@ -72,6 +72,10 @@ CHECKS = [
         ROOT / "fixtures/adapters/synthetic-command-adapter-config.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/local-adapter-config.v0.1.0.json",
+        ROOT / "fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/local-adapter-invocation.v0.1.0.json",
         ROOT / "fixtures/adapters/local-adapter-invocation.valid.json",
     ),
@@ -201,6 +205,7 @@ RELEASE_COMPATIBILITY = ROOT / "manifests/release-compatibility.v0.1.0.json"
 ADAPTER_FIXTURE = ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json"
 ADAPTER_CONFIG = ROOT / "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json"
 COMMAND_ADAPTER_CONFIG = ROOT / "fixtures/adapters/synthetic-command-adapter-config.v0.1.0.json"
+COMMAND_LIFECYCLE_APPLY_CONFIG = ROOT / "fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json"
 LIFECYCLE_APPLY_APPROVED_FIXTURE = ROOT / "fixtures/adapters/synthetic-lifecycle-apply-approved.v0.1.0.json"
 
 
@@ -287,6 +292,7 @@ def main() -> int:
     adapter_fixture = load_json(ADAPTER_FIXTURE)
     adapter_config = load_json(ADAPTER_CONFIG)
     command_adapter_config = load_json(COMMAND_ADAPTER_CONFIG)
+    command_lifecycle_apply_config = load_json(COMMAND_LIFECYCLE_APPLY_CONFIG)
     lifecycle_apply_receipt_schema = load_json(ROOT / "schemas/lifecycle-apply-receipt.v0.1.0.json")
     lifecycle_apply_approved_fixture = load_json(LIFECYCLE_APPLY_APPROVED_FIXTURE)
     for operation in manifest["operations"]:
@@ -369,13 +375,14 @@ def main() -> int:
     if not fixture_ref.exists():
         all_errors.append(f"adapter config references missing fixture {adapter_config['backend']['fixture_path']}")
 
-    command = command_adapter_config["backend"]["command"]
-    command_script = ROOT / command[1]
-    command_fixture = ROOT / command[2]
-    if not command_script.exists():
-        all_errors.append(f"command adapter config references missing script {command[1]}")
-    if not command_fixture.exists():
-        all_errors.append(f"command adapter config references missing fixture {command[2]}")
+    for command_config in (command_adapter_config, command_lifecycle_apply_config):
+        command = command_config["backend"]["command"]
+        command_script = ROOT / command[1]
+        command_fixture = ROOT / command[2]
+        if not command_script.exists():
+            all_errors.append(f"command adapter config references missing script {command[1]}")
+        if not command_fixture.exists():
+            all_errors.append(f"command adapter config references missing fixture {command[2]}")
 
     apply_capabilities = {
         item["name"]: item["envelope"]["result"] for item in lifecycle_apply_approved_fixture["capabilities"]
@@ -405,6 +412,7 @@ def main() -> int:
         ADAPTER_FIXTURE.read_text(encoding="utf-8")
         + ADAPTER_CONFIG.read_text(encoding="utf-8")
         + COMMAND_ADAPTER_CONFIG.read_text(encoding="utf-8")
+        + COMMAND_LIFECYCLE_APPLY_CONFIG.read_text(encoding="utf-8")
         + LIFECYCLE_APPLY_APPROVED_FIXTURE.read_text(encoding="utf-8")
     )
     for fragment in forbidden_fragments:

@@ -32,6 +32,10 @@ DEFAULT_CASES = [
     ("fixtures/adapters/synthetic-lifecycle-apply-stale-approval.v0.1.0.json", "blocked", False),
 ]
 
+DEFAULT_CONFIG_CASES = [
+    ("fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json", "applied", True),
+]
+
 
 def run_json(command: list[str]) -> Any:
     completed = subprocess.run(
@@ -114,9 +118,47 @@ def validate_fixture(path: Path, expect_status: str, expect_mutates: bool) -> li
     return errors
 
 
+def validate_config(path: Path, expect_status: str, expect_mutates: bool) -> list[str]:
+    errors: list[str] = []
+    config = load_json(path)
+    config_errors = validate(load_json(ROOT / "schemas/local-adapter-config.v0.1.0.json"), config)
+    errors.extend(f"{path}: config {error}" for error in config_errors)
+
+    result = run_json(
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "project",
+            "archive",
+            "--project-name",
+            "synthetic-project",
+            "--mode",
+            "apply",
+            "--adapter-config",
+            str(path.relative_to(ROOT)),
+        ]
+    )
+    output_errors = validate(load_json(ROOT / "schemas/operations/project.lifecycle.output.v0.1.0.json"), result)
+    errors.extend(f"{path}: lifecycle output {error}" for error in output_errors)
+
+    if result.get("status") != expect_status:
+        errors.append(f"{path}: expected status {expect_status!r}, got {result.get('status')!r}")
+    if result.get("mutates") is not expect_mutates:
+        errors.append(f"{path}: expected mutates {expect_mutates!r}, got {result.get('mutates')!r}")
+
+    serialized = json.dumps({"config": config, "result": result}, sort_keys=True)
+    for fragment in ("channel:", "0000000000000000000", "/home/", "github.com/RusDavies"):
+        if fragment in serialized:
+            errors.append(f"{path}: contains forbidden private/local fragment {fragment!r}")
+
+    return errors
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--adapter-fixture", default=None, help="Single adapter fixture to validate.")
+    parser.add_argument("--adapter-config", default=None, help="Single adapter config to validate.")
     parser.add_argument("--expect-status", choices=["applied", "requires_approval", "blocked"], default="applied")
     parser.add_argument("--expect-mutates", choices=["true", "false"], default="true")
     return parser
@@ -124,20 +166,31 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.adapter_fixture and args.adapter_config:
+        print("--adapter-fixture and --adapter-config are mutually exclusive", file=sys.stderr)
+        return 2
+
     if args.adapter_fixture:
         cases = [(args.adapter_fixture, args.expect_status, args.expect_mutates == "true")]
+        config_cases: list[tuple[str, str, bool]] = []
+    elif args.adapter_config:
+        cases = []
+        config_cases = [(args.adapter_config, args.expect_status, args.expect_mutates == "true")]
     else:
         cases = DEFAULT_CASES
+        config_cases = DEFAULT_CONFIG_CASES
 
     errors: list[str] = []
     for fixture, expect_status, expect_mutates in cases:
         errors.extend(validate_fixture(ROOT / fixture, expect_status, expect_mutates))
+    for config, expect_status, expect_mutates in config_cases:
+        errors.extend(validate_config(ROOT / config, expect_status, expect_mutates))
 
     if errors:
         print("\n".join(errors))
         return 1
 
-    print(f"Validated {len(cases)} lifecycle write conformance case(s).")
+    print(f"Validated {len(cases) + len(config_cases)} lifecycle write conformance case(s).")
     return 0
 
 
