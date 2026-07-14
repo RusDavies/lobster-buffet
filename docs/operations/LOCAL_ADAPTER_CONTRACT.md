@@ -215,6 +215,7 @@ The adapter loader supports two backend kinds:
 - `schemas/local-adapter-invocation.v0.1.0.json`
 - `fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json`
 - `fixtures/adapters/synthetic-command-adapter-config.v0.1.0.json`
+- `fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json`
 
 The CLI accepts:
 
@@ -244,6 +245,15 @@ adapters. The synthetic command adapter is:
 
 ```bash
 python3 scripts/synthetic_local_adapter_command.py fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json
+```
+
+Command-backed lifecycle apply is covered by:
+
+```bash
+python3 -m lobster_buffet.cli project archive \
+  --project-name synthetic-project \
+  --mode apply \
+  --adapter-config fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json
 ```
 
 Shared example adapter config must not contain private workspace paths, channel

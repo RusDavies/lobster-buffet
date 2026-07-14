@@ -87,6 +87,16 @@ async function main() {
     throw new Error("project lifecycle wrapper did not return the expected apply result");
   }
 
+  const commandLifecycleApply = await call("lobster_buffet_project_lifecycle", {
+    action: "archive",
+    project_name: "synthetic-project",
+    mode: "apply",
+    adapter_config: "fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json",
+  });
+  if (commandLifecycleApply.status !== "applied" || commandLifecycleApply.mutates !== true) {
+    throw new Error("command-backed project lifecycle wrapper did not return the expected apply result");
+  }
+
   const guard = await call("lobster_buffet_git_workflow_guard", {
     adapter_config: "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
     requested_action: "lifecycle_apply",
@@ -153,6 +163,7 @@ async function main() {
     inspect,
     lifecycle,
     lifecycleApply,
+    commandLifecycleApply,
     list,
     plan,
     reviews,
