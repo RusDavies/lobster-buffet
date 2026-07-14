@@ -40,6 +40,10 @@ CHECKS = [
         ROOT / "fixtures/adapters/synthetic-lifecycle-apply-readiness.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/lifecycle-apply-receipt.v0.1.0.json",
+        ROOT / "fixtures/operations/lifecycle.apply.receipt.valid.json",
+    ),
+    (
         ROOT / "schemas/local-adapter-fixture.v0.1.0.json",
         ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
     ),
@@ -188,6 +192,7 @@ DISTRIBUTION_HANDOFF = ROOT / "manifests/distribution-handoff.v0.1.0.json"
 RELEASE_COMPATIBILITY = ROOT / "manifests/release-compatibility.v0.1.0.json"
 ADAPTER_FIXTURE = ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json"
 ADAPTER_CONFIG = ROOT / "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json"
+LIFECYCLE_APPLY_APPROVED_FIXTURE = ROOT / "fixtures/adapters/synthetic-lifecycle-apply-approved.v0.1.0.json"
 
 
 class ValidationError(Exception):
@@ -272,6 +277,8 @@ def main() -> int:
     release_compatibility = load_json(RELEASE_COMPATIBILITY)
     adapter_fixture = load_json(ADAPTER_FIXTURE)
     adapter_config = load_json(ADAPTER_CONFIG)
+    lifecycle_apply_receipt_schema = load_json(ROOT / "schemas/lifecycle-apply-receipt.v0.1.0.json")
+    lifecycle_apply_approved_fixture = load_json(LIFECYCLE_APPLY_APPROVED_FIXTURE)
     for operation in manifest["operations"]:
         for key in ("input_schema_ref", "output_schema_ref"):
             ref = ROOT / operation[key]
@@ -352,8 +359,35 @@ def main() -> int:
     if not fixture_ref.exists():
         all_errors.append(f"adapter config references missing fixture {adapter_config['backend']['fixture_path']}")
 
+    apply_capabilities = {
+        item["name"]: item["envelope"]["result"] for item in lifecycle_apply_approved_fixture["capabilities"]
+    }
+    embedded_receipt = {
+        "schema": "lobster-buffet.lifecycle-apply-receipt.v0.1.0",
+        "operation_family": "project_lifecycle",
+        "operation": "project.archive",
+        "status": "applied",
+        "mutates": True,
+        "receipts": [
+            apply_capabilities["filesystem.write_project_files"]["receipt"],
+            apply_capabilities["git.write_branch"]["receipt"],
+        ],
+        "privacy": {
+            "private_refs_only": True,
+            "disclosure_policy": "local_adapter_controlled",
+        },
+    }
+    embedded_receipt_errors = validate(lifecycle_apply_receipt_schema, embedded_receipt)
+    if embedded_receipt_errors:
+        all_errors.append("synthetic lifecycle apply approved fixture has invalid embedded receipts")
+        all_errors.extend(f"  {error}" for error in embedded_receipt_errors)
+
     forbidden_fragments = ("channel:", "0000000000000000000", "/home/", "github.com/RusDavies")
-    fixture_text = ADAPTER_FIXTURE.read_text(encoding="utf-8") + ADAPTER_CONFIG.read_text(encoding="utf-8")
+    fixture_text = (
+        ADAPTER_FIXTURE.read_text(encoding="utf-8")
+        + ADAPTER_CONFIG.read_text(encoding="utf-8")
+        + LIFECYCLE_APPLY_APPROVED_FIXTURE.read_text(encoding="utf-8")
+    )
     for fragment in forbidden_fragments:
         if fragment in fixture_text:
             all_errors.append(f"adapter fixture contains forbidden private/local fragment {fragment!r}")

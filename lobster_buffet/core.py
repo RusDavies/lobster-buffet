@@ -1014,7 +1014,12 @@ def project_lifecycle_apply(
 
     filesystem_write = require_fixture_capability(fixture, "filesystem.write_project_files")["result"]
     git_write = require_fixture_capability(fixture, "git.write_branch")["result"]
-    post_write = filesystem_write.get("verification", []) + git_write.get("verification", [])
+    filesystem_receipt = filesystem_write.get("receipt", {})
+    git_receipt = git_write.get("receipt", {})
+    post_write = (
+        filesystem_receipt.get("verification", filesystem_write.get("verification", []))
+        + git_receipt.get("verification", git_write.get("verification", []))
+    )
 
     return {
         "operation": {
@@ -1048,11 +1053,14 @@ def project_lifecycle_apply(
             },
             {
                 "kind": "filesystem.write",
-                "description": filesystem_write.get("summary", "Adapter reported filesystem write completion."),
+                "description": filesystem_receipt.get(
+                    "summary",
+                    filesystem_write.get("summary", "Adapter reported filesystem write completion."),
+                ),
             },
             {
                 "kind": "git.write",
-                "description": git_write.get("summary", "Adapter reported git write completion."),
+                "description": git_receipt.get("summary", git_write.get("summary", "Adapter reported git write completion.")),
             },
             *[
                 {

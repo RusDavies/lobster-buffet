@@ -1,0 +1,35 @@
+{
+  "schema": "lobster-buffet.lifecycle-apply-receipt.v0.1.0",
+  "operation_family": "project_lifecycle",
+  "operation": "project.archive",
+  "status": "applied",
+  "mutates": true,
+  "receipts": [
+    {
+      "capability": "filesystem.write_project_files",
+      "ref_policy": "category_only",
+      "summary": "Adapter reported lifecycle file writes for archive operation.",
+      "verification": [
+        {
+          "kind": "filesystem.verify",
+          "summary": "Adapter verified lifecycle metadata after write."
+        }
+      ]
+    },
+    {
+      "capability": "git.write_branch",
+      "ref_policy": "opaque_ref",
+      "summary": "Adapter reported branch, stage, and commit completion.",
+      "verification": [
+        {
+          "kind": "git.verify",
+          "summary": "Adapter verified clean repository state after commit."
+        }
+      ]
+    }
+  ],
+  "privacy": {
+    "private_refs_only": true,
+    "disclosure_policy": "local_adapter_controlled"
+  }
+}
