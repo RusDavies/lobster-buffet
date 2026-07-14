@@ -40,6 +40,8 @@ mode. Apply mode validates repo-mutation approval, write-capable adapter
 capabilities, clean git state, reviewed preview evidence, and adapter-reported
 post-write verification before returning an applied result. Shared code does
 not directly mutate filesystem or git state; local adapters own those writes.
+Adapter write evidence uses the lifecycle apply receipt contract in
+`schemas/lifecycle-apply-receipt.v0.1.0.json`.
 
 Lifecycle apply-mode readiness is defined in
 `docs/operations/LIFECYCLE_APPLY_READINESS.md` and validated with
@@ -118,6 +120,6 @@ The next schema work should focus on the remaining high-leverage read-only and s
 
 1. Local adapter implementations for lifecycle writes
 
-The shared provider now validates the apply-mode contract against synthetic
-fixtures. The next schema work should define richer adapter write receipts once
-real local adapters need to report more than compact verification summaries.
+The shared provider now validates the apply-mode contract and adapter write
+receipt shape against synthetic fixtures. Next schema work should move toward
+real local adapter conformance once an instance wants to execute actual writes.

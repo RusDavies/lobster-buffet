@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/lifecycle-apply-receipt.v0.1.0.json",
+  "title": "Lobster Buffet lifecycle apply receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "operation_family", "operation", "status", "mutates", "receipts", "privacy"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["lobster-buffet.lifecycle-apply-receipt.v0.1.0"]
+    },
+    "operation_family": {
+      "type": "string",
+      "enum": ["project_lifecycle"]
+    },
+    "operation": {
+      "type": "string",
+      "enum": ["project.bootstrap", "project.adopt", "project.repair", "project.migrate", "project.archive"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["applied", "blocked", "rolled_back"]
+    },
+    "mutates": {
+      "type": "boolean"
+    },
+    "receipts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["capability", "ref_policy", "summary", "verification"],
+        "properties": {
+          "capability": {
+            "type": "string",
+            "enum": ["filesystem.write_project_files", "git.write_branch"]
+          },
+          "ref_policy": {
+            "type": "string",
+            "enum": ["category_only", "opaque_ref"]
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "verification": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "summary"],
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "summary": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["private_refs_only", "disclosure_policy"],
+      "properties": {
+        "private_refs_only": {
+          "type": "boolean"
+        },
+        "disclosure_policy": {
+          "type": "string",
+          "enum": ["local_adapter_controlled"]
+        }
+      }
+    }
+  }
+}

@@ -50,6 +50,9 @@ The repository includes a synthetic readiness fixture at
 `fixtures/adapters/synthetic-lifecycle-apply-readiness.v0.1.0.json`, a schema
 at `schemas/lifecycle-apply-readiness.v0.1.0.json`, and apply-mode fixtures for
 approved, approval-missing, dirty-git, and stale-approval gate outcomes.
+Lifecycle apply receipts are defined by
+`schemas/lifecycle-apply-receipt.v0.1.0.json` and demonstrated by
+`fixtures/operations/lifecycle.apply.receipt.valid.json`.
 
 Those fixtures demonstrate the shape expected from a local instance. The apply
 executor does not directly perform filesystem writes, git writes, approval
