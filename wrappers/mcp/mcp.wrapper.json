@@ -11,6 +11,14 @@
       "operation": "command.list",
       "read_only": true,
       "delegates_to": ["python3", "-m", "lobster_buffet.cli", "command", "list"]
+    },
+    {
+      "name": "lobster_buffet_project_inspect",
+      "operation": "project.inspect",
+      "read_only": true,
+      "adapter_config_supported": true,
+      "adapter_fixture_supported": true,
+      "delegates_to": ["python3", "-m", "lobster_buffet.cli", "project", "inspect"]
     }
   ],
   "private_data": {

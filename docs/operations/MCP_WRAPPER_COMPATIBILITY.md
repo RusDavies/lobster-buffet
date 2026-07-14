@@ -123,11 +123,14 @@ The current skeleton lives in `wrappers/mcp/`. It is SDK-neutral and exposes:
 - `wrappers/mcp/mcp.wrapper.json` for provider API, adapter API, entrypoint, and
   initial tool metadata;
 - `wrappers/mcp/index.js` for MCP-shaped tool listing and tool calls;
-- `wrappers/mcp/test.js` for a smoke test proving `command.list` delegates to
-  the CLI core.
+- `wrappers/mcp/test.js` for smoke tests proving `command.list` and
+  `project.inspect` delegate to the CLI core.
 
 The skeleton is not a complete MCP server yet. It is the compatibility and
-delegation base for the next implementation slice.
+delegation base for the next implementation slices. Current delegated tools:
+
+- `lobster_buffet_command_list`
+- `lobster_buffet_project_inspect`
 
 ## Non-Goals
 

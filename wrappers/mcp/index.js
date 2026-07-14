@@ -3,6 +3,8 @@ const path = require("node:path");
 
 const PROVIDER_API = "lobster-buffet.provider.v0";
 const LOCAL_ADAPTER_API = "lobster-buffet.local-adapter.v0";
+const DEFAULT_ADAPTER_FIXTURE = "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json";
+const DEFAULT_ADAPTER_CONFIG = "";
 
 function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -12,10 +14,16 @@ function defaultProjectRoot() {
   return path.resolve(__dirname, "..", "..");
 }
 
+function readString(value) {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
 function createOptions(config = {}) {
   return {
-    projectRoot: typeof config.projectRoot === "string" && config.projectRoot.trim() ? config.projectRoot : defaultProjectRoot(),
-    python: typeof config.python === "string" && config.python.trim() ? config.python : "python3",
+    projectRoot: readString(config.projectRoot) || defaultProjectRoot(),
+    python: readString(config.python) || "python3",
+    defaultAdapterFixture: readString(config.defaultAdapterFixture) || DEFAULT_ADAPTER_FIXTURE,
+    defaultAdapterConfig: readString(config.defaultAdapterConfig) || DEFAULT_ADAPTER_CONFIG,
   };
 }
 
@@ -60,6 +68,20 @@ function commandList(params, options) {
   return mcpJsonResult(runCli(args, options));
 }
 
+function projectInspect(params, options) {
+  const args = ["project", "inspect"];
+  const adapterFixture = readString(params.adapter_fixture);
+  const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
+  if (adapterFixture) {
+    args.push("--adapter-fixture", adapterFixture);
+  } else if (adapterConfig) {
+    args.push("--adapter-config", adapterConfig);
+  } else {
+    args.push("--adapter-fixture", options.defaultAdapterFixture);
+  }
+  return mcpJsonResult(runCli(args, options));
+}
+
 const tools = [
   {
     name: "lobster_buffet_command_list",
@@ -72,6 +94,25 @@ const tools = [
         include_deprecated: {
           type: "boolean",
           description: "Include deprecated operations.",
+        },
+      },
+    },
+  },
+  {
+    name: "lobster_buffet_project_inspect",
+    title: "Lobster Buffet Project Inspect",
+    description: "Inspect project state through the CLI core and configured adapter fixture or config.",
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        adapter_fixture: {
+          type: "string",
+          description: "Optional adapter fixture path relative to the project root.",
+        },
+        adapter_config: {
+          type: "string",
+          description: "Optional adapter config path relative to the project root.",
         },
       },
     },
@@ -91,6 +132,9 @@ function callTool(name, rawParams = {}, config = {}) {
   const options = createOptions(config);
   if (name === "lobster_buffet_command_list") {
     return commandList(params, options);
+  }
+  if (name === "lobster_buffet_project_inspect") {
+    return projectInspect(params, options);
   }
   return mcpJsonResult({
     error: {
