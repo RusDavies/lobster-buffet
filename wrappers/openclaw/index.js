@@ -40,13 +40,24 @@ function createOptions(config) {
   };
 }
 
+function parseCliOutput(output) {
+  return JSON.parse(Buffer.isBuffer(output) ? output.toString("utf8") : output);
+}
+
 function runCli(args, options) {
-  const output = execFileSync(options.python, ["-m", "lobster_buffet.cli", ...args], {
-    cwd: options.projectRoot,
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-  });
-  return JSON.parse(output);
+  try {
+    const output = execFileSync(options.python, ["-m", "lobster_buffet.cli", ...args], {
+      cwd: options.projectRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    return parseCliOutput(output);
+  } catch (error) {
+    if (error && error.stdout) {
+      return parseCliOutput(error.stdout);
+    }
+    throw error;
+  }
 }
 
 function requireParam(params, name) {

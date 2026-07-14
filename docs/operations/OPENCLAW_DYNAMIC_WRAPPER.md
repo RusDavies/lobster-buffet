@@ -70,3 +70,7 @@ quietly mutate.
 
 CLI conformance separately covers command transport failures such as invalid
 JSON, nonzero exit, timeout, and missing required capabilities.
+
+The wrapper preserves CLI JSON error envelopes returned on nonzero CLI exits,
+including command adapter failures, so callers receive structured `details`
+instead of an opaque child-process exception.

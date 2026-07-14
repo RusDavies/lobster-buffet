@@ -127,6 +127,46 @@ async function main() {
     throw new Error("command-backed project lifecycle wrapper did not block the stale approval case");
   }
 
+  const commandLifecycleInvalidJson = await call("lobster_buffet_project_lifecycle", {
+    action: "archive",
+    project_name: "synthetic-project",
+    mode: "apply",
+    adapter_config: "fixtures/adapters/synthetic-command-invalid-json-config.v0.1.0.json",
+  });
+  if (commandLifecycleInvalidJson.error?.code !== "adapter.command_invalid_json") {
+    throw new Error("command-backed project lifecycle wrapper did not return the invalid JSON error envelope");
+  }
+
+  const commandLifecycleNonzero = await call("lobster_buffet_project_lifecycle", {
+    action: "archive",
+    project_name: "synthetic-project",
+    mode: "apply",
+    adapter_config: "fixtures/adapters/synthetic-command-nonzero-exit-config.v0.1.0.json",
+  });
+  if (commandLifecycleNonzero.error?.code !== "adapter.command_failed") {
+    throw new Error("command-backed project lifecycle wrapper did not return the nonzero-exit error envelope");
+  }
+
+  const commandLifecycleTimeout = await call("lobster_buffet_project_lifecycle", {
+    action: "archive",
+    project_name: "synthetic-project",
+    mode: "apply",
+    adapter_config: "fixtures/adapters/synthetic-command-timeout-config.v0.1.0.json",
+  });
+  if (commandLifecycleTimeout.error?.code !== "adapter.command_timeout") {
+    throw new Error("command-backed project lifecycle wrapper did not return the timeout error envelope");
+  }
+
+  const commandLifecycleMissingCapability = await call("lobster_buffet_project_lifecycle", {
+    action: "archive",
+    project_name: "synthetic-project",
+    mode: "apply",
+    adapter_config: "fixtures/adapters/synthetic-command-missing-capability-config.v0.1.0.json",
+  });
+  if (commandLifecycleMissingCapability.status !== "blocked" || commandLifecycleMissingCapability.mutates !== false) {
+    throw new Error("command-backed project lifecycle wrapper did not block the missing capability case");
+  }
+
   const guard = await call("lobster_buffet_git_workflow_guard", {
     adapter_config: "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
     requested_action: "lifecycle_apply",
@@ -196,7 +236,11 @@ async function main() {
     commandLifecycleApply,
     commandLifecycleApprovalMissing,
     commandLifecycleDirty,
+    commandLifecycleInvalidJson,
+    commandLifecycleMissingCapability,
+    commandLifecycleNonzero,
     commandLifecycleStale,
+    commandLifecycleTimeout,
     list,
     plan,
     reviews,
