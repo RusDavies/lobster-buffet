@@ -5,6 +5,7 @@ const PROVIDER_API = "lobster-buffet.provider.v0";
 const LOCAL_ADAPTER_API = "lobster-buffet.local-adapter.v0";
 const DEFAULT_ADAPTER_FIXTURE = "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json";
 const DEFAULT_ADAPTER_CONFIG = "";
+const LIFECYCLE_ACTIONS = ["bootstrap", "adopt", "repair", "migrate", "archive"];
 
 function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -16,6 +17,17 @@ function defaultProjectRoot() {
 
 function readString(value) {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function errorResult(code, message) {
+  return mcpJsonResult({
+    error: {
+      code,
+      message,
+      retryable: false,
+      details: {},
+    },
+  });
 }
 
 function createOptions(config = {}) {
@@ -82,6 +94,28 @@ function projectInspect(params, options) {
   return mcpJsonResult(runCli(args, options));
 }
 
+function projectLifecycle(params, options) {
+  const action = readString(params.action);
+  const projectName = readString(params.project_name);
+  const mode = readString(params.mode) || "plan";
+  if (!LIFECYCLE_ACTIONS.includes(action)) {
+    return errorResult("mcp.input_invalid", `Lifecycle action must be one of: ${LIFECYCLE_ACTIONS.join(", ")}`);
+  }
+  if (!projectName) {
+    return errorResult("mcp.input_invalid", "Missing required parameter: project_name");
+  }
+  if (mode !== "plan") {
+    return errorResult("mcp.unsupported_mode", "MCP wrapper skeleton currently supports lifecycle plan mode only.");
+  }
+
+  const args = ["project", action, "--project-name", projectName];
+  const reason = readString(params.reason);
+  if (reason) {
+    args.push("--reason", reason);
+  }
+  return mcpJsonResult(runCli(args, options));
+}
+
 const tools = [
   {
     name: "lobster_buffet_command_list",
@@ -117,6 +151,36 @@ const tools = [
       },
     },
   },
+  {
+    name: "lobster_buffet_project_lifecycle",
+    title: "Lobster Buffet Project Lifecycle",
+    description: "Generate a lifecycle operation preview through the CLI core.",
+    inputSchema: {
+      type: "object",
+      additionalProperties: false,
+      required: ["action", "project_name"],
+      properties: {
+        action: {
+          type: "string",
+          description: "Lifecycle action.",
+          enum: LIFECYCLE_ACTIONS,
+        },
+        project_name: {
+          type: "string",
+          description: "Opaque or sanitized project name.",
+        },
+        mode: {
+          type: "string",
+          description: "Lifecycle mode. The skeleton currently supports plan only.",
+          enum: ["plan"],
+        },
+        reason: {
+          type: "string",
+          description: "Optional local reason for the lifecycle preview.",
+        },
+      },
+    },
+  },
 ];
 
 function listTools() {
@@ -136,14 +200,10 @@ function callTool(name, rawParams = {}, config = {}) {
   if (name === "lobster_buffet_project_inspect") {
     return projectInspect(params, options);
   }
-  return mcpJsonResult({
-    error: {
-      code: "mcp.tool_not_found",
-      message: `Unknown MCP wrapper tool: ${name}`,
-      retryable: false,
-      details: {},
-    },
-  });
+  if (name === "lobster_buffet_project_lifecycle") {
+    return projectLifecycle(params, options);
+  }
+  return errorResult("mcp.tool_not_found", `Unknown MCP wrapper tool: ${name}`);
 }
 
 module.exports = {

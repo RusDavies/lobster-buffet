@@ -19,6 +19,14 @@
       "adapter_config_supported": true,
       "adapter_fixture_supported": true,
       "delegates_to": ["python3", "-m", "lobster_buffet.cli", "project", "inspect"]
+    },
+    {
+      "name": "lobster_buffet_project_lifecycle",
+      "operation": "project.<lifecycle_action>",
+      "read_only": false,
+      "mode": "plan",
+      "apply_supported": false,
+      "delegates_to": ["python3", "-m", "lobster_buffet.cli", "project", "<action>", "--project-name", "<project_name>"]
     }
   ],
   "private_data": {

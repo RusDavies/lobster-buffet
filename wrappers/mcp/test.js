@@ -13,6 +13,9 @@ if (!metadata.tools.some((tool) => tool.name === "lobster_buffet_command_list"))
 if (!metadata.tools.some((tool) => tool.name === "lobster_buffet_project_inspect")) {
   throw new Error("MCP wrapper did not expose lobster_buffet_project_inspect");
 }
+if (!metadata.tools.some((tool) => tool.name === "lobster_buffet_project_lifecycle")) {
+  throw new Error("MCP wrapper did not expose lobster_buffet_project_lifecycle");
+}
 
 const list = wrapper.callTool("lobster_buffet_command_list", {});
 if (list.isError || !Array.isArray(list.content) || !list.structuredContent) {
@@ -36,12 +39,35 @@ if (commandInspect.isError || commandInspect.structuredContent.project?.name !==
   throw new Error("MCP wrapper project.inspect did not support command-backed adapter config");
 }
 
+const lifecycle = wrapper.callTool("lobster_buffet_project_lifecycle", {
+  action: "archive",
+  project_name: "synthetic-project",
+  reason: "Synthetic MCP lifecycle preview.",
+});
+if (
+  lifecycle.isError ||
+  lifecycle.structuredContent.operation?.name !== "project.archive" ||
+  lifecycle.structuredContent.status !== "requires_approval" ||
+  lifecycle.structuredContent.mutates !== false
+) {
+  throw new Error("MCP wrapper lifecycle preview did not return the expected non-mutating approval gate");
+}
+
+const lifecycleApply = wrapper.callTool("lobster_buffet_project_lifecycle", {
+  action: "archive",
+  project_name: "synthetic-project",
+  mode: "apply",
+});
+if (!lifecycleApply.isError || lifecycleApply.structuredContent.error?.code !== "mcp.unsupported_mode") {
+  throw new Error("MCP wrapper lifecycle preview did not block apply mode in the skeleton");
+}
+
 const unknown = wrapper.callTool("lobster_buffet_missing_tool", {});
 if (!unknown.isError || unknown.structuredContent.error?.code !== "mcp.tool_not_found") {
   throw new Error("MCP wrapper did not return a structured unknown-tool error");
 }
 
-const serialized = JSON.stringify({ commandInspect, inspect, list, metadata, unknown });
+const serialized = JSON.stringify({ commandInspect, inspect, lifecycle, lifecycleApply, list, metadata, unknown });
 for (const fragment of ["channel:", "0000000000000000000", "/home/", "github.com/RusDavies"]) {
   if (serialized.includes(fragment)) {
     throw new Error(`MCP wrapper output contains forbidden private/local fragment ${fragment}`);
