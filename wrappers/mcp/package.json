@@ -1,0 +1,10 @@
+{
+  "name": "lobster-buffet-mcp-wrapper",
+  "version": "0.1.0",
+  "description": "MCP-style wrapper skeleton for Lobster Buffet CLI-core operations.",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  }
+}

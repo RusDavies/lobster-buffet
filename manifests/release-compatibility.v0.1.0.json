@@ -31,6 +31,11 @@
       "name": "mcp_wrapper_target",
       "current": "docs/operations/MCP_WRAPPER_COMPATIBILITY.md",
       "compatibility_policy": "MCP wrapper releases must remain compatible with the documented CLI delegation and structured result target."
+    },
+    {
+      "name": "mcp_wrapper",
+      "current": "wrappers/mcp/mcp.wrapper.json",
+      "compatibility_policy": "MCP wrapper metadata must declare provider API support and delegate operation behavior to the CLI core."
     }
   ],
   "compatibility_classes": [
@@ -55,6 +60,7 @@
     "schema_manifest_fixture_validation_passes",
     "cli_core_regression_passes",
     "wrapper_regression_passes",
+    "mcp_wrapper_regression_passes",
     "lifecycle_write_conformance_passes",
     "command_adapter_failure_conformance_passes",
     "local_only_boundary_review_passes",

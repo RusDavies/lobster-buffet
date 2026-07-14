@@ -91,6 +91,11 @@
       "path": "wrappers/openclaw/",
       "kind": "wrapper",
       "role": "OpenClaw dynamic tool wrapper that delegates to the CLI core."
+    },
+    {
+      "path": "wrappers/mcp/",
+      "kind": "wrapper",
+      "role": "MCP-style wrapper skeleton that delegates to the CLI core."
     }
   ],
   "local_only_boundaries": [
@@ -177,6 +182,10 @@
     {
       "path": "wrappers/openclaw/openclaw.plugin.json",
       "purpose": "Discover OpenClaw dynamic tool wrapper metadata."
+    },
+    {
+      "path": "wrappers/mcp/mcp.wrapper.json",
+      "purpose": "Discover MCP-style wrapper skeleton metadata."
     },
     {
       "path": "docs/operations/MCP_WRAPPER_COMPATIBILITY.md",

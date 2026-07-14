@@ -17,6 +17,7 @@ is embedded in shared artifacts.
 - Provider API: `lobster-buffet.provider.v0`
 - Local adapter API: `lobster-buffet.local-adapter.v0`
 - Target wrapper ref: `wrappers/mcp/`
+- Skeleton metadata: `wrappers/mcp/mcp.wrapper.json`
 - Compatibility target doc: `docs/operations/MCP_WRAPPER_COMPATIBILITY.md`
 
 An MCP wrapper release must declare the provider API and local adapter API it
@@ -114,6 +115,19 @@ Before an MCP wrapper is treated as packageable, it should have:
 
 These gates should complement, not replace, existing CLI, schema, lifecycle,
 and OpenClaw wrapper regression checks.
+
+## Current Skeleton
+
+The current skeleton lives in `wrappers/mcp/`. It is SDK-neutral and exposes:
+
+- `wrappers/mcp/mcp.wrapper.json` for provider API, adapter API, entrypoint, and
+  initial tool metadata;
+- `wrappers/mcp/index.js` for MCP-shaped tool listing and tool calls;
+- `wrappers/mcp/test.js` for a smoke test proving `command.list` delegates to
+  the CLI core.
+
+The skeleton is not a complete MCP server yet. It is the compatibility and
+delegation base for the next implementation slice.
 
 ## Non-Goals
 

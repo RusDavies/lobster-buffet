@@ -108,6 +108,9 @@ until the target's delegation, naming, error propagation, adapter configuration,
 and local-only boundaries are satisfied without creating wrapper-specific
 operation semantics.
 
+The initial skeleton lives in `wrappers/mcp/` and delegates `command.list` to
+the CLI core as the first smoke-tested MCP-style tool surface.
+
 ## Redshield Integration
 
 The CLI core should be able to produce operation plans before execution. Those
