@@ -1,0 +1,107 @@
+{
+  "schema": "lobster-buffet.local-adapter-fixture.v0.1.0",
+  "fixture_id": "synthetic-lifecycle-apply-stale-approval",
+  "adapter_api": "lobster-buffet.local-adapter.v0",
+  "capabilities": [
+    {
+      "name": "project.resolve",
+      "envelope": {
+        "ok": true,
+        "capability": "project.resolve",
+        "result": {
+          "project_ref": "opaque-project-synthetic",
+          "project_name": "synthetic-project",
+          "kind": "software",
+          "lifecycle_state": "active",
+          "privacy": "public-candidate"
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "opaque_ref"
+        }
+      }
+    },
+    {
+      "name": "git.inspect_status",
+      "envelope": {
+        "ok": true,
+        "capability": "git.inspect_status",
+        "result": {
+          "repo": {
+            "is_git_repo": true,
+            "branch": "main",
+            "dirty": false,
+            "ahead": 0,
+            "behind": 0
+          },
+          "worktree": {
+            "changed_count": 0,
+            "untracked_count": 0
+          }
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "redacted_summary"
+        }
+      }
+    },
+    {
+      "name": "approval.request",
+      "envelope": {
+        "ok": true,
+        "capability": "approval.request",
+        "result": {
+          "approved": true,
+          "approval_class": "repo_mutation",
+          "operation": "project.repair",
+          "scope": "operation_plan",
+          "preview_reviewed": true
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "explicit_disclosure_required"
+        }
+      }
+    },
+    {
+      "name": "filesystem.write_project_files",
+      "envelope": {
+        "ok": true,
+        "capability": "filesystem.write_project_files",
+        "result": {
+          "summary": "Adapter write capability is available but stale approval must block execution.",
+          "verification": []
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "local_only"
+        }
+      }
+    },
+    {
+      "name": "git.write_branch",
+      "envelope": {
+        "ok": true,
+        "capability": "git.write_branch",
+        "result": {
+          "summary": "Adapter git write capability is available but stale approval must block execution.",
+          "verification": []
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "local_only"
+        }
+      }
+    }
+  ]
+}

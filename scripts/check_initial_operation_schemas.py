@@ -44,6 +44,22 @@ CHECKS = [
         ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/local-adapter-fixture.v0.1.0.json",
+        ROOT / "fixtures/adapters/synthetic-lifecycle-apply-approved.v0.1.0.json",
+    ),
+    (
+        ROOT / "schemas/local-adapter-fixture.v0.1.0.json",
+        ROOT / "fixtures/adapters/synthetic-lifecycle-apply-approval-missing.v0.1.0.json",
+    ),
+    (
+        ROOT / "schemas/local-adapter-fixture.v0.1.0.json",
+        ROOT / "fixtures/adapters/synthetic-lifecycle-apply-dirty-git.v0.1.0.json",
+    ),
+    (
+        ROOT / "schemas/local-adapter-fixture.v0.1.0.json",
+        ROOT / "fixtures/adapters/synthetic-lifecycle-apply-stale-approval.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/local-adapter-config.v0.1.0.json",
         ROOT / "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
     ),

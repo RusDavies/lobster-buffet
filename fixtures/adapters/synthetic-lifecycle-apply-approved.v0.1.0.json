@@ -1,0 +1,124 @@
+{
+  "schema": "lobster-buffet.local-adapter-fixture.v0.1.0",
+  "fixture_id": "synthetic-lifecycle-apply-approved",
+  "adapter_api": "lobster-buffet.local-adapter.v0",
+  "capabilities": [
+    {
+      "name": "project.resolve",
+      "envelope": {
+        "ok": true,
+        "capability": "project.resolve",
+        "result": {
+          "project_ref": "opaque-project-synthetic",
+          "project_name": "synthetic-project",
+          "kind": "software",
+          "lifecycle_state": "active",
+          "privacy": "public-candidate"
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "opaque_ref"
+        }
+      }
+    },
+    {
+      "name": "git.inspect_status",
+      "envelope": {
+        "ok": true,
+        "capability": "git.inspect_status",
+        "result": {
+          "repo": {
+            "is_git_repo": true,
+            "branch": "main",
+            "dirty": false,
+            "ahead": 0,
+            "behind": 0
+          },
+          "worktree": {
+            "changed_count": 0,
+            "untracked_count": 0
+          },
+          "remote": {
+            "has_remote": true,
+            "remote_ref": "origin"
+          }
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "redacted_summary"
+        }
+      }
+    },
+    {
+      "name": "approval.request",
+      "envelope": {
+        "ok": true,
+        "capability": "approval.request",
+        "result": {
+          "approved": true,
+          "approval_class": "repo_mutation",
+          "operation": "project.archive",
+          "scope": "operation_plan",
+          "preview_reviewed": true
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "explicit_disclosure_required"
+        }
+      }
+    },
+    {
+      "name": "filesystem.write_project_files",
+      "envelope": {
+        "ok": true,
+        "capability": "filesystem.write_project_files",
+        "result": {
+          "summary": "Adapter reported lifecycle file writes for archive operation.",
+          "changed_refs": ["lifecycle_state", "backlog_state"],
+          "verification": [
+            {
+              "kind": "filesystem.verify",
+              "summary": "Adapter verified lifecycle metadata after write."
+            }
+          ]
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "local_only"
+        }
+      }
+    },
+    {
+      "name": "git.write_branch",
+      "envelope": {
+        "ok": true,
+        "capability": "git.write_branch",
+        "result": {
+          "summary": "Adapter reported branch, stage, and commit completion.",
+          "branch_ref": "opaque-branch-ref",
+          "commit_ref": "opaque-commit-ref",
+          "verification": [
+            {
+              "kind": "git.verify",
+              "summary": "Adapter verified clean repository state after commit."
+            }
+          ]
+        },
+        "warnings": [],
+        "private_data": {
+          "contains_private_values": false,
+          "private_refs_only": true,
+          "disclosure_policy": "local_only"
+        }
+      }
+    }
+  ]
+}

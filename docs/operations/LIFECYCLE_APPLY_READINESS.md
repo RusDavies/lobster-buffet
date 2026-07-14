@@ -9,8 +9,10 @@ and approval gates are explicit. This contract defines the minimum readiness
 shape required before `project.bootstrap`, `project.adopt`, `project.repair`,
 `project.migrate`, or `project.archive` can move beyond preview-only output.
 
-This is not an apply-mode implementation. It is the contract apply-mode must
-validate before mutating filesystem or git state.
+The CLI core now includes a fixture-backed apply-mode executor. The shared
+provider validates readiness evidence and accepts adapter-reported write
+results; actual filesystem writes, git writes, approval prompts, local paths,
+branch names, and policy details remain owned by the local adapter.
 
 ## Required Readiness Evidence
 
@@ -44,10 +46,12 @@ Buffet apply-mode must still:
 
 ## Current State
 
-The repository now includes a synthetic readiness fixture at
-`fixtures/adapters/synthetic-lifecycle-apply-readiness.v0.1.0.json` and a
-schema at `schemas/lifecycle-apply-readiness.v0.1.0.json`.
+The repository includes a synthetic readiness fixture at
+`fixtures/adapters/synthetic-lifecycle-apply-readiness.v0.1.0.json`, a schema
+at `schemas/lifecycle-apply-readiness.v0.1.0.json`, and apply-mode fixtures for
+approved, approval-missing, dirty-git, and stale-approval gate outcomes.
 
-That fixture demonstrates the shape expected from a local instance, but it does
-not perform filesystem writes, git writes, approval requests, or visible
-messages.
+Those fixtures demonstrate the shape expected from a local instance. The apply
+executor does not directly perform filesystem writes, git writes, approval
+requests, or visible messages; it only validates the adapter evidence and
+returns structured results.

@@ -13,6 +13,13 @@ LIFECYCLE_ACTIONS = ("bootstrap", "adopt", "repair", "migrate", "archive")
 GIT_WORKFLOW_ACTIONS = ("branch", "commit", "merge", "push", "release", "lifecycle_apply")
 REVIEW_UPDATE_KINDS = ("comment", "decision", "approval", "blocker", "note")
 REVIEW_APPLY_GATES = ("none", "pending", "approved", "blocked")
+LIFECYCLE_APPLY_CAPABILITIES = (
+    "project.resolve",
+    "filesystem.write_project_files",
+    "git.inspect_status",
+    "git.write_branch",
+    "approval.request",
+)
 
 
 class OperationError(Exception):
@@ -85,6 +92,8 @@ def affected_surfaces_for(operation: dict[str, Any]) -> list[dict[str, str]]:
             kinds.append("remote")
         elif capability.startswith("visible_message."):
             kinds.append("visible_message")
+        elif capability.startswith("approval."):
+            kinds.append("approval")
         elif capability.startswith("secret."):
             kinds.append("secret")
 
@@ -875,3 +884,205 @@ def project_lifecycle_preview(operation_name: str, project_name: str, reason: st
         ],
         "reason": reason or "No local reason supplied.",
     }
+
+
+def lifecycle_blocked_result(
+    manifest_entry: dict[str, Any],
+    project_name: str,
+    status: str,
+    warnings: list[str],
+    reason: str | None,
+) -> dict[str, Any]:
+    action = manifest_entry["name"].removeprefix("project.")
+    return {
+        "operation": {
+            "name": manifest_entry["name"],
+            "version": manifest_entry["version"],
+            "stability": manifest_entry["stability"],
+        },
+        "mode": "apply",
+        "status": status,
+        "mutates": False,
+        "project": {
+            "name": project_name,
+            "ref_policy": "opaque_ref",
+        },
+        "approval": {
+            "required": True,
+            "classes": manifest_entry["approval"]["classes"],
+            "reason": "Lifecycle apply mode requires completed repo-mutation approval scoped to the operation plan.",
+        },
+        "side_effects": manifest_entry["side_effects"],
+        "adapter_capabilities": manifest_entry["adapter_capabilities"],
+        "preview": lifecycle_preview_steps(action),
+        "verification": [
+            {
+                "kind": "approval_gate",
+                "description": "Apply mode stopped before adapter write execution.",
+            },
+            {
+                "kind": "schema",
+                "description": "Validate blocked lifecycle apply result shape.",
+            },
+        ],
+        "warnings": warnings,
+        "reason": reason or "No local reason supplied.",
+    }
+
+
+def project_lifecycle_apply(
+    operation_name: str,
+    project_name: str,
+    reason: str | None = None,
+    adapter_fixture_path: Path | None = None,
+    adapter_config_path: Path | None = None,
+) -> dict[str, Any]:
+    action = operation_name.removeprefix("project.")
+    if action not in LIFECYCLE_ACTIONS:
+        raise OperationError("catalog.command_not_found", f"Unsupported lifecycle operation: {operation_name}")
+    manifest_entry = manifest_operation(operation_name)
+    fixture = load_adapter_fixture(
+        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    )
+
+    missing = [capability for capability in LIFECYCLE_APPLY_CAPABILITIES if capability not in fixture]
+    if missing:
+        return lifecycle_blocked_result(
+            manifest_entry,
+            project_name,
+            "blocked",
+            [f"Adapter fixture is missing apply capability {capability}." for capability in missing],
+            reason,
+        )
+
+    project = require_fixture_capability(fixture, "project.resolve")["result"]
+    git_status = require_fixture_capability(fixture, "git.inspect_status")["result"]
+    approval = require_fixture_capability(fixture, "approval.request")["result"]
+
+    if project.get("project_name") and project["project_name"] != project_name:
+        return lifecycle_blocked_result(
+            manifest_entry,
+            project_name,
+            "blocked",
+            ["Adapter project reference does not match requested project name."],
+            reason,
+        )
+
+    repo = git_status.get("repo", {})
+    worktree = git_status.get("worktree", {})
+    if repo.get("dirty") or int(worktree.get("changed_count", 0)) or int(worktree.get("untracked_count", 0)):
+        return lifecycle_blocked_result(
+            manifest_entry,
+            project_name,
+            "blocked",
+            ["Git worktree is dirty in adapter state; lifecycle apply refused before write execution."],
+            reason,
+        )
+
+    if not approval.get("approved"):
+        return lifecycle_blocked_result(
+            manifest_entry,
+            project_name,
+            "requires_approval",
+            ["Repo-mutation approval is missing or incomplete."],
+            reason,
+        )
+    if approval.get("approval_class") != "repo_mutation":
+        return lifecycle_blocked_result(
+            manifest_entry,
+            project_name,
+            "requires_approval",
+            ["Approval class is not scoped to repo_mutation."],
+            reason,
+        )
+    if approval.get("operation") != operation_name:
+        return lifecycle_blocked_result(
+            manifest_entry,
+            project_name,
+            "blocked",
+            ["Approval is scoped to a different lifecycle operation."],
+            reason,
+        )
+    if not approval.get("preview_reviewed"):
+        return lifecycle_blocked_result(
+            manifest_entry,
+            project_name,
+            "requires_approval",
+            ["Lifecycle preview has not been marked reviewed by the local approval gate."],
+            reason,
+        )
+
+    filesystem_write = require_fixture_capability(fixture, "filesystem.write_project_files")["result"]
+    git_write = require_fixture_capability(fixture, "git.write_branch")["result"]
+    post_write = filesystem_write.get("verification", []) + git_write.get("verification", [])
+
+    return {
+        "operation": {
+            "name": manifest_entry["name"],
+            "version": manifest_entry["version"],
+            "stability": manifest_entry["stability"],
+        },
+        "mode": "apply",
+        "status": "applied",
+        "mutates": True,
+        "project": {
+            "name": project_name,
+            "ref_policy": "opaque_ref",
+        },
+        "approval": {
+            "required": True,
+            "classes": manifest_entry["approval"]["classes"],
+            "reason": "Local adapter reported completed repo-mutation approval before write execution.",
+        },
+        "side_effects": manifest_entry["side_effects"],
+        "adapter_capabilities": manifest_entry["adapter_capabilities"],
+        "preview": lifecycle_preview_steps(action),
+        "verification": [
+            {
+                "kind": "operation_plan",
+                "description": "Operation plan was reviewed before apply-mode execution.",
+            },
+            {
+                "kind": "approval_gate",
+                "description": "Repo-mutation approval completed for this lifecycle operation.",
+            },
+            {
+                "kind": "filesystem.write",
+                "description": filesystem_write.get("summary", "Adapter reported filesystem write completion."),
+            },
+            {
+                "kind": "git.write",
+                "description": git_write.get("summary", "Adapter reported git write completion."),
+            },
+            *[
+                {
+                    "kind": item.get("kind", "post_write"),
+                    "description": item.get("summary", "Adapter reported post-write verification."),
+                }
+                for item in post_write
+            ],
+        ],
+        "warnings": [],
+        "reason": reason or "No local reason supplied.",
+    }
+
+
+def project_lifecycle(
+    operation_name: str,
+    project_name: str,
+    mode: str = "plan",
+    reason: str | None = None,
+    adapter_fixture_path: Path | None = None,
+    adapter_config_path: Path | None = None,
+) -> dict[str, Any]:
+    if mode not in {"plan", "apply"}:
+        raise OperationError("input.invalid", f"Unsupported lifecycle mode: {mode}")
+    if mode == "plan":
+        return project_lifecycle_preview(operation_name, project_name, reason=reason)
+    return project_lifecycle_apply(
+        operation_name,
+        project_name,
+        reason=reason,
+        adapter_fixture_path=adapter_fixture_path,
+        adapter_config_path=adapter_config_path,
+    )

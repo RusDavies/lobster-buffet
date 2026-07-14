@@ -55,7 +55,7 @@
       "read_only": false,
       "side_effects": ["filesystem.write", "git.write"],
       "approval_classes": ["repo_mutation"],
-      "adapter_capabilities": ["project.resolve", "filesystem.write_project_files", "git.inspect_status", "git.write_branch"],
+      "adapter_capabilities": ["project.resolve", "filesystem.write_project_files", "git.inspect_status", "git.write_branch", "approval.request"],
       "errors": ["input.invalid", "project.already_exists", "adapter.capability_missing", "approval.required", "git.dirty_worktree"],
       "summary": "Create the standard project skeleton and local lifecycle files for a new project."
     },
@@ -68,7 +68,7 @@
       "read_only": false,
       "side_effects": ["filesystem.read", "filesystem.write", "git.read", "git.write"],
       "approval_classes": ["repo_mutation"],
-      "adapter_capabilities": ["project.resolve", "filesystem.read_project_metadata", "filesystem.write_project_files", "git.inspect_status", "git.write_branch"],
+      "adapter_capabilities": ["project.resolve", "filesystem.read_project_metadata", "filesystem.write_project_files", "git.inspect_status", "git.write_branch", "approval.request"],
       "errors": ["input.invalid", "project.not_found", "adapter.ambiguous_context", "approval.required", "git.dirty_worktree"],
       "summary": "Bind an existing local project or channel to managed lifecycle metadata."
     },
@@ -81,7 +81,7 @@
       "read_only": false,
       "side_effects": ["filesystem.read", "filesystem.write", "git.read", "git.write"],
       "approval_classes": ["repo_mutation"],
-      "adapter_capabilities": ["project.resolve", "filesystem.read_project_metadata", "filesystem.write_project_files", "git.inspect_status", "git.write_branch"],
+      "adapter_capabilities": ["project.resolve", "filesystem.read_project_metadata", "filesystem.write_project_files", "git.inspect_status", "git.write_branch", "approval.request"],
       "errors": ["input.invalid", "project.not_found", "approval.required", "repair.conflict", "git.dirty_worktree"],
       "summary": "Reconcile missing, stale, or inconsistent lifecycle/project files after inspection."
     },
@@ -94,7 +94,7 @@
       "read_only": false,
       "side_effects": ["filesystem.read", "filesystem.write", "git.read", "git.write"],
       "approval_classes": ["repo_mutation"],
-      "adapter_capabilities": ["project.resolve", "filesystem.read_project_metadata", "filesystem.write_project_files", "git.inspect_status", "git.write_branch"],
+      "adapter_capabilities": ["project.resolve", "filesystem.read_project_metadata", "filesystem.write_project_files", "git.inspect_status", "git.write_branch", "approval.request"],
       "errors": ["input.invalid", "project.not_found", "approval.required", "migration.conflict", "git.dirty_worktree"],
       "summary": "Move a project between lifecycle layouts or naming conventions with preview and verification."
     },
@@ -107,7 +107,7 @@
       "read_only": false,
       "side_effects": ["filesystem.write", "git.write"],
       "approval_classes": ["repo_mutation"],
-      "adapter_capabilities": ["project.resolve", "filesystem.write_project_files", "git.inspect_status", "git.write_branch"],
+      "adapter_capabilities": ["project.resolve", "filesystem.write_project_files", "git.inspect_status", "git.write_branch", "approval.request"],
       "errors": ["input.invalid", "project.not_found", "approval.required", "archive.conflict", "git.dirty_worktree"],
       "summary": "Mark a project archived and update lifecycle/backlog state without deleting data."
     },
