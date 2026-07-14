@@ -25,7 +25,7 @@
       "operation": "project.<lifecycle_action>",
       "read_only": false,
       "modes": ["plan", "apply"],
-      "apply_supported": "blocked_paths",
+      "apply_supported": true,
       "adapter_config_supported": true,
       "adapter_fixture_supported": true,
       "delegates_to": ["python3", "-m", "lobster_buffet.cli", "project", "<action>", "--project-name", "<project_name>"]

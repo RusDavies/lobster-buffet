@@ -95,6 +95,20 @@ if (
   throw new Error("MCP wrapper lifecycle apply did not preserve the stale-approval blocked path");
 }
 
+const lifecycleApply = wrapper.callTool("lobster_buffet_project_lifecycle", {
+  action: "archive",
+  project_name: "synthetic-project",
+  mode: "apply",
+  adapter_config: "fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json",
+});
+if (
+  lifecycleApply.isError ||
+  lifecycleApply.structuredContent.status !== "applied" ||
+  lifecycleApply.structuredContent.mutates !== true
+) {
+  throw new Error("MCP wrapper lifecycle apply did not preserve the approved synthetic apply path");
+}
+
 const unknown = wrapper.callTool("lobster_buffet_missing_tool", {});
 if (!unknown.isError || unknown.structuredContent.error?.code !== "mcp.tool_not_found") {
   throw new Error("MCP wrapper did not return a structured unknown-tool error");
@@ -104,6 +118,7 @@ const serialized = JSON.stringify({
   commandInspect,
   inspect,
   lifecycle,
+  lifecycleApply,
   lifecycleApprovalMissing,
   lifecycleDirty,
   lifecycleStale,
