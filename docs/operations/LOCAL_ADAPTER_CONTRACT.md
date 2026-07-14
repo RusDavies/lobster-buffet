@@ -205,10 +205,16 @@ python3 scripts/check_lifecycle_write_conformance.py \
 
 ## Adapter Config Loading
 
-The first implemented adapter loader is fixture-backed:
+The adapter loader supports two backend kinds:
+
+- `fixture`: load a checked-in or local fixture file.
+- `command`: invoke a local command with a JSON request on stdin and read a
+  local adapter fixture envelope from stdout.
 
 - `schemas/local-adapter-config.v0.1.0.json`
+- `schemas/local-adapter-invocation.v0.1.0.json`
 - `fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json`
+- `fixtures/adapters/synthetic-command-adapter-config.v0.1.0.json`
 
 The CLI accepts:
 
@@ -221,6 +227,24 @@ If `--adapter-config` is omitted, the CLI also checks
 
 `--adapter-fixture` remains available as an explicit test/development override.
 When both are provided, the fixture override wins.
+
+Command-backed adapters receive:
+
+```json
+{
+  "schema": "lobster-buffet.local-adapter-invocation.v0.1.0",
+  "adapter_api": "lobster-buffet.local-adapter.v0",
+  "operation": "project.inspect",
+  "requested_capabilities": ["project.resolve"]
+}
+```
+
+They must return the same capability envelope shape used by fixture-backed
+adapters. The synthetic command adapter is:
+
+```bash
+python3 scripts/synthetic_local_adapter_command.py fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json
+```
 
 Shared example adapter config must not contain private workspace paths, channel
 IDs, secrets, tokens, or remote credentials. Real local deployments may point at

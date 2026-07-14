@@ -62,6 +62,13 @@ async function main() {
     throw new Error("project inspect returned the wrong synthetic project");
   }
 
+  const commandInspect = await call("lobster_buffet_project_inspect", {
+    adapter_config: "fixtures/adapters/synthetic-command-adapter-config.v0.1.0.json",
+  });
+  if (commandInspect.project.name !== "lobster-buffet") {
+    throw new Error("command-backed project inspect returned the wrong synthetic project");
+  }
+
   const lifecycle = await call("lobster_buffet_project_lifecycle", {
     action: "archive",
     project_name: "synthetic-project",
@@ -142,6 +149,7 @@ async function main() {
     heartbeat,
     heartbeatCheck,
     incidents,
+    commandInspect,
     inspect,
     lifecycle,
     lifecycleApply,

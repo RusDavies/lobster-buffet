@@ -1,0 +1,10 @@
+{
+  "schema": "lobster-buffet.local-adapter-invocation.v0.1.0",
+  "adapter_api": "lobster-buffet.local-adapter.v0",
+  "operation": "project.inspect",
+  "requested_capabilities": [
+    "project.resolve",
+    "filesystem.read_project_metadata",
+    "git.inspect_status"
+  ]
+}

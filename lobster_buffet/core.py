@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -224,29 +225,87 @@ def load_adapter_config(path: Path) -> dict[str, Any]:
         raise OperationError("adapter.config_invalid", f"Unsupported adapter config schema: {path}")
     if config.get("adapter_api") != "lobster-buffet.local-adapter.v0":
         raise OperationError("adapter.config_invalid", f"Unsupported adapter API in config: {path}")
-    if config.get("backend", {}).get("kind") != "fixture":
-        raise OperationError("adapter.config_invalid", "Only fixture-backed adapter config is implemented.")
-    fixture_path = config["backend"].get("fixture_path")
-    if not fixture_path:
-        raise OperationError("adapter.config_invalid", "Adapter config is missing backend.fixture_path.")
-    return {
-        "fixture_path": resolve_path(fixture_path, path.parent),
+    backend = config.get("backend", {})
+    kind = backend.get("kind")
+    if kind == "fixture":
+        fixture_path = backend.get("fixture_path")
+        if not fixture_path:
+            raise OperationError("adapter.config_invalid", "Fixture adapter config is missing backend.fixture_path.")
+        return {
+            "backend_kind": "fixture",
+            "fixture_path": resolve_path(fixture_path, path.parent),
+        }
+    if kind == "command":
+        command = backend.get("command")
+        if not isinstance(command, list) or not command or not all(isinstance(item, str) and item for item in command):
+            raise OperationError("adapter.config_invalid", "Command adapter config requires a non-empty backend.command list.")
+        return {
+            "backend_kind": "command",
+            "command": command,
+            "timeout_seconds": int(backend.get("timeout_seconds", 10)),
+        }
+    raise OperationError("adapter.config_invalid", f"Unsupported adapter backend kind: {kind}")
+
+
+def invoke_adapter_command(
+    command: list[str],
+    timeout_seconds: int,
+    operation_name: str | None = None,
+    requested_capabilities: list[str] | None = None,
+) -> dict[str, Any]:
+    request = {
+        "schema": "lobster-buffet.local-adapter-invocation.v0.1.0",
+        "adapter_api": "lobster-buffet.local-adapter.v0",
+        "operation": operation_name or "unknown",
+        "requested_capabilities": requested_capabilities or [],
     }
+    try:
+        completed = subprocess.run(
+            command,
+            cwd=ROOT,
+            input=json.dumps(request),
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=timeout_seconds,
+            check=True,
+        )
+    except subprocess.TimeoutExpired as error:
+        raise OperationError("adapter.command_timeout", f"Adapter command timed out after {timeout_seconds}s") from error
+    except subprocess.CalledProcessError as error:
+        message = error.stderr.strip() or "Adapter command failed."
+        raise OperationError("adapter.command_failed", message) from error
+
+    try:
+        fixture = json.loads(completed.stdout)
+    except json.JSONDecodeError as error:
+        raise OperationError("adapter.command_invalid_json", "Adapter command did not return valid JSON.") from error
+
+    return {item["name"]: item["envelope"] for item in fixture["capabilities"]}
 
 
-def resolve_adapter_fixture_path(
+def load_adapter(
     adapter_fixture_path: Path | None = None,
     adapter_config_path: Path | None = None,
-) -> Path:
+    operation_name: str | None = None,
+    requested_capabilities: list[str] | None = None,
+) -> dict[str, Any]:
     if adapter_fixture_path is not None:
-        return resolve_path(adapter_fixture_path)
+        return load_adapter_fixture(resolve_path(adapter_fixture_path))
 
     config_path = adapter_config_path or default_adapter_config_path()
-    if config_path is not None:
-        config = load_adapter_config(resolve_path(config_path))
-        return config["fixture_path"]
+    if config_path is None:
+        return load_adapter_fixture(resolve_path(DEFAULT_ADAPTER_FIXTURE))
 
-    return resolve_path(DEFAULT_ADAPTER_FIXTURE)
+    config = load_adapter_config(resolve_path(config_path))
+    if config["backend_kind"] == "fixture":
+        return load_adapter_fixture(config["fixture_path"])
+    return invoke_adapter_command(
+        config["command"],
+        config["timeout_seconds"],
+        operation_name=operation_name,
+        requested_capabilities=requested_capabilities,
+    )
 
 
 def require_fixture_capability(fixture: dict[str, Any], capability: str) -> dict[str, Any]:
@@ -262,8 +321,11 @@ def project_inspect(
     adapter_fixture_path: Path | None = None,
     adapter_config_path: Path | None = None,
 ) -> dict[str, Any]:
-    fixture = load_adapter_fixture(
-        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    fixture = load_adapter(
+        adapter_fixture_path=adapter_fixture_path,
+        adapter_config_path=adapter_config_path,
+        operation_name="project.inspect",
+        requested_capabilities=["project.resolve", "filesystem.read_project_metadata", "git.inspect_status"],
     )
     project = require_fixture_capability(fixture, "project.resolve")["result"]
     metadata = require_fixture_capability(fixture, "filesystem.read_project_metadata")["result"]
@@ -298,8 +360,11 @@ def git_workflow_guard(
     if detail not in {"summary", "full"}:
         raise OperationError("input.invalid", f"Unsupported git workflow guard detail level: {detail}")
 
-    fixture = load_adapter_fixture(
-        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    fixture = load_adapter(
+        adapter_fixture_path=adapter_fixture_path,
+        adapter_config_path=adapter_config_path,
+        operation_name="git.workflow.guard",
+        requested_capabilities=["git.inspect_status"],
     )
     git_status = require_fixture_capability(fixture, "git.inspect_status")["result"]
     repo = git_status.get("repo", {})
@@ -406,8 +471,11 @@ def incident_list(
     if detail not in {"summary", "full"}:
         raise OperationError("input.invalid", f"Unsupported incident detail level: {detail}")
 
-    fixture = load_adapter_fixture(
-        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    fixture = load_adapter(
+        adapter_fixture_path=adapter_fixture_path,
+        adapter_config_path=adapter_config_path,
+        operation_name="incident.list",
+        requested_capabilities=["incident.read_state"],
     )
     incident_state = require_fixture_capability(fixture, "incident.read_state")["result"]
     incidents = incident_state.get("incidents", [])
@@ -454,8 +522,11 @@ def alignment_scan(
     if detail not in {"summary", "full"}:
         raise OperationError("input.invalid", f"Unsupported alignment detail level: {detail}")
 
-    fixture = load_adapter_fixture(
-        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    fixture = load_adapter(
+        adapter_fixture_path=adapter_fixture_path,
+        adapter_config_path=adapter_config_path,
+        operation_name="alignment.scan",
+        requested_capabilities=["project.resolve", "filesystem.read_project_metadata", "git.inspect_status"],
     )
     project_ref = require_fixture_capability(fixture, "project.resolve")["result"]
     metadata = require_fixture_capability(fixture, "filesystem.read_project_metadata")["result"]
@@ -552,8 +623,11 @@ def review_list(
     if detail not in {"summary", "full"}:
         raise OperationError("input.invalid", f"Unsupported review detail level: {detail}")
 
-    fixture = load_adapter_fixture(
-        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    fixture = load_adapter(
+        adapter_fixture_path=adapter_fixture_path,
+        adapter_config_path=adapter_config_path,
+        operation_name="review.list",
+        requested_capabilities=["review.read_state"],
     )
     review_state = require_fixture_capability(fixture, "review.read_state")["result"]
     reviews = review_state.get("reviews", [])
@@ -603,8 +677,11 @@ def review_update_preview(
     if apply_gate is not None and apply_gate not in REVIEW_APPLY_GATES:
         raise OperationError("input.invalid", f"Unsupported review apply gate: {apply_gate}")
 
-    fixture = load_adapter_fixture(
-        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    fixture = load_adapter(
+        adapter_fixture_path=adapter_fixture_path,
+        adapter_config_path=adapter_config_path,
+        operation_name="review.update",
+        requested_capabilities=["review.read_state"],
     )
     review_state = require_fixture_capability(fixture, "review.read_state")["result"]
     review = next((item for item in review_state.get("reviews", []) if item["id"] == review_id), None)
@@ -678,8 +755,18 @@ def heartbeat_packet(
     if detail not in {"summary", "full"}:
         raise OperationError("input.invalid", f"Unsupported heartbeat detail level: {detail}")
 
-    fixture = load_adapter_fixture(
-        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    fixture = load_adapter(
+        adapter_fixture_path=adapter_fixture_path,
+        adapter_config_path=adapter_config_path,
+        operation_name="heartbeat.packet",
+        requested_capabilities=[
+            "project.resolve",
+            "filesystem.read_project_metadata",
+            "git.inspect_status",
+            "incident.read_state",
+            "review.read_state",
+            "heartbeat.read_state",
+        ],
     )
     project = require_fixture_capability(fixture, "project.resolve")["result"]
     metadata = require_fixture_capability(fixture, "filesystem.read_project_metadata")["result"]
@@ -765,8 +852,11 @@ def heartbeat_check(
     if detail not in {"summary", "full"}:
         raise OperationError("input.invalid", f"Unsupported heartbeat check detail level: {detail}")
 
-    fixture = load_adapter_fixture(
-        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    fixture = load_adapter(
+        adapter_fixture_path=adapter_fixture_path,
+        adapter_config_path=adapter_config_path,
+        operation_name="heartbeat.check",
+        requested_capabilities=["heartbeat.read_state"],
     )
     heartbeat_state = require_fixture_capability(fixture, "heartbeat.read_state")["result"]
     due = bool(heartbeat_state.get("visible_progress_due"))
@@ -941,8 +1031,11 @@ def project_lifecycle_apply(
     if action not in LIFECYCLE_ACTIONS:
         raise OperationError("catalog.command_not_found", f"Unsupported lifecycle operation: {operation_name}")
     manifest_entry = manifest_operation(operation_name)
-    fixture = load_adapter_fixture(
-        resolve_adapter_fixture_path(adapter_fixture_path=adapter_fixture_path, adapter_config_path=adapter_config_path)
+    fixture = load_adapter(
+        adapter_fixture_path=adapter_fixture_path,
+        adapter_config_path=adapter_config_path,
+        operation_name=operation_name,
+        requested_capabilities=list(LIFECYCLE_APPLY_CAPABILITIES),
     )
 
     missing = [capability for capability in LIFECYCLE_APPLY_CAPABILITIES if capability not in fixture]

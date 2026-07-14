@@ -30,6 +30,18 @@ COMMANDS = [
         ROOT / "schemas/operations/project.inspect.output.v0.1.0.json",
     ),
     (
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "project",
+            "inspect",
+            "--adapter-config",
+            "fixtures/adapters/synthetic-command-adapter-config.v0.1.0.json",
+        ],
+        ROOT / "schemas/operations/project.inspect.output.v0.1.0.json",
+    ),
+    (
         ["python3", "-m", "lobster_buffet.cli", "operation", "plan", "--name", "project.inspect"],
         ROOT / "schemas/operation-plan.v0.1.0.json",
     ),
