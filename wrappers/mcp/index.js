@@ -98,17 +98,27 @@ function projectLifecycle(params, options) {
   const action = readString(params.action);
   const projectName = readString(params.project_name);
   const mode = readString(params.mode) || "plan";
+  const adapterFixture = readString(params.adapter_fixture);
+  const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
   if (!LIFECYCLE_ACTIONS.includes(action)) {
     return errorResult("mcp.input_invalid", `Lifecycle action must be one of: ${LIFECYCLE_ACTIONS.join(", ")}`);
   }
   if (!projectName) {
     return errorResult("mcp.input_invalid", "Missing required parameter: project_name");
   }
-  if (mode !== "plan") {
-    return errorResult("mcp.unsupported_mode", "MCP wrapper skeleton currently supports lifecycle plan mode only.");
+  if (!["plan", "apply"].includes(mode)) {
+    return errorResult("mcp.unsupported_mode", "Lifecycle mode must be plan or apply.");
   }
 
   const args = ["project", action, "--project-name", projectName];
+  if (mode === "apply") {
+    args.push("--mode", "apply");
+    if (adapterFixture) {
+      args.push("--adapter-fixture", adapterFixture);
+    } else if (adapterConfig) {
+      args.push("--adapter-config", adapterConfig);
+    }
+  }
   const reason = readString(params.reason);
   if (reason) {
     args.push("--reason", reason);
@@ -171,12 +181,20 @@ const tools = [
         },
         mode: {
           type: "string",
-          description: "Lifecycle mode. The skeleton currently supports plan only.",
-          enum: ["plan"],
+          description: "Lifecycle mode. Apply mode is currently covered for blocked paths.",
+          enum: ["plan", "apply"],
         },
         reason: {
           type: "string",
           description: "Optional local reason for the lifecycle preview.",
+        },
+        adapter_fixture: {
+          type: "string",
+          description: "Optional adapter fixture path relative to the project root for apply mode.",
+        },
+        adapter_config: {
+          type: "string",
+          description: "Optional adapter config path relative to the project root for apply mode.",
         },
       },
     },
