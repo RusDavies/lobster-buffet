@@ -62,6 +62,8 @@ The wrapper may expose packageable metadata and synthetic fixture-backed
 results. Real local data must flow through local adapters once adapter loading
 exists.
 
-Lifecycle wrapper calls currently generate preview-only lifecycle plans. They
-return `status: requires_approval` and `mutates: false`; they do not execute
-filesystem or git writes.
+Lifecycle wrapper calls generate preview lifecycle plans by default. In apply
+mode, they pass through the CLI core and local adapter config. Wrapper
+regression coverage exercises command-backed approved apply, missing approval,
+dirty git, and stale approval cases so blocked command-backed adapters cannot
+quietly mutate.

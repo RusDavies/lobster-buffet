@@ -1,0 +1,18 @@
+{
+  "schema": "lobster-buffet.local-adapter-config.v0.1.0",
+  "adapter_api": "lobster-buffet.local-adapter.v0",
+  "backend": {
+    "kind": "command",
+    "command": [
+      "python3",
+      "scripts/synthetic_local_adapter_command.py",
+      "fixtures/adapters/synthetic-lifecycle-apply-stale-approval.v0.1.0.json"
+    ],
+    "timeout_seconds": 5
+  },
+  "private_data": {
+    "contains_private_values": false,
+    "private_refs_only": true,
+    "disclosure_policy": "local_only"
+  }
+}

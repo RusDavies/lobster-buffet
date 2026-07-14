@@ -216,6 +216,9 @@ The adapter loader supports two backend kinds:
 - `fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json`
 - `fixtures/adapters/synthetic-command-adapter-config.v0.1.0.json`
 - `fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json`
+- `fixtures/adapters/synthetic-command-lifecycle-apply-approval-missing-config.v0.1.0.json`
+- `fixtures/adapters/synthetic-command-lifecycle-apply-dirty-git-config.v0.1.0.json`
+- `fixtures/adapters/synthetic-command-lifecycle-apply-stale-approval-config.v0.1.0.json`
 
 The CLI accepts:
 
@@ -255,6 +258,10 @@ python3 -m lobster_buffet.cli project archive \
   --mode apply \
   --adapter-config fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json
 ```
+
+The conformance suite also runs command-backed negative apply cases for missing
+approval, dirty git state, and stale approval scope. Those cases must stop
+before write execution and return `mutates: false`.
 
 Shared example adapter config must not contain private workspace paths, channel
 IDs, secrets, tokens, or remote credentials. Real local deployments may point at

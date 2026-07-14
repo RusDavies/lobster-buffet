@@ -157,6 +157,30 @@ COMMANDS.append(
     )
 )
 
+for config in (
+    "synthetic-command-lifecycle-apply-approval-missing-config.v0.1.0.json",
+    "synthetic-command-lifecycle-apply-dirty-git-config.v0.1.0.json",
+    "synthetic-command-lifecycle-apply-stale-approval-config.v0.1.0.json",
+):
+    COMMANDS.append(
+        (
+            [
+                "python3",
+                "-m",
+                "lobster_buffet.cli",
+                "project",
+                "archive",
+                "--project-name",
+                "synthetic-project",
+                "--mode",
+                "apply",
+                "--adapter-config",
+                f"fixtures/adapters/{config}",
+            ],
+            ROOT / "schemas/operations/project.lifecycle.output.v0.1.0.json",
+        )
+    )
+
 
 def run_json(command: list[str]) -> Any:
     completed = subprocess.run(
@@ -279,6 +303,51 @@ def main() -> int:
             "fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json",
         ]
     )
+    lifecycle_command_approval_missing_output = run_json(
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "project",
+            "archive",
+            "--project-name",
+            "synthetic-project",
+            "--mode",
+            "apply",
+            "--adapter-config",
+            "fixtures/adapters/synthetic-command-lifecycle-apply-approval-missing-config.v0.1.0.json",
+        ]
+    )
+    lifecycle_command_dirty_output = run_json(
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "project",
+            "archive",
+            "--project-name",
+            "synthetic-project",
+            "--mode",
+            "apply",
+            "--adapter-config",
+            "fixtures/adapters/synthetic-command-lifecycle-apply-dirty-git-config.v0.1.0.json",
+        ]
+    )
+    lifecycle_command_stale_output = run_json(
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "project",
+            "archive",
+            "--project-name",
+            "synthetic-project",
+            "--mode",
+            "apply",
+            "--adapter-config",
+            "fixtures/adapters/synthetic-command-lifecycle-apply-stale-approval-config.v0.1.0.json",
+        ]
+    )
     plan_output = run_json(["python3", "-m", "lobster_buffet.cli", "operation", "plan", "--name", "project.inspect"])
     output_text = json.dumps(
         {
@@ -292,6 +361,9 @@ def main() -> int:
             "lifecycle_dirty": lifecycle_dirty_output,
             "lifecycle_stale": lifecycle_stale_output,
             "lifecycle_command": lifecycle_command_output,
+            "lifecycle_command_approval_missing": lifecycle_command_approval_missing_output,
+            "lifecycle_command_dirty": lifecycle_command_dirty_output,
+            "lifecycle_command_stale": lifecycle_command_stale_output,
             "plan": plan_output,
             "project": project_output,
             "review": review_output,
@@ -338,6 +410,18 @@ def main() -> int:
 
     if lifecycle_command_output["status"] != "applied" or lifecycle_command_output["mutates"] is not True:
         errors.append("command-backed project lifecycle apply did not return an applied mutating result")
+
+    if (
+        lifecycle_command_approval_missing_output["status"] != "requires_approval"
+        or lifecycle_command_approval_missing_output["mutates"] is not False
+    ):
+        errors.append("command-backed project lifecycle apply did not require approval for missing approval fixture")
+
+    if lifecycle_command_dirty_output["status"] != "blocked" or lifecycle_command_dirty_output["mutates"] is not False:
+        errors.append("command-backed project lifecycle apply did not block dirty git fixture")
+
+    if lifecycle_command_stale_output["status"] != "blocked" or lifecycle_command_stale_output["mutates"] is not False:
+        errors.append("command-backed project lifecycle apply did not block stale approval fixture")
 
     if errors:
         print("\n".join(errors))

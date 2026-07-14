@@ -97,6 +97,36 @@ async function main() {
     throw new Error("command-backed project lifecycle wrapper did not return the expected apply result");
   }
 
+  const commandLifecycleApprovalMissing = await call("lobster_buffet_project_lifecycle", {
+    action: "archive",
+    project_name: "synthetic-project",
+    mode: "apply",
+    adapter_config: "fixtures/adapters/synthetic-command-lifecycle-apply-approval-missing-config.v0.1.0.json",
+  });
+  if (commandLifecycleApprovalMissing.status !== "requires_approval" || commandLifecycleApprovalMissing.mutates !== false) {
+    throw new Error("command-backed project lifecycle wrapper did not require approval for the missing approval case");
+  }
+
+  const commandLifecycleDirty = await call("lobster_buffet_project_lifecycle", {
+    action: "archive",
+    project_name: "synthetic-project",
+    mode: "apply",
+    adapter_config: "fixtures/adapters/synthetic-command-lifecycle-apply-dirty-git-config.v0.1.0.json",
+  });
+  if (commandLifecycleDirty.status !== "blocked" || commandLifecycleDirty.mutates !== false) {
+    throw new Error("command-backed project lifecycle wrapper did not block the dirty git case");
+  }
+
+  const commandLifecycleStale = await call("lobster_buffet_project_lifecycle", {
+    action: "archive",
+    project_name: "synthetic-project",
+    mode: "apply",
+    adapter_config: "fixtures/adapters/synthetic-command-lifecycle-apply-stale-approval-config.v0.1.0.json",
+  });
+  if (commandLifecycleStale.status !== "blocked" || commandLifecycleStale.mutates !== false) {
+    throw new Error("command-backed project lifecycle wrapper did not block the stale approval case");
+  }
+
   const guard = await call("lobster_buffet_git_workflow_guard", {
     adapter_config: "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json",
     requested_action: "lifecycle_apply",
@@ -164,6 +194,9 @@ async function main() {
     lifecycle,
     lifecycleApply,
     commandLifecycleApply,
+    commandLifecycleApprovalMissing,
+    commandLifecycleDirty,
+    commandLifecycleStale,
     list,
     plan,
     reviews,

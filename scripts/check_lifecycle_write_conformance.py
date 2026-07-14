@@ -34,6 +34,13 @@ DEFAULT_CASES = [
 
 DEFAULT_CONFIG_CASES = [
     ("fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json", "applied", True),
+    (
+        "fixtures/adapters/synthetic-command-lifecycle-apply-approval-missing-config.v0.1.0.json",
+        "requires_approval",
+        False,
+    ),
+    ("fixtures/adapters/synthetic-command-lifecycle-apply-dirty-git-config.v0.1.0.json", "blocked", False),
+    ("fixtures/adapters/synthetic-command-lifecycle-apply-stale-approval-config.v0.1.0.json", "blocked", False),
 ]
 
 

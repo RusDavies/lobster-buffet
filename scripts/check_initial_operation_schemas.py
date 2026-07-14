@@ -205,7 +205,13 @@ RELEASE_COMPATIBILITY = ROOT / "manifests/release-compatibility.v0.1.0.json"
 ADAPTER_FIXTURE = ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json"
 ADAPTER_CONFIG = ROOT / "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json"
 COMMAND_ADAPTER_CONFIG = ROOT / "fixtures/adapters/synthetic-command-adapter-config.v0.1.0.json"
-COMMAND_LIFECYCLE_APPLY_CONFIG = ROOT / "fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json"
+COMMAND_ADAPTER_CONFIGS = [
+    COMMAND_ADAPTER_CONFIG,
+    ROOT / "fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json",
+    ROOT / "fixtures/adapters/synthetic-command-lifecycle-apply-approval-missing-config.v0.1.0.json",
+    ROOT / "fixtures/adapters/synthetic-command-lifecycle-apply-dirty-git-config.v0.1.0.json",
+    ROOT / "fixtures/adapters/synthetic-command-lifecycle-apply-stale-approval-config.v0.1.0.json",
+]
 LIFECYCLE_APPLY_APPROVED_FIXTURE = ROOT / "fixtures/adapters/synthetic-lifecycle-apply-approved.v0.1.0.json"
 
 
@@ -291,8 +297,7 @@ def main() -> int:
     release_compatibility = load_json(RELEASE_COMPATIBILITY)
     adapter_fixture = load_json(ADAPTER_FIXTURE)
     adapter_config = load_json(ADAPTER_CONFIG)
-    command_adapter_config = load_json(COMMAND_ADAPTER_CONFIG)
-    command_lifecycle_apply_config = load_json(COMMAND_LIFECYCLE_APPLY_CONFIG)
+    command_adapter_configs = [load_json(path) for path in COMMAND_ADAPTER_CONFIGS]
     lifecycle_apply_receipt_schema = load_json(ROOT / "schemas/lifecycle-apply-receipt.v0.1.0.json")
     lifecycle_apply_approved_fixture = load_json(LIFECYCLE_APPLY_APPROVED_FIXTURE)
     for operation in manifest["operations"]:
@@ -375,7 +380,7 @@ def main() -> int:
     if not fixture_ref.exists():
         all_errors.append(f"adapter config references missing fixture {adapter_config['backend']['fixture_path']}")
 
-    for command_config in (command_adapter_config, command_lifecycle_apply_config):
+    for command_config in command_adapter_configs:
         command = command_config["backend"]["command"]
         command_script = ROOT / command[1]
         command_fixture = ROOT / command[2]
@@ -411,8 +416,7 @@ def main() -> int:
     fixture_text = (
         ADAPTER_FIXTURE.read_text(encoding="utf-8")
         + ADAPTER_CONFIG.read_text(encoding="utf-8")
-        + COMMAND_ADAPTER_CONFIG.read_text(encoding="utf-8")
-        + COMMAND_LIFECYCLE_APPLY_CONFIG.read_text(encoding="utf-8")
+        + "".join(path.read_text(encoding="utf-8") for path in COMMAND_ADAPTER_CONFIGS)
         + LIFECYCLE_APPLY_APPROVED_FIXTURE.read_text(encoding="utf-8")
     )
     for fragment in forbidden_fragments:
