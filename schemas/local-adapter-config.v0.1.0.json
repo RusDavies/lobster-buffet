@@ -17,15 +17,26 @@
     "backend": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "fixture_path"],
+      "required": ["kind"],
       "properties": {
         "kind": {
           "type": "string",
-          "enum": ["fixture"]
+          "enum": ["fixture", "command"]
         },
         "fixture_path": {
           "type": "string",
           "minLength": 1
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1
         }
       }
     },

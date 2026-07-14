@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/local-adapter-invocation.v0.1.0.json",
+  "title": "Lobster Buffet local adapter invocation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "adapter_api", "operation", "requested_capabilities"],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["lobster-buffet.local-adapter-invocation.v0.1.0"]
+    },
+    "adapter_api": {
+      "type": "string",
+      "enum": ["lobster-buffet.local-adapter.v0"]
+    },
+    "operation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "requested_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

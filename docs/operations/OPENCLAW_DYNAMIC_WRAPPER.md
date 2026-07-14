@@ -49,8 +49,9 @@ Supported plugin configuration:
 
 `project.inspect` uses a caller-supplied `adapter_config`, then
 `defaultAdapterConfig`, then a caller-supplied `adapter_fixture`, then
-`defaultAdapterFixture`. The fixture path remains a development/test escape
-hatch for now; real local deployments should prefer adapter config.
+`defaultAdapterFixture`. Adapter config may point at a fixture backend or a
+command backend. The fixture path remains a development/test escape hatch;
+real local deployments should prefer adapter config.
 
 ## Boundary
 
