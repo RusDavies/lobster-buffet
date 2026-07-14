@@ -40,11 +40,11 @@
     },
     "mode": {
       "type": "string",
-      "enum": ["plan"]
+      "enum": ["plan", "apply"]
     },
     "status": {
       "type": "string",
-      "enum": ["requires_approval"]
+      "enum": ["requires_approval", "blocked", "applied"]
     },
     "mutates": {
       "type": "boolean"

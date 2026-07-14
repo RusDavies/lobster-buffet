@@ -101,6 +101,31 @@ for action in ("bootstrap", "adopt", "repair", "migrate", "archive"):
         )
     )
 
+for fixture in (
+    "synthetic-lifecycle-apply-approved.v0.1.0.json",
+    "synthetic-lifecycle-apply-approval-missing.v0.1.0.json",
+    "synthetic-lifecycle-apply-dirty-git.v0.1.0.json",
+    "synthetic-lifecycle-apply-stale-approval.v0.1.0.json",
+):
+    COMMANDS.append(
+        (
+            [
+                "python3",
+                "-m",
+                "lobster_buffet.cli",
+                "project",
+                "archive",
+                "--project-name",
+                "synthetic-project",
+                "--mode",
+                "apply",
+                "--adapter-fixture",
+                f"fixtures/adapters/{fixture}",
+            ],
+            ROOT / "schemas/operations/project.lifecycle.output.v0.1.0.json",
+        )
+    )
+
 
 def run_json(command: list[str]) -> Any:
     completed = subprocess.run(
@@ -148,6 +173,66 @@ def main() -> int:
     heartbeat_output = run_json(["python3", "-m", "lobster_buffet.cli", "heartbeat", "packet"])
     heartbeat_check_output = run_json(["python3", "-m", "lobster_buffet.cli", "heartbeat", "check"])
     git_guard_output = run_json(["python3", "-m", "lobster_buffet.cli", "git", "workflow-guard"])
+    lifecycle_apply_output = run_json(
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "project",
+            "archive",
+            "--project-name",
+            "synthetic-project",
+            "--mode",
+            "apply",
+            "--adapter-fixture",
+            "fixtures/adapters/synthetic-lifecycle-apply-approved.v0.1.0.json",
+        ]
+    )
+    lifecycle_approval_missing_output = run_json(
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "project",
+            "archive",
+            "--project-name",
+            "synthetic-project",
+            "--mode",
+            "apply",
+            "--adapter-fixture",
+            "fixtures/adapters/synthetic-lifecycle-apply-approval-missing.v0.1.0.json",
+        ]
+    )
+    lifecycle_dirty_output = run_json(
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "project",
+            "archive",
+            "--project-name",
+            "synthetic-project",
+            "--mode",
+            "apply",
+            "--adapter-fixture",
+            "fixtures/adapters/synthetic-lifecycle-apply-dirty-git.v0.1.0.json",
+        ]
+    )
+    lifecycle_stale_output = run_json(
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "project",
+            "archive",
+            "--project-name",
+            "synthetic-project",
+            "--mode",
+            "apply",
+            "--adapter-fixture",
+            "fixtures/adapters/synthetic-lifecycle-apply-stale-approval.v0.1.0.json",
+        ]
+    )
     plan_output = run_json(["python3", "-m", "lobster_buffet.cli", "operation", "plan", "--name", "project.inspect"])
     output_text = json.dumps(
         {
@@ -156,6 +241,10 @@ def main() -> int:
             "heartbeat_check": heartbeat_check_output,
             "git_guard": git_guard_output,
             "incident": incident_output,
+            "lifecycle_apply": lifecycle_apply_output,
+            "lifecycle_approval_missing": lifecycle_approval_missing_output,
+            "lifecycle_dirty": lifecycle_dirty_output,
+            "lifecycle_stale": lifecycle_stale_output,
             "plan": plan_output,
             "project": project_output,
             "review": review_output,
@@ -187,6 +276,18 @@ def main() -> int:
 
     if git_guard_output["decision"] != "allowed":
         errors.append("git.workflow.guard did not return allowed for synthetic clean git state")
+
+    if lifecycle_apply_output["status"] != "applied" or lifecycle_apply_output["mutates"] is not True:
+        errors.append("project lifecycle apply did not return an applied mutating result for approved fixture")
+
+    if lifecycle_approval_missing_output["status"] != "requires_approval" or lifecycle_approval_missing_output["mutates"] is not False:
+        errors.append("project lifecycle apply did not require approval for missing approval fixture")
+
+    if lifecycle_dirty_output["status"] != "blocked" or lifecycle_dirty_output["mutates"] is not False:
+        errors.append("project lifecycle apply did not block dirty git fixture")
+
+    if lifecycle_stale_output["status"] != "blocked" or lifecycle_stale_output["mutates"] is not False:
+        errors.append("project lifecycle apply did not block stale approval fixture")
 
     if errors:
         print("\n".join(errors))

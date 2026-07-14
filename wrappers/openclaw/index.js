@@ -236,7 +236,7 @@ function tools(options) {
     createTool({
       name: "lobster_buffet_project_lifecycle",
       label: "Lobster Buffet Project Lifecycle",
-      description: "Generate a lifecycle operation preview through the CLI core.",
+      description: "Generate a lifecycle operation preview or gated apply result through the CLI core.",
       parameters: {
         type: "object",
         additionalProperties: false,
@@ -251,17 +251,46 @@ function tools(options) {
             type: "string",
             description: "Opaque or sanitized project name.",
           },
+          mode: {
+            type: "string",
+            description: "Lifecycle mode.",
+            enum: ["plan", "apply"],
+          },
           reason: {
             type: "string",
             description: "Optional local reason for the lifecycle action.",
           },
+          adapter_fixture: {
+            type: "string",
+            description: "Optional adapter fixture path relative to the project root.",
+          },
+          adapter_config: {
+            type: "string",
+            description: "Optional adapter config path relative to the project root.",
+          },
         },
       },
       execute: (params) => {
-        const args = ["project", requireLifecycleAction(params.action), "--project-name", requireParam(params, "project_name")];
+        const args = [
+          "project",
+          requireLifecycleAction(params.action),
+          "--project-name",
+          requireParam(params, "project_name"),
+          "--mode",
+          readString(params.mode) === "apply" ? "apply" : "plan",
+        ];
         const reason = readString(params.reason);
         if (reason) {
           args.push("--reason", reason);
+        }
+        const adapterFixture = readString(params.adapter_fixture);
+        const adapterConfig = readString(params.adapter_config) || options.defaultAdapterConfig;
+        if (adapterFixture) {
+          args.push("--adapter-fixture", adapterFixture);
+        } else if (adapterConfig) {
+          args.push("--adapter-config", adapterConfig);
+        } else {
+          args.push("--adapter-fixture", options.defaultAdapterFixture);
         }
         return runCli(args, options);
       },

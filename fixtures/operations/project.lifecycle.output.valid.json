@@ -17,7 +17,7 @@
     "reason": "Lifecycle operations require approval before filesystem or git mutation."
   },
   "side_effects": ["filesystem.write", "git.write"],
-  "adapter_capabilities": ["project.resolve", "filesystem.write_project_files", "git.inspect_status", "git.write_branch"],
+  "adapter_capabilities": ["project.resolve", "filesystem.write_project_files", "git.inspect_status", "git.write_branch", "approval.request"],
   "preview": [
     {
       "kind": "filesystem.write",

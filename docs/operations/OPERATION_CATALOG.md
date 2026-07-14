@@ -35,16 +35,18 @@ The machine-readable catalog lives at `manifests/operation-catalog.v0.1.0.json`.
 - `project.migrate`: move a project between lifecycle layouts or naming conventions.
 - `project.archive`: mark a project archived without deleting data.
 
-The current lifecycle implementation is preview-only. It emits structured
-approval-required plans and verification steps, but it does not perform
-filesystem or git mutations. Apply-mode lifecycle execution requires
-write-capable local adapters and an approval gate.
+The lifecycle implementation supports preview mode and a fixture-backed apply
+mode. Apply mode validates repo-mutation approval, write-capable adapter
+capabilities, clean git state, reviewed preview evidence, and adapter-reported
+post-write verification before returning an applied result. Shared code does
+not directly mutate filesystem or git state; local adapters own those writes.
 
 Lifecycle apply-mode readiness is defined in
 `docs/operations/LIFECYCLE_APPLY_READINESS.md` and validated with
 `fixtures/adapters/synthetic-lifecycle-apply-readiness.v0.1.0.json`. The
-synthetic fixture is intentionally `blocked`; it defines the required shape but
-does not complete approval or execute writes.
+readiness fixture is intentionally `blocked`; it defines the required shape.
+Separate apply fixtures cover approved, approval-missing, dirty-git, and
+stale-approval outcomes.
 
 ### Incident
 
@@ -114,8 +116,8 @@ lifecycle changes.
 
 The next schema work should focus on the remaining high-leverage read-only and state operations:
 
-1. `project.lifecycle` apply mode
+1. Local adapter implementations for lifecycle writes
 
-Lifecycle apply mode should wait until the write-capable adapter and approval
-gate are concrete. A mutating provider without a firm gate model is still just a
-footgun with a logo.
+The shared provider now validates the apply-mode contract against synthetic
+fixtures. The next schema work should define richer adapter write receipts once
+real local adapters need to report more than compact verification summaries.

@@ -73,7 +73,18 @@ def build_parser() -> argparse.ArgumentParser:
     for action in core.LIFECYCLE_ACTIONS:
         lifecycle = project_subparsers.add_parser(action)
         lifecycle.add_argument("--project-name", required=True)
+        lifecycle.add_argument("--mode", choices=["plan", "apply"], default="plan")
         lifecycle.add_argument("--reason", default=None)
+        lifecycle.add_argument(
+            "--adapter-fixture",
+            default=None,
+            help="Adapter fixture path. Overrides adapter config in apply mode.",
+        )
+        lifecycle.add_argument(
+            "--adapter-config",
+            default=None,
+            help=f"Adapter config path. Defaults to ${core.ADAPTER_CONFIG_ENV} when set in apply mode.",
+        )
 
     incident = subparsers.add_parser("incident")
     incident_subparsers = incident.add_subparsers(dest="action", required=True)
@@ -205,7 +216,16 @@ def run(argv: list[str] | None = None) -> int:
             return 0
 
         if args.group == "project" and args.action in core.LIFECYCLE_ACTIONS:
-            emit(core.project_lifecycle_preview(f"project.{args.action}", args.project_name, reason=args.reason))
+            emit(
+                core.project_lifecycle(
+                    f"project.{args.action}",
+                    args.project_name,
+                    mode=args.mode,
+                    reason=args.reason,
+                    adapter_fixture_path=Path(args.adapter_fixture) if args.adapter_fixture else None,
+                    adapter_config_path=Path(args.adapter_config) if args.adapter_config else None,
+                )
+            )
             return 0
 
         if args.group == "git" and args.action == "workflow-guard":
