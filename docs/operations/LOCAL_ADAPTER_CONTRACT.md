@@ -165,7 +165,7 @@ disclosure policies.
 
 ## First Conformance Target
 
-The first adapter fixture should support `project.inspect` with:
+The first read-only adapter fixture should support `project.inspect` with:
 
 - `project.resolve`
 - `filesystem.read_project_metadata`
@@ -178,6 +178,30 @@ The current synthetic fixture is:
 
 - `fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json`
 - `schemas/local-adapter-fixture.v0.1.0.json`
+
+The first lifecycle write conformance target validates apply-mode fixtures with:
+
+- `project.resolve`
+- `git.inspect_status`
+- `approval.request`
+- `filesystem.write_project_files`
+- `git.write_branch`
+- lifecycle apply receipts matching `schemas/lifecycle-apply-receipt.v0.1.0.json`
+
+The conformance script is:
+
+```bash
+python3 scripts/check_lifecycle_write_conformance.py
+```
+
+For a single adapter fixture:
+
+```bash
+python3 scripts/check_lifecycle_write_conformance.py \
+  --adapter-fixture fixtures/adapters/synthetic-lifecycle-apply-approved.v0.1.0.json \
+  --expect-status applied \
+  --expect-mutates true
+```
 
 ## Adapter Config Loading
 
