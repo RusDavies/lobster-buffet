@@ -63,6 +63,11 @@
       "role": "Dependency-free validation of schemas, manifests, fixtures, and references."
     },
     {
+      "path": "scripts/check_lifecycle_write_conformance.py",
+      "kind": "script",
+      "role": "Validate lifecycle write adapter fixtures against apply-mode approval, receipt, and privacy expectations."
+    },
+    {
       "path": "wrappers/openclaw/",
       "kind": "wrapper",
       "role": "OpenClaw dynamic tool wrapper that delegates to the CLI core."
