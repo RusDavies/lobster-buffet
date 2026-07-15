@@ -8,14 +8,24 @@ if (metadata.providerApi !== "lobster-buffet.provider.v0") {
 if (metadata.localAdapterApi !== "lobster-buffet.local-adapter.v0") {
   throw new Error("MCP wrapper metadata did not declare the local adapter API");
 }
-if (!metadata.tools.some((tool) => tool.name === "lobster_buffet_command_list")) {
-  throw new Error("MCP wrapper did not expose lobster_buffet_command_list");
-}
-if (!metadata.tools.some((tool) => tool.name === "lobster_buffet_project_inspect")) {
-  throw new Error("MCP wrapper did not expose lobster_buffet_project_inspect");
-}
-if (!metadata.tools.some((tool) => tool.name === "lobster_buffet_project_lifecycle")) {
-  throw new Error("MCP wrapper did not expose lobster_buffet_project_lifecycle");
+const expectedTools = [
+  "lobster_buffet_alignment_scan",
+  "lobster_buffet_command_describe",
+  "lobster_buffet_command_list",
+  "lobster_buffet_git_workflow_guard",
+  "lobster_buffet_heartbeat_check",
+  "lobster_buffet_heartbeat_packet",
+  "lobster_buffet_incident_list",
+  "lobster_buffet_operation_plan",
+  "lobster_buffet_project_inspect",
+  "lobster_buffet_project_lifecycle",
+  "lobster_buffet_review_list",
+  "lobster_buffet_review_update",
+];
+for (const toolName of expectedTools) {
+  if (!metadata.tools.some((tool) => tool.name === toolName)) {
+    throw new Error(`MCP wrapper did not expose ${toolName}`);
+  }
 }
 
 const initialize = server.handleRequest({
@@ -88,6 +98,79 @@ const commandInspect = wrapper.callTool("lobster_buffet_project_inspect", {
 });
 if (commandInspect.isError || commandInspect.structuredContent.project?.name !== "lobster-buffet") {
   throw new Error("MCP wrapper project.inspect did not support command-backed adapter config");
+}
+
+const commandDescribe = wrapper.callTool("lobster_buffet_command_describe", {
+  name: "project.inspect",
+});
+if (commandDescribe.isError || commandDescribe.structuredContent.operation?.name !== "project.inspect") {
+  throw new Error("MCP wrapper command.describe did not delegate to the CLI core");
+}
+
+const operationPlan = wrapper.callTool("lobster_buffet_operation_plan", {
+  name: "project.inspect",
+  surface: "discord",
+});
+if (operationPlan.isError || operationPlan.structuredContent.plan_id !== "plan:project.inspect:v0.1.0") {
+  throw new Error("MCP wrapper operation.plan did not delegate to the CLI core");
+}
+
+const gitWorkflowGuard = wrapper.callTool("lobster_buffet_git_workflow_guard", {
+  requested_action: "lifecycle_apply",
+  adapter_fixture: "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
+});
+if (gitWorkflowGuard.isError || gitWorkflowGuard.structuredContent.decision !== "allowed") {
+  throw new Error("MCP wrapper git.workflow.guard did not return the expected guard decision");
+}
+
+const incidentList = wrapper.callTool("lobster_buffet_incident_list", {
+  adapter_fixture: "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
+});
+if (incidentList.isError || incidentList.structuredContent.counts?.active !== 1) {
+  throw new Error("MCP wrapper incident.list did not return the expected incident counts");
+}
+
+const alignmentScan = wrapper.callTool("lobster_buffet_alignment_scan", {
+  adapter_fixture: "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
+});
+if (alignmentScan.isError || alignmentScan.structuredContent.verdict !== "aligned") {
+  throw new Error("MCP wrapper alignment.scan did not return the expected verdict");
+}
+
+const reviewList = wrapper.callTool("lobster_buffet_review_list", {
+  adapter_fixture: "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
+});
+if (reviewList.isError || reviewList.structuredContent.counts?.active !== 1) {
+  throw new Error("MCP wrapper review.list did not return the expected review counts");
+}
+
+const reviewUpdate = wrapper.callTool("lobster_buffet_review_update", {
+  review_id: "review-001",
+  kind: "note",
+  summary: "Synthetic MCP review update.",
+  adapter_fixture: "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
+});
+if (
+  reviewUpdate.isError ||
+  reviewUpdate.structuredContent.operation?.name !== "review.update" ||
+  reviewUpdate.structuredContent.status !== "requires_approval" ||
+  reviewUpdate.structuredContent.mutates !== false
+) {
+  throw new Error("MCP wrapper review.update did not preserve the gated preview result");
+}
+
+const heartbeatPacket = wrapper.callTool("lobster_buffet_heartbeat_packet", {
+  adapter_fixture: "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
+});
+if (heartbeatPacket.isError || heartbeatPacket.structuredContent.overall_status !== "blocked") {
+  throw new Error("MCP wrapper heartbeat.packet did not return the expected packet status");
+}
+
+const heartbeatCheck = wrapper.callTool("lobster_buffet_heartbeat_check", {
+  adapter_fixture: "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json",
+});
+if (heartbeatCheck.isError || heartbeatCheck.structuredContent.status !== "not_due") {
+  throw new Error("MCP wrapper heartbeat.check did not return the expected due state");
 }
 
 const lifecycle = wrapper.callTool("lobster_buffet_project_lifecycle", {
@@ -211,6 +294,11 @@ if (!unknown.isError || unknown.structuredContent.error?.code !== "mcp.tool_not_
 
 const serialized = JSON.stringify({
   commandInspect,
+  commandDescribe,
+  operationPlan,
+  gitWorkflowGuard,
+  incidentList,
+  alignmentScan,
   inspect,
   lifecycle,
   lifecycleApply,
@@ -224,6 +312,10 @@ const serialized = JSON.stringify({
   list,
   metadata,
   parseError,
+  reviewList,
+  reviewUpdate,
+  heartbeatPacket,
+  heartbeatCheck,
   serverList,
   serverTools,
   unknown,

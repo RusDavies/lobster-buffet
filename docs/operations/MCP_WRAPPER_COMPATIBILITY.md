@@ -181,19 +181,30 @@ The current skeleton lives in `wrappers/mcp/`. It is SDK-neutral and exposes:
   handles `initialize`, `tools/list`, `tools/call`, and initialized
   notifications while delegating tool execution to `wrappers/mcp/index.js`;
 - `wrappers/mcp/test.js` for smoke tests proving `command.list`,
-  `project.inspect`, lifecycle preview, blocked lifecycle apply paths, and the
-  approved synthetic lifecycle apply path delegate to the CLI core while
-  preserving CLI error envelopes for command-backed adapter failures. The tests
-  also cover the server entrypoint's tool listing, tool-call delegation,
-  notification handling, and JSON-RPC parse errors.
+  `command.describe`, `operation.plan`, `project.inspect`, `git.workflow.guard`,
+  `incident.list`, `alignment.scan`, `review.list`, `review.update`,
+  `heartbeat.packet`, `heartbeat.check`, lifecycle preview, blocked lifecycle
+  apply paths, and the approved synthetic lifecycle apply path delegate to the
+  CLI core while preserving CLI error envelopes for command-backed adapter
+  failures. The tests also cover the server entrypoint's tool listing,
+  tool-call delegation, notification handling, and JSON-RPC parse errors.
 
 The skeleton is not packageable yet, but it now has a first SDK/client-facing
 stdio server entrypoint as the compatibility and delegation base for the next
 implementation slices. Current delegated tools:
 
 - `lobster_buffet_command_list`
+- `lobster_buffet_command_describe`
+- `lobster_buffet_operation_plan`
 - `lobster_buffet_project_inspect`
 - `lobster_buffet_project_lifecycle` preview mode and synthetic apply paths
+- `lobster_buffet_git_workflow_guard`
+- `lobster_buffet_incident_list`
+- `lobster_buffet_alignment_scan`
+- `lobster_buffet_review_list`
+- `lobster_buffet_review_update` preview mode
+- `lobster_buffet_heartbeat_packet`
+- `lobster_buffet_heartbeat_check`
 
 ## Non-Goals
 
