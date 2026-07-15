@@ -1,7 +1,7 @@
 # MCP Wrapper Compatibility Target
 
-Status: Draft v0.1 target. This defines the wrapper compatibility target; it
-does not implement an MCP server yet.
+Status: Draft v0.1 target. This defines the wrapper compatibility target and
+includes a first stdio JSON-RPC MCP server entrypoint.
 
 ## Purpose
 
@@ -18,6 +18,7 @@ is embedded in shared artifacts.
 - Local adapter API: `lobster-buffet.local-adapter.v0`
 - Target wrapper ref: `wrappers/mcp/`
 - Skeleton metadata: `wrappers/mcp/mcp.wrapper.json`
+- Server entrypoint: `wrappers/mcp/server.js`
 - Promotion gate metadata: `manifests/mcp-wrapper-promotion-gates.v0.1.0.json`
 - Compatibility target doc: `docs/operations/MCP_WRAPPER_COMPATIBILITY.md`
 
@@ -130,8 +131,8 @@ The MCP wrapper remains `skeleton` until all packageable-wrapper criteria below
 are true in the same release candidate:
 
 1. `wrappers/mcp/mcp.wrapper.json` declares `status: packageable` and names the
-   exact provider API, local adapter API, entrypoint, delegated CLI command, and
-   supported tool list.
+   exact provider API, local adapter API, module entrypoint, server entrypoint,
+   delegated CLI command, and supported tool list.
 2. `wrappers/mcp/package.json` has package metadata suitable for downstream
    packaging: stable name, version, description, entrypoint, test command, and
    no private local paths or runtime-only configuration.
@@ -176,13 +177,19 @@ The current skeleton lives in `wrappers/mcp/`. It is SDK-neutral and exposes:
 - `wrappers/mcp/mcp.wrapper.json` for provider API, adapter API, entrypoint, and
   initial tool metadata;
 - `wrappers/mcp/index.js` for MCP-shaped tool listing and tool calls;
+- `wrappers/mcp/server.js` for a stdio JSON-RPC MCP server entrypoint that
+  handles `initialize`, `tools/list`, `tools/call`, and initialized
+  notifications while delegating tool execution to `wrappers/mcp/index.js`;
 - `wrappers/mcp/test.js` for smoke tests proving `command.list`,
   `project.inspect`, lifecycle preview, blocked lifecycle apply paths, and the
   approved synthetic lifecycle apply path delegate to the CLI core while
-  preserving CLI error envelopes for command-backed adapter failures.
+  preserving CLI error envelopes for command-backed adapter failures. The tests
+  also cover the server entrypoint's tool listing, tool-call delegation,
+  notification handling, and JSON-RPC parse errors.
 
-The skeleton is not a complete MCP server yet. It is the compatibility and
-delegation base for the next implementation slices. Current delegated tools:
+The skeleton is not packageable yet, but it now has a first SDK/client-facing
+stdio server entrypoint as the compatibility and delegation base for the next
+implementation slices. Current delegated tools:
 
 - `lobster_buffet_command_list`
 - `lobster_buffet_project_inspect`

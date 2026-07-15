@@ -10,9 +10,9 @@
   "gates": [
     {
       "id": "metadata_declares_packageable_api_surface",
-      "requirement": "Wrapper metadata declares packageable status, provider API, local adapter API, entrypoint, delegated CLI command, and supported tools.",
+      "requirement": "Wrapper metadata declares packageable status, provider API, local adapter API, module entrypoint, server entrypoint, delegated CLI command, and supported tools.",
       "packageable_required": true,
-      "evidence_refs": ["wrappers/mcp/mcp.wrapper.json"],
+      "evidence_refs": ["wrappers/mcp/mcp.wrapper.json", "wrappers/mcp/server.js"],
       "validation_refs": ["scripts/check_initial_operation_schemas.py", "scripts/check_mcp_wrapper_packageability.py"]
     },
     {
