@@ -109,6 +109,50 @@ if (
   throw new Error("MCP wrapper lifecycle apply did not preserve the approved synthetic apply path");
 }
 
+const lifecycleInvalidJson = wrapper.callTool("lobster_buffet_project_lifecycle", {
+  action: "archive",
+  project_name: "synthetic-project",
+  mode: "apply",
+  adapter_config: "fixtures/adapters/synthetic-command-invalid-json-config.v0.1.0.json",
+});
+if (!lifecycleInvalidJson.isError || lifecycleInvalidJson.structuredContent.error?.code !== "adapter.command_invalid_json") {
+  throw new Error("MCP wrapper lifecycle apply did not preserve the invalid JSON error envelope");
+}
+
+const lifecycleNonzero = wrapper.callTool("lobster_buffet_project_lifecycle", {
+  action: "archive",
+  project_name: "synthetic-project",
+  mode: "apply",
+  adapter_config: "fixtures/adapters/synthetic-command-nonzero-exit-config.v0.1.0.json",
+});
+if (!lifecycleNonzero.isError || lifecycleNonzero.structuredContent.error?.code !== "adapter.command_failed") {
+  throw new Error("MCP wrapper lifecycle apply did not preserve the nonzero-exit error envelope");
+}
+
+const lifecycleTimeout = wrapper.callTool("lobster_buffet_project_lifecycle", {
+  action: "archive",
+  project_name: "synthetic-project",
+  mode: "apply",
+  adapter_config: "fixtures/adapters/synthetic-command-timeout-config.v0.1.0.json",
+});
+if (!lifecycleTimeout.isError || lifecycleTimeout.structuredContent.error?.code !== "adapter.command_timeout") {
+  throw new Error("MCP wrapper lifecycle apply did not preserve the timeout error envelope");
+}
+
+const lifecycleMissingCapability = wrapper.callTool("lobster_buffet_project_lifecycle", {
+  action: "archive",
+  project_name: "synthetic-project",
+  mode: "apply",
+  adapter_config: "fixtures/adapters/synthetic-command-missing-capability-config.v0.1.0.json",
+});
+if (
+  lifecycleMissingCapability.isError ||
+  lifecycleMissingCapability.structuredContent.status !== "blocked" ||
+  lifecycleMissingCapability.structuredContent.mutates !== false
+) {
+  throw new Error("MCP wrapper lifecycle apply did not preserve the missing-capability blocked result");
+}
+
 const unknown = wrapper.callTool("lobster_buffet_missing_tool", {});
 if (!unknown.isError || unknown.structuredContent.error?.code !== "mcp.tool_not_found") {
   throw new Error("MCP wrapper did not return a structured unknown-tool error");
@@ -121,7 +165,11 @@ const serialized = JSON.stringify({
   lifecycleApply,
   lifecycleApprovalMissing,
   lifecycleDirty,
+  lifecycleInvalidJson,
+  lifecycleMissingCapability,
+  lifecycleNonzero,
   lifecycleStale,
+  lifecycleTimeout,
   list,
   metadata,
   unknown,

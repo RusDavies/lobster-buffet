@@ -125,7 +125,8 @@ The current skeleton lives in `wrappers/mcp/`. It is SDK-neutral and exposes:
 - `wrappers/mcp/index.js` for MCP-shaped tool listing and tool calls;
 - `wrappers/mcp/test.js` for smoke tests proving `command.list`,
   `project.inspect`, lifecycle preview, blocked lifecycle apply paths, and the
-  approved synthetic lifecycle apply path delegate to the CLI core.
+  approved synthetic lifecycle apply path delegate to the CLI core while
+  preserving CLI error envelopes for command-backed adapter failures.
 
 The skeleton is not a complete MCP server yet. It is the compatibility and
 delegation base for the next implementation slices. Current delegated tools:
