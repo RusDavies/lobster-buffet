@@ -1,4 +1,5 @@
 const wrapper = require("./index.js");
+const server = require("./server.js");
 
 const metadata = wrapper.listTools();
 if (metadata.providerApi !== "lobster-buffet.provider.v0") {
@@ -17,12 +18,62 @@ if (!metadata.tools.some((tool) => tool.name === "lobster_buffet_project_lifecyc
   throw new Error("MCP wrapper did not expose lobster_buffet_project_lifecycle");
 }
 
+const initialize = server.handleRequest({
+  jsonrpc: "2.0",
+  id: 1,
+  method: "initialize",
+  params: {},
+});
+if (initialize.result?.serverInfo?.name !== "lobster-buffet-mcp-wrapper") {
+  throw new Error("MCP server entrypoint did not return server identity");
+}
+
+const serverTools = server.handleRequest({
+  jsonrpc: "2.0",
+  id: 2,
+  method: "tools/list",
+  params: {},
+});
+if (!serverTools.result?.tools?.some((tool) => tool.name === "lobster_buffet_command_list")) {
+  throw new Error("MCP server entrypoint did not expose wrapper tools");
+}
+
 const list = wrapper.callTool("lobster_buffet_command_list", {});
 if (list.isError || !Array.isArray(list.content) || !list.structuredContent) {
   throw new Error("MCP wrapper command.list returned an invalid MCP-style result");
 }
 if (!list.structuredContent.operations.some((operation) => operation.name === "project.inspect")) {
   throw new Error("MCP wrapper command.list did not delegate to the CLI core");
+}
+
+const serverList = server.handleRequest({
+  jsonrpc: "2.0",
+  id: 3,
+  method: "tools/call",
+  params: {
+    name: "lobster_buffet_command_list",
+    arguments: {},
+  },
+});
+if (
+  serverList.error ||
+  !serverList.result?.structuredContent?.operations?.some((operation) => operation.name === "project.inspect")
+) {
+  throw new Error("MCP server entrypoint did not delegate tools/call to the wrapper path");
+}
+
+const initialized = server.handleRequest({
+  jsonrpc: "2.0",
+  method: "notifications/initialized",
+  params: {},
+});
+if (initialized !== undefined) {
+  throw new Error("MCP server entrypoint should not respond to initialized notifications");
+}
+
+const parseError = server.handleJsonRpcLine("{");
+if (parseError.error?.code !== -32700) {
+  throw new Error("MCP server entrypoint did not return JSON-RPC parse errors");
 }
 
 const inspect = wrapper.callTool("lobster_buffet_project_inspect", {
@@ -172,6 +223,9 @@ const serialized = JSON.stringify({
   lifecycleTimeout,
   list,
   metadata,
+  parseError,
+  serverList,
+  serverTools,
   unknown,
 });
 for (const fragment of ["channel:", "0000000000000000000", "/home/", "github.com/RusDavies"]) {

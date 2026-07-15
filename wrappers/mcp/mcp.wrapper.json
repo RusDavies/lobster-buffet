@@ -4,6 +4,7 @@
   "local_adapter_api": "lobster-buffet.local-adapter.v0",
   "status": "skeleton",
   "entrypoint": "wrappers/mcp/index.js",
+  "server_entrypoint": "wrappers/mcp/server.js",
   "delegates_to": "python3 -m lobster_buffet.cli",
   "tools": [
     {

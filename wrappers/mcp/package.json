@@ -4,6 +4,13 @@
   "description": "MCP-style wrapper skeleton for Lobster Buffet CLI-core operations.",
   "type": "commonjs",
   "main": "index.js",
+  "bin": {
+    "lobster-buffet-mcp": "server.js"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./server": "./server.js"
+  },
   "scripts": {
     "test": "node test.js"
   }

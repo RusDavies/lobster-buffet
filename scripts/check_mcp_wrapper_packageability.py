@@ -60,6 +60,10 @@ def validate_common(
         errors.append("MCP wrapper metadata must declare local adapter API lobster-buffet.local-adapter.v0")
     if wrapper["entrypoint"] != "wrappers/mcp/index.js":
         errors.append("MCP wrapper metadata must name wrappers/mcp/index.js as the entrypoint")
+    if wrapper.get("server_entrypoint") != "wrappers/mcp/server.js":
+        errors.append("MCP wrapper metadata must name wrappers/mcp/server.js as the server entrypoint")
+    elif not (ROOT / wrapper["server_entrypoint"]).exists():
+        errors.append("MCP wrapper metadata server entrypoint does not exist")
     if wrapper["delegates_to"] != "python3 -m lobster_buffet.cli":
         errors.append("MCP wrapper metadata must delegate to python3 -m lobster_buffet.cli")
 
@@ -90,6 +94,8 @@ def validate_common(
             errors.append(f"wrappers/mcp/package.json missing required field {field!r}")
     if package_json.get("main") != "index.js":
         errors.append("wrappers/mcp/package.json main must be index.js")
+    if package_json.get("bin", {}).get("lobster-buffet-mcp") != "server.js":
+        errors.append("wrappers/mcp/package.json must expose the lobster-buffet-mcp server bin")
     if package_json.get("scripts", {}).get("test") != "node test.js":
         errors.append("wrappers/mcp/package.json scripts.test must run node test.js")
     version = package_json.get("version", "")
