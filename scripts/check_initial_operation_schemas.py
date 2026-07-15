@@ -36,6 +36,10 @@ CHECKS = [
         ROOT / "manifests/release-compatibility.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/mcp-wrapper-promotion-gates.v0.1.0.json",
+        ROOT / "manifests/mcp-wrapper-promotion-gates.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/lifecycle-apply-readiness.v0.1.0.json",
         ROOT / "fixtures/adapters/synthetic-lifecycle-apply-readiness.v0.1.0.json",
     ),
@@ -202,6 +206,7 @@ CATALOG = ROOT / "manifests/operation-catalog.v0.1.0.json"
 ADAPTER_CAPABILITIES = ROOT / "manifests/local-adapter-capabilities.v0.1.0.json"
 DISTRIBUTION_HANDOFF = ROOT / "manifests/distribution-handoff.v0.1.0.json"
 RELEASE_COMPATIBILITY = ROOT / "manifests/release-compatibility.v0.1.0.json"
+MCP_WRAPPER_PROMOTION_GATES = ROOT / "manifests/mcp-wrapper-promotion-gates.v0.1.0.json"
 ADAPTER_FIXTURE = ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json"
 ADAPTER_CONFIG = ROOT / "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json"
 COMMAND_ADAPTER_CONFIG = ROOT / "fixtures/adapters/synthetic-command-adapter-config.v0.1.0.json"
@@ -299,6 +304,7 @@ def main() -> int:
     adapter_capabilities = load_json(ADAPTER_CAPABILITIES)
     distribution_handoff = load_json(DISTRIBUTION_HANDOFF)
     release_compatibility = load_json(RELEASE_COMPATIBILITY)
+    mcp_wrapper_promotion_gates = load_json(MCP_WRAPPER_PROMOTION_GATES)
     adapter_fixture = load_json(ADAPTER_FIXTURE)
     adapter_config = load_json(ADAPTER_CONFIG)
     command_adapter_configs = [load_json(path) for path in COMMAND_ADAPTER_CONFIGS]
@@ -355,6 +361,23 @@ def main() -> int:
     for ref in release_compatibility["portage_handoff"]["inspectable_refs"]:
         if not (ROOT / ref).exists():
             all_errors.append(f"release compatibility handoff: missing inspectable ref {ref}")
+
+    promotion_gate_ids = [gate["id"] for gate in mcp_wrapper_promotion_gates["gates"]]
+    if len(promotion_gate_ids) != len(set(promotion_gate_ids)):
+        all_errors.append("MCP wrapper promotion gates contain duplicate gate ids")
+    if len(promotion_gate_ids) < 10:
+        all_errors.append("MCP wrapper promotion gates must cover the full ten-item promotion checklist")
+    for ref in mcp_wrapper_promotion_gates["wrapper"].values():
+        if not (ROOT / ref).exists():
+            all_errors.append(f"MCP wrapper promotion gates: missing wrapper ref {ref}")
+    for gate in mcp_wrapper_promotion_gates["gates"]:
+        if not gate["packageable_required"]:
+            all_errors.append(f"MCP wrapper promotion gate {gate['id']}: packageable_required must be true")
+        for ref in gate["evidence_refs"]:
+            if not (ROOT / ref).exists():
+                all_errors.append(f"MCP wrapper promotion gate {gate['id']}: missing evidence ref {ref}")
+    if "mcp_wrapper_promotion_gate_validation_passes" not in release_compatibility["release_gates"]:
+        all_errors.append("release compatibility gates must include MCP wrapper promotion gate validation")
 
     required_fixture_capabilities = {
         "project.resolve",
@@ -438,6 +461,7 @@ def main() -> int:
         f"{len(adapter_capabilities['capabilities'])} adapter capability(ies), "
         f"{len(distribution_handoff['packageable_artifacts'])} handoff artifact(s), "
         f"{len(release_compatibility['release_gates'])} release gate(s), "
+        f"{len(mcp_wrapper_promotion_gates['gates'])} MCP wrapper promotion gate(s), "
         f"and {len(adapter_fixture['capabilities'])} adapter fixture capability(ies)."
     )
     return 0

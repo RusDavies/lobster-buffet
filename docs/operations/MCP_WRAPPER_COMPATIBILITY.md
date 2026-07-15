@@ -18,6 +18,7 @@ is embedded in shared artifacts.
 - Local adapter API: `lobster-buffet.local-adapter.v0`
 - Target wrapper ref: `wrappers/mcp/`
 - Skeleton metadata: `wrappers/mcp/mcp.wrapper.json`
+- Promotion gate metadata: `manifests/mcp-wrapper-promotion-gates.v0.1.0.json`
 - Compatibility target doc: `docs/operations/MCP_WRAPPER_COMPATIBILITY.md`
 
 An MCP wrapper release must declare the provider API and local adapter API it
@@ -115,6 +116,9 @@ Before an MCP wrapper is treated as packageable, it should have:
 
 These gates should complement, not replace, existing CLI, schema, lifecycle,
 and OpenClaw wrapper regression checks.
+The machine-readable gate list lives in
+`manifests/mcp-wrapper-promotion-gates.v0.1.0.json` and is validated by
+`scripts/check_initial_operation_schemas.py`.
 
 ## Promotion Criteria
 

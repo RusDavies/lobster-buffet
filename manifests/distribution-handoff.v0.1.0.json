@@ -58,6 +58,11 @@
       "role": "Machine-readable catalogs and packageable metadata."
     },
     {
+      "path": "manifests/mcp-wrapper-promotion-gates.v0.1.0.json",
+      "kind": "manifest",
+      "role": "Machine-readable MCP wrapper promotion gates for skeleton-to-packageable review."
+    },
+    {
       "path": "fixtures/",
       "kind": "fixture",
       "role": "Synthetic validation fixtures without private workspace data."
@@ -143,7 +148,8 @@
       "operation-catalog@0.1.0",
       "local-adapter-capabilities@0.1.0",
       "distribution-handoff@0.1.0",
-      "release-compatibility@0.1.0"
+      "release-compatibility@0.1.0",
+      "mcp-wrapper-promotion-gates@0.1.0"
     ],
     "adapter_api": "lobster-buffet.local-adapter.v0"
   },
@@ -190,6 +196,10 @@
     {
       "path": "docs/operations/MCP_WRAPPER_COMPATIBILITY.md",
       "purpose": "Discover the MCP-style wrapper compatibility target."
+    },
+    {
+      "path": "manifests/mcp-wrapper-promotion-gates.v0.1.0.json",
+      "purpose": "Discover machine-readable MCP wrapper promotion gates."
     }
   ]
 }

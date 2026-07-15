@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.lobster-buffet.local/mcp-wrapper-promotion-gates.v0.1.0.json",
+  "title": "Lobster Buffet MCP wrapper promotion gates",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "wrapper",
+    "current_status",
+    "promotion_target",
+    "gates"
+  ],
+  "properties": {
+    "schema": {
+      "type": "string",
+      "enum": ["lobster-buffet.mcp-wrapper-promotion-gates.v0.1.0"]
+    },
+    "wrapper": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metadata_ref", "package_ref", "compatibility_ref"],
+      "properties": {
+        "metadata_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "package_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "compatibility_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "current_status": {
+      "type": "string",
+      "enum": ["skeleton", "validated_skeleton", "packageable"]
+    },
+    "promotion_target": {
+      "type": "string",
+      "enum": ["packageable"]
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "requirement",
+          "packageable_required",
+          "evidence_refs",
+          "validation_refs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requirement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "packageable_required": {
+            "type": "boolean"
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "validation_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

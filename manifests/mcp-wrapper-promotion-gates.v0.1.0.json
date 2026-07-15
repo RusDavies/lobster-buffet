@@ -1,0 +1,82 @@
+{
+  "schema": "lobster-buffet.mcp-wrapper-promotion-gates.v0.1.0",
+  "wrapper": {
+    "metadata_ref": "wrappers/mcp/mcp.wrapper.json",
+    "package_ref": "wrappers/mcp/package.json",
+    "compatibility_ref": "docs/operations/MCP_WRAPPER_COMPATIBILITY.md"
+  },
+  "current_status": "skeleton",
+  "promotion_target": "packageable",
+  "gates": [
+    {
+      "id": "metadata_declares_packageable_api_surface",
+      "requirement": "Wrapper metadata declares packageable status, provider API, local adapter API, entrypoint, delegated CLI command, and supported tools.",
+      "packageable_required": true,
+      "evidence_refs": ["wrappers/mcp/mcp.wrapper.json"],
+      "validation_refs": ["scripts/check_initial_operation_schemas.py"]
+    },
+    {
+      "id": "package_metadata_is_portable",
+      "requirement": "Package metadata has a stable name, version, description, entrypoint, test command, and no private local paths.",
+      "packageable_required": true,
+      "evidence_refs": ["wrappers/mcp/package.json"],
+      "validation_refs": ["scripts/check_initial_operation_schemas.py"]
+    },
+    {
+      "id": "supported_tools_delegate_to_cli_core",
+      "requirement": "Every supported MCP tool delegates to the CLI core instead of reimplementing operation behavior.",
+      "packageable_required": true,
+      "evidence_refs": ["wrappers/mcp/index.js", "wrappers/mcp/test.js"],
+      "validation_refs": ["node wrappers/mcp/test.js"]
+    },
+    {
+      "id": "tool_inputs_track_operation_schemas",
+      "requirement": "Tool input schemas are generated from operation schemas or reviewed against them with any drift documented.",
+      "packageable_required": true,
+      "evidence_refs": ["schemas/operations/", "docs/operations/MCP_WRAPPER_COMPATIBILITY.md"],
+      "validation_refs": ["scripts/check_initial_operation_schemas.py"]
+    },
+    {
+      "id": "structured_results_preserve_cli_payloads",
+      "requirement": "Structured MCP results preserve CLI JSON payloads, including errors, warnings, side effects, approval metadata, and mutation flags.",
+      "packageable_required": true,
+      "evidence_refs": ["wrappers/mcp/index.js", "wrappers/mcp/test.js"],
+      "validation_refs": ["node wrappers/mcp/test.js"]
+    },
+    {
+      "id": "apply_mode_preserves_lifecycle_gates",
+      "requirement": "Apply-capable tools preserve preview-first behavior, approval checks, capability checks, dirty-state blocks, stale-approval blocks, and post-write verification results.",
+      "packageable_required": true,
+      "evidence_refs": ["wrappers/mcp/test.js", "fixtures/adapters/"],
+      "validation_refs": ["node wrappers/mcp/test.js", "python3 scripts/check_lifecycle_write_conformance.py"]
+    },
+    {
+      "id": "wrapper_regression_coverage_complete",
+      "requirement": "Wrapper tests cover metadata, read-only delegation, stateful adapter-backed delegation, preview/apply lifecycle behavior, command failures, unknown tools, and local-only fragments.",
+      "packageable_required": true,
+      "evidence_refs": ["wrappers/mcp/test.js"],
+      "validation_refs": ["node wrappers/mcp/test.js"]
+    },
+    {
+      "id": "release_gates_include_mcp_promotion",
+      "requirement": "Release gates include MCP wrapper regression and promotion-gate validation alongside CLI, schema, lifecycle, command-adapter, and OpenClaw wrapper checks.",
+      "packageable_required": true,
+      "evidence_refs": ["manifests/release-compatibility.v0.1.0.json"],
+      "validation_refs": ["scripts/check_initial_operation_schemas.py"]
+    },
+    {
+      "id": "handoff_metadata_lists_wrapper_promotion",
+      "requirement": "Distribution handoff metadata lists the wrapper promotion gate manifest without moving Portage-owned package, doctor, install, rollback, or release mechanics into Buffet.",
+      "packageable_required": true,
+      "evidence_refs": ["manifests/distribution-handoff.v0.1.0.json", "manifests/mcp-wrapper-promotion-gates.v0.1.0.json"],
+      "validation_refs": ["scripts/check_initial_operation_schemas.py"]
+    },
+    {
+      "id": "local_adapter_config_remains_local_only",
+      "requirement": "Local deployments can use explicit adapter config or LOBSTER_BUFFET_ADAPTER_CONFIG without embedding private adapter data in shared metadata.",
+      "packageable_required": true,
+      "evidence_refs": ["wrappers/mcp/mcp.wrapper.json", "wrappers/mcp/test.js"],
+      "validation_refs": ["node wrappers/mcp/test.js", "scripts/check_initial_operation_schemas.py"]
+    }
+  ]
+}
