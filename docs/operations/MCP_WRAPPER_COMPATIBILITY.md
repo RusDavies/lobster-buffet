@@ -116,6 +116,45 @@ Before an MCP wrapper is treated as packageable, it should have:
 These gates should complement, not replace, existing CLI, schema, lifecycle,
 and OpenClaw wrapper regression checks.
 
+## Promotion Criteria
+
+The MCP wrapper remains `skeleton` until all packageable-wrapper criteria below
+are true in the same release candidate:
+
+1. `wrappers/mcp/mcp.wrapper.json` declares `status: packageable` and names the
+   exact provider API, local adapter API, entrypoint, delegated CLI command, and
+   supported tool list.
+2. `wrappers/mcp/package.json` has package metadata suitable for downstream
+   packaging: stable name, version, description, entrypoint, test command, and
+   no private local paths or runtime-only configuration.
+3. The wrapper exposes every operation marked as supported in
+   `mcp.wrapper.json`, and each supported tool delegates to the CLI core rather
+   than reimplementing operation behavior.
+4. Tool input schemas are either generated from operation schemas or reviewed
+   against those schemas with drift called out in this document.
+5. Structured MCP results preserve the CLI JSON payload, including errors,
+   warnings, side effects, approval metadata, and mutation flags.
+6. Apply-capable tools preserve preview-first behavior, approval checks,
+   adapter capability checks, dirty-state blocks, stale-approval blocks, and
+   post-write verification results.
+7. Wrapper tests cover metadata, read-only delegation, stateful adapter-backed
+   delegation, preview/apply lifecycle behavior, command failure propagation,
+   unknown-tool errors, and local-only boundary fragments.
+8. Release gates include `wrappers/mcp` regression checks alongside CLI,
+   schema, lifecycle, command-adapter, and OpenClaw wrapper checks.
+9. Distribution handoff metadata lists the wrapper as packageable and identifies
+   any downstream packaging notes without moving Portage-owned package, doctor,
+   install, rollback, or release mechanics into Buffet.
+10. Local deployments can point the wrapper at an explicit adapter config or the
+    `LOBSTER_BUFFET_ADAPTER_CONFIG` fallback without embedding private adapter
+    data in shared metadata.
+
+A release candidate that satisfies the test coverage but lacks package metadata
+or handoff metadata should be treated as `validated_skeleton`, not packageable.
+A release candidate that adds an SDK-specific MCP transport can be packageable
+only if the transport layer stays thin and delegates to the same wrapper/core
+path validated by `wrappers/mcp/test.js`.
+
 ## Current Skeleton
 
 The current skeleton lives in `wrappers/mcp/`. It is SDK-neutral and exposes:
