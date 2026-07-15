@@ -73,6 +73,11 @@
       "role": "Dependency-free validation of schemas, manifests, fixtures, and references."
     },
     {
+      "path": "scripts/check_mcp_wrapper_packageability.py",
+      "kind": "script",
+      "role": "Validate MCP wrapper promotion status against packageability gates."
+    },
+    {
       "path": "scripts/check_lifecycle_write_conformance.py",
       "kind": "script",
       "role": "Validate lifecycle write adapter fixtures against apply-mode approval, receipt, and privacy expectations."
@@ -184,6 +189,10 @@
     {
       "path": "scripts/check_initial_operation_schemas.py",
       "purpose": "Validate the current public/packageable contract set."
+    },
+    {
+      "path": "scripts/check_mcp_wrapper_packageability.py",
+      "purpose": "Validate MCP wrapper skeleton, validated_skeleton, and packageable status transitions."
     },
     {
       "path": "wrappers/openclaw/openclaw.plugin.json",

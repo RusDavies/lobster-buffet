@@ -118,7 +118,11 @@ These gates should complement, not replace, existing CLI, schema, lifecycle,
 and OpenClaw wrapper regression checks.
 The machine-readable gate list lives in
 `manifests/mcp-wrapper-promotion-gates.v0.1.0.json` and is validated by
-`scripts/check_initial_operation_schemas.py`.
+`scripts/check_initial_operation_schemas.py`. Promotion status is also checked
+by `scripts/check_mcp_wrapper_packageability.py`, which compares the declared
+status in `wrappers/mcp/mcp.wrapper.json` and the promotion-gate manifest
+against package metadata, handoff metadata, release gates, CLI delegation, and
+local-only boundary expectations.
 
 ## Promotion Criteria
 
@@ -158,6 +162,12 @@ or handoff metadata should be treated as `validated_skeleton`, not packageable.
 A release candidate that adds an SDK-specific MCP transport can be packageable
 only if the transport layer stays thin and delegates to the same wrapper/core
 path validated by `wrappers/mcp/test.js`.
+
+Changing `current_status` or `wrappers/mcp/mcp.wrapper.json` status from
+`skeleton` to `validated_skeleton` or `packageable` is a validation-controlled
+transition. The packageability check must pass in the same change, and
+`packageable` status additionally requires the wrapper and promotion gates to
+remain listed as packageable handoff artifacts.
 
 ## Current Skeleton
 

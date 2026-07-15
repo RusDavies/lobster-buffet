@@ -8,6 +8,7 @@ schema slice so the repository does not need a validator dependency yet.
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -207,6 +208,7 @@ ADAPTER_CAPABILITIES = ROOT / "manifests/local-adapter-capabilities.v0.1.0.json"
 DISTRIBUTION_HANDOFF = ROOT / "manifests/distribution-handoff.v0.1.0.json"
 RELEASE_COMPATIBILITY = ROOT / "manifests/release-compatibility.v0.1.0.json"
 MCP_WRAPPER_PROMOTION_GATES = ROOT / "manifests/mcp-wrapper-promotion-gates.v0.1.0.json"
+MCP_WRAPPER_PACKAGEABILITY_CHECK = ROOT / "scripts/check_mcp_wrapper_packageability.py"
 ADAPTER_FIXTURE = ROOT / "fixtures/adapters/synthetic-project-inspect-adapter.v0.1.0.json"
 ADAPTER_CONFIG = ROOT / "fixtures/adapters/synthetic-local-adapter-config.v0.1.0.json"
 COMMAND_ADAPTER_CONFIG = ROOT / "fixtures/adapters/synthetic-command-adapter-config.v0.1.0.json"
@@ -378,6 +380,21 @@ def main() -> int:
                 all_errors.append(f"MCP wrapper promotion gate {gate['id']}: missing evidence ref {ref}")
     if "mcp_wrapper_promotion_gate_validation_passes" not in release_compatibility["release_gates"]:
         all_errors.append("release compatibility gates must include MCP wrapper promotion gate validation")
+
+    packageability_check = subprocess.run(
+        ["python3", str(MCP_WRAPPER_PACKAGEABILITY_CHECK)],
+        cwd=ROOT,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    if packageability_check.returncode != 0:
+        all_errors.append("MCP wrapper packageability validation failed")
+        if packageability_check.stdout:
+            all_errors.extend(f"  {line}" for line in packageability_check.stdout.splitlines())
+        if packageability_check.stderr:
+            all_errors.extend(f"  {line}" for line in packageability_check.stderr.splitlines())
 
     required_fixture_capabilities = {
         "project.resolve",

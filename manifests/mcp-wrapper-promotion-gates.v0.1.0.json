@@ -13,14 +13,14 @@
       "requirement": "Wrapper metadata declares packageable status, provider API, local adapter API, entrypoint, delegated CLI command, and supported tools.",
       "packageable_required": true,
       "evidence_refs": ["wrappers/mcp/mcp.wrapper.json"],
-      "validation_refs": ["scripts/check_initial_operation_schemas.py"]
+      "validation_refs": ["scripts/check_initial_operation_schemas.py", "scripts/check_mcp_wrapper_packageability.py"]
     },
     {
       "id": "package_metadata_is_portable",
       "requirement": "Package metadata has a stable name, version, description, entrypoint, test command, and no private local paths.",
       "packageable_required": true,
       "evidence_refs": ["wrappers/mcp/package.json"],
-      "validation_refs": ["scripts/check_initial_operation_schemas.py"]
+      "validation_refs": ["scripts/check_initial_operation_schemas.py", "scripts/check_mcp_wrapper_packageability.py"]
     },
     {
       "id": "supported_tools_delegate_to_cli_core",
@@ -34,7 +34,7 @@
       "requirement": "Tool input schemas are generated from operation schemas or reviewed against them with any drift documented.",
       "packageable_required": true,
       "evidence_refs": ["schemas/operations/", "docs/operations/MCP_WRAPPER_COMPATIBILITY.md"],
-      "validation_refs": ["scripts/check_initial_operation_schemas.py"]
+      "validation_refs": ["scripts/check_initial_operation_schemas.py", "scripts/check_mcp_wrapper_packageability.py"]
     },
     {
       "id": "structured_results_preserve_cli_payloads",
@@ -62,7 +62,7 @@
       "requirement": "Release gates include MCP wrapper regression and promotion-gate validation alongside CLI, schema, lifecycle, command-adapter, and OpenClaw wrapper checks.",
       "packageable_required": true,
       "evidence_refs": ["manifests/release-compatibility.v0.1.0.json"],
-      "validation_refs": ["scripts/check_initial_operation_schemas.py"]
+      "validation_refs": ["scripts/check_initial_operation_schemas.py", "scripts/check_mcp_wrapper_packageability.py"]
     },
     {
       "id": "handoff_metadata_lists_wrapper_promotion",
@@ -76,7 +76,7 @@
       "requirement": "Local deployments can use explicit adapter config or LOBSTER_BUFFET_ADAPTER_CONFIG without embedding private adapter data in shared metadata.",
       "packageable_required": true,
       "evidence_refs": ["wrappers/mcp/mcp.wrapper.json", "wrappers/mcp/test.js"],
-      "validation_refs": ["node wrappers/mcp/test.js", "scripts/check_initial_operation_schemas.py"]
+      "validation_refs": ["node wrappers/mcp/test.js", "scripts/check_initial_operation_schemas.py", "scripts/check_mcp_wrapper_packageability.py"]
     }
   ]
 }
