@@ -14,6 +14,18 @@
       "delegates_to": ["python3", "-m", "lobster_buffet.cli", "command", "list"]
     },
     {
+      "name": "lobster_buffet_command_describe",
+      "operation": "command.describe",
+      "read_only": true,
+      "delegates_to": ["python3", "-m", "lobster_buffet.cli", "command", "describe"]
+    },
+    {
+      "name": "lobster_buffet_operation_plan",
+      "operation": "operation.plan",
+      "read_only": true,
+      "delegates_to": ["python3", "-m", "lobster_buffet.cli", "operation", "plan"]
+    },
+    {
       "name": "lobster_buffet_project_inspect",
       "operation": "project.inspect",
       "read_only": true,
@@ -30,6 +42,64 @@
       "adapter_config_supported": true,
       "adapter_fixture_supported": true,
       "delegates_to": ["python3", "-m", "lobster_buffet.cli", "project", "<action>", "--project-name", "<project_name>"]
+    },
+    {
+      "name": "lobster_buffet_git_workflow_guard",
+      "operation": "git.workflow.guard",
+      "read_only": true,
+      "adapter_config_supported": true,
+      "adapter_fixture_supported": true,
+      "delegates_to": ["python3", "-m", "lobster_buffet.cli", "git", "workflow-guard"]
+    },
+    {
+      "name": "lobster_buffet_incident_list",
+      "operation": "incident.list",
+      "read_only": true,
+      "adapter_config_supported": true,
+      "adapter_fixture_supported": true,
+      "delegates_to": ["python3", "-m", "lobster_buffet.cli", "incident", "list"]
+    },
+    {
+      "name": "lobster_buffet_alignment_scan",
+      "operation": "alignment.scan",
+      "read_only": true,
+      "adapter_config_supported": true,
+      "adapter_fixture_supported": true,
+      "delegates_to": ["python3", "-m", "lobster_buffet.cli", "alignment", "scan"]
+    },
+    {
+      "name": "lobster_buffet_review_list",
+      "operation": "review.list",
+      "read_only": true,
+      "adapter_config_supported": true,
+      "adapter_fixture_supported": true,
+      "delegates_to": ["python3", "-m", "lobster_buffet.cli", "review", "list"]
+    },
+    {
+      "name": "lobster_buffet_review_update",
+      "operation": "review.update",
+      "read_only": false,
+      "modes": ["plan", "apply"],
+      "apply_supported": true,
+      "adapter_config_supported": true,
+      "adapter_fixture_supported": true,
+      "delegates_to": ["python3", "-m", "lobster_buffet.cli", "review", "update"]
+    },
+    {
+      "name": "lobster_buffet_heartbeat_packet",
+      "operation": "heartbeat.packet",
+      "read_only": true,
+      "adapter_config_supported": true,
+      "adapter_fixture_supported": true,
+      "delegates_to": ["python3", "-m", "lobster_buffet.cli", "heartbeat", "packet"]
+    },
+    {
+      "name": "lobster_buffet_heartbeat_check",
+      "operation": "heartbeat.check",
+      "read_only": true,
+      "adapter_config_supported": true,
+      "adapter_fixture_supported": true,
+      "delegates_to": ["python3", "-m", "lobster_buffet.cli", "heartbeat", "check"]
     }
   ],
   "private_data": {
