@@ -35,6 +35,7 @@ python3 scripts/check_cli_core.py
 python3 scripts/check_mcp_wrapper_packageability.py
 python3 scripts/check_command_adapter_failure_conformance.py
 python3 scripts/check_lifecycle_write_conformance.py
+python3 scripts/check_local_project_adapter.py
 node wrappers/openclaw/test.js
 node wrappers/mcp/test.js
 ```

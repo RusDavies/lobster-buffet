@@ -35,6 +35,7 @@ jobs:
         run: |
           python3 scripts/check_command_adapter_failure_conformance.py
           python3 scripts/check_lifecycle_write_conformance.py
+          python3 scripts/check_local_project_adapter.py
 
       - name: Test wrappers
         run: |

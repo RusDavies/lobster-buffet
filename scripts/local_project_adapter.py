@@ -105,13 +105,14 @@ def git_status(root: Path) -> dict[str, Any]:
     changed = 0
     untracked = 0
     for line in status_lines:
-        if line.startswith("## ") and "[" in line:
-            marker = line.split("[", 1)[1].split("]", 1)[0]
-            for part in marker.split(", "):
-                if part.startswith("ahead "):
-                    ahead = int(part.removeprefix("ahead "))
-                if part.startswith("behind "):
-                    behind = int(part.removeprefix("behind "))
+        if line.startswith("## "):
+            if "[" in line:
+                marker = line.split("[", 1)[1].split("]", 1)[0]
+                for part in marker.split(", "):
+                    if part.startswith("ahead "):
+                        ahead = int(part.removeprefix("ahead "))
+                    if part.startswith("behind "):
+                        behind = int(part.removeprefix("behind "))
             continue
         if line.startswith("??"):
             untracked += 1
