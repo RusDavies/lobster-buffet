@@ -98,6 +98,16 @@
       "role": "Synthetic command-backed local adapter used to validate failure-path conformance."
     },
     {
+      "path": "scripts/local_project_adapter.py",
+      "kind": "script",
+      "role": "Executable local command adapter for redacted project.inspect capabilities."
+    },
+    {
+      "path": "fixtures/adapters/local-project-command-adapter-config.v0.1.0.json",
+      "kind": "fixture",
+      "role": "Example command adapter config without private local project root data."
+    },
+    {
       "path": "wrappers/openclaw/",
       "kind": "wrapper",
       "role": "OpenClaw dynamic tool wrapper that delegates to the CLI core."
@@ -193,6 +203,14 @@
     {
       "path": "scripts/check_mcp_wrapper_packageability.py",
       "purpose": "Validate MCP wrapper skeleton, validated_skeleton, and packageable status transitions."
+    },
+    {
+      "path": "scripts/local_project_adapter.py",
+      "purpose": "Inspect the first executable local adapter slice without exposing local config."
+    },
+    {
+      "path": "fixtures/adapters/local-project-command-adapter-config.v0.1.0.json",
+      "purpose": "Discover the shared command config for the first local project adapter slice."
     },
     {
       "path": "wrappers/openclaw/openclaw.plugin.json",

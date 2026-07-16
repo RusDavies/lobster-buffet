@@ -81,6 +81,10 @@ CHECKS = [
         ROOT / "fixtures/adapters/synthetic-command-lifecycle-apply-config.v0.1.0.json",
     ),
     (
+        ROOT / "schemas/local-adapter-config.v0.1.0.json",
+        ROOT / "fixtures/adapters/local-project-command-adapter-config.v0.1.0.json",
+    ),
+    (
         ROOT / "schemas/local-adapter-invocation.v0.1.0.json",
         ROOT / "fixtures/adapters/local-adapter-invocation.valid.json",
     ),
@@ -222,6 +226,7 @@ COMMAND_ADAPTER_CONFIGS = [
     ROOT / "fixtures/adapters/synthetic-command-missing-capability-config.v0.1.0.json",
     ROOT / "fixtures/adapters/synthetic-command-nonzero-exit-config.v0.1.0.json",
     ROOT / "fixtures/adapters/synthetic-command-timeout-config.v0.1.0.json",
+    ROOT / "fixtures/adapters/local-project-command-adapter-config.v0.1.0.json",
 ]
 LIFECYCLE_APPLY_APPROVED_FIXTURE = ROOT / "fixtures/adapters/synthetic-lifecycle-apply-approved.v0.1.0.json"
 
@@ -426,12 +431,12 @@ def main() -> int:
 
     for command_config in command_adapter_configs:
         command = command_config["backend"]["command"]
-        command_script = ROOT / command[1]
-        command_fixture = ROOT / command[2]
-        if not command_script.exists():
-            all_errors.append(f"command adapter config references missing script {command[1]}")
-        if not command_fixture.exists():
-            all_errors.append(f"command adapter config references missing fixture {command[2]}")
+        for item in command[1:]:
+            if item.startswith("-"):
+                continue
+            path = ROOT / item
+            if ("/" in item or item.endswith((".py", ".json"))) and not path.exists():
+                all_errors.append(f"command adapter config references missing path {item}")
 
     apply_capabilities = {
         item["name"]: item["envelope"]["result"] for item in lifecycle_apply_approved_fixture["capabilities"]
