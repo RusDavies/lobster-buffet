@@ -223,6 +223,7 @@ The adapter loader supports two backend kinds:
 - `fixtures/adapters/synthetic-command-missing-capability-config.v0.1.0.json`
 - `fixtures/adapters/synthetic-command-nonzero-exit-config.v0.1.0.json`
 - `fixtures/adapters/synthetic-command-timeout-config.v0.1.0.json`
+- `fixtures/adapters/local-project-command-adapter-config.v0.1.0.json`
 
 The CLI accepts:
 
@@ -282,3 +283,39 @@ Shared example adapter config must not contain private workspace paths, channel
 IDs, secrets, tokens, or remote credentials. Real local deployments may point at
 local-only config files, but shared operation outputs must still obey the
 capability disclosure policies.
+
+## First Local Command Adapter Slice
+
+The first real executable local adapter slice is:
+
+```bash
+scripts/local_project_adapter.py
+```
+
+It supports the read-only project inspection capabilities:
+
+- `project.resolve`
+- `filesystem.read_project_metadata`
+- `git.inspect_status`
+
+The checked-in adapter config:
+
+```bash
+fixtures/adapters/local-project-command-adapter-config.v0.1.0.json
+```
+
+contains only the command path and timeout. It does not contain a local project
+root, channel id, remote URL, secret, or host-specific path. Runtime deployments
+provide the project root through `LOBSTER_BUFFET_LOCAL_PROJECT_ROOT` or through
+a local-only adapter config outside shared artifacts.
+
+Example:
+
+```bash
+LOBSTER_BUFFET_LOCAL_PROJECT_ROOT=/path/to/local/project \
+  python3 -m lobster_buffet.cli project inspect \
+  --adapter-config fixtures/adapters/local-project-command-adapter-config.v0.1.0.json
+```
+
+The adapter returns opaque refs and redacted summaries only. It reports the git
+remote as an adapter-local label such as `origin`, not as a remote URL.

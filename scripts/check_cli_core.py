@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -38,6 +39,18 @@ COMMANDS = [
             "inspect",
             "--adapter-config",
             "fixtures/adapters/synthetic-command-adapter-config.v0.1.0.json",
+        ],
+        ROOT / "schemas/operations/project.inspect.output.v0.1.0.json",
+    ),
+    (
+        [
+            "python3",
+            "-m",
+            "lobster_buffet.cli",
+            "project",
+            "inspect",
+            "--adapter-config",
+            "fixtures/adapters/local-project-command-adapter-config.v0.1.0.json",
         ],
         ROOT / "schemas/operations/project.inspect.output.v0.1.0.json",
     ),
@@ -190,6 +203,10 @@ def run_json(command: list[str]) -> Any:
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        env={
+            **os.environ,
+            "LOBSTER_BUFFET_LOCAL_PROJECT_ROOT": str(ROOT),
+        },
     )
     return json.loads(completed.stdout)
 
