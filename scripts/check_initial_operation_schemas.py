@@ -461,7 +461,7 @@ def main() -> int:
         all_errors.append("synthetic lifecycle apply approved fixture has invalid embedded receipts")
         all_errors.extend(f"  {error}" for error in embedded_receipt_errors)
 
-    forbidden_fragments = ("channel:", "0000000000000000000", "/home/", "github.com/RusDavies")
+    forbidden_fragments = ("channel:", "999999999999999999", "/home/", "github.com/RusDavies")
     fixture_text = (
         ADAPTER_FIXTURE.read_text(encoding="utf-8")
         + ADAPTER_CONFIG.read_text(encoding="utf-8")

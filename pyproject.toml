@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lobster-buffet"
+version = "0.1.0"
+description = "Portable OpenClaw process-provider operations."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+  { name = "Russell Davies" }
+]
+keywords = ["openclaw", "automation", "provider", "workflow"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only"
+]
+
+[project.scripts]
+lobster-buffet = "lobster_buffet.cli:main"
+
+[tool.setuptools]
+packages = ["lobster_buffet"]

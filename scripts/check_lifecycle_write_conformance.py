@@ -118,7 +118,7 @@ def validate_fixture(path: Path, expect_status: str, expect_mutates: bool) -> li
         errors.append(f"{path}: expected mutates {expect_mutates!r}, got {result.get('mutates')!r}")
 
     serialized = json.dumps({"fixture": fixture, "result": result}, sort_keys=True)
-    for fragment in ("channel:", "0000000000000000000", "/home/", "github.com/RusDavies"):
+    for fragment in ("channel:", "999999999999999999", "/home/", "github.com/RusDavies"):
         if fragment in serialized:
             errors.append(f"{path}: contains forbidden private/local fragment {fragment!r}")
 
@@ -155,7 +155,7 @@ def validate_config(path: Path, expect_status: str, expect_mutates: bool) -> lis
         errors.append(f"{path}: expected mutates {expect_mutates!r}, got {result.get('mutates')!r}")
 
     serialized = json.dumps({"config": config, "result": result}, sort_keys=True)
-    for fragment in ("channel:", "0000000000000000000", "/home/", "github.com/RusDavies"):
+    for fragment in ("channel:", "999999999999999999", "/home/", "github.com/RusDavies"):
         if fragment in serialized:
             errors.append(f"{path}: contains forbidden private/local fragment {fragment!r}")
 

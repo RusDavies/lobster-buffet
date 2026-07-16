@@ -388,7 +388,7 @@ def main() -> int:
         },
         sort_keys=True,
     )
-    for fragment in ("channel:", "0000000000000000000", "/home/", "github.com/RusDavies"):
+    for fragment in ("channel:", "999999999999999999", "/home/", "github.com/RusDavies"):
         if fragment in output_text:
             errors.append(f"project.inspect output contains forbidden private/local fragment {fragment!r}")
 

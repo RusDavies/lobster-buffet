@@ -320,7 +320,7 @@ const serialized = JSON.stringify({
   serverTools,
   unknown,
 });
-for (const fragment of ["channel:", "0000000000000000000", "/home/", "github.com/RusDavies"]) {
+for (const fragment of ["channel:", "999999999999999999", "/home/", "github.com/RusDavies"]) {
   if (serialized.includes(fragment)) {
     throw new Error(`MCP wrapper output contains forbidden private/local fragment ${fragment}`);
   }
