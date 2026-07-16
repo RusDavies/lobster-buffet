@@ -1,5 +1,7 @@
 # Lobster Buffet
 
+[![CI](https://github.com/RusDavies/lobster-buffet/actions/workflows/ci.yml/badge.svg)](https://github.com/RusDavies/lobster-buffet/actions/workflows/ci.yml)
+
 Lobster Buffet is a pre-alpha provider layer for portable OpenClaw process
 operations. It turns project lifecycle checks, incident/status summaries,
 review state, intent alignment, and related workflow operations into
